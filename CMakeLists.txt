@@ -15,9 +15,9 @@ set(INCLUDE_DIRECTORIES src)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 
-
 add_subdirectory(src)
 
 if (TESTING)
+  include(cmake/gtest.cmake)
   add_subdirectory(tests)
 endif()
