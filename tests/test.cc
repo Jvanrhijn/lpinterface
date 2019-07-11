@@ -3,6 +3,7 @@
 #include "lpinterface.hpp"
 
 using ::testing::AtLeast;
+using namespace lpint;
 
 class MockLpSolver : public LinearProgramSolver {
   public:

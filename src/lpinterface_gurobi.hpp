@@ -3,6 +3,8 @@
 
 #include "lpinterface.hpp"
 
+namespace lpint {
+
 class GurobiSolver : public LinearProgramSolver {
 
   public:
@@ -11,9 +13,12 @@ class GurobiSolver : public LinearProgramSolver {
 
     ~GurobiSolver() override = default;
 
-    virtual LpError solve() override;
+    virtual LpError solve_primal() override;
+
+    virtual LpError solve_dual() override;
 
 };
 
+}
 
 #endif // LPINTERFACE_LPINTERFACE_GUROBI_H
