@@ -12,6 +12,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-promo -Wstrict-overflow=5 -Wswitc
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-unused")
 
 include_directories(src)
+include_directories(lib)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 

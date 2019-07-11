@@ -1,8 +1,8 @@
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-#include "mock_lpsolver.hpp"
 #include "mock_lp.hpp"
+#include "mock_lpsolver.hpp"
 
 using ::testing::AtLeast;
 using namespace lpint;
@@ -19,4 +19,3 @@ int main(int argc, char *argv[]) {
   testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }
-

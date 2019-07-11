@@ -7,6 +7,6 @@ class Column {};
 
 class Row {};
 
-}
+}  // namespace lpint
 
-#endif // LPINTERFACE_DATA_OBJECTS_H
+#endif  // LPINTERFACE_DATA_OBJECTS_H

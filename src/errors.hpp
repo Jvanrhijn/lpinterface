@@ -4,10 +4,9 @@
 namespace lpint {
 
 enum class LpError {
-    SolveSuccess,
+  SolveSuccess,
 };
 
 }
 
-
-#endif // LPINTERFACE_ERRORS_H
+#endif  // LPINTERFACE_ERRORS_H

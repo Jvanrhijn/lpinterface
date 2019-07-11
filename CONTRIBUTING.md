@@ -8,6 +8,8 @@ the Google style guide.
 
 ### Error handling
 
-Don't use exceptions, since most solver backends also don't. Instead, return error codes. Use
-enum classes to define error types, never plain enums.
+Don't use exceptions, since most solver backends also don't. To avoid making too much of a 
+C-like API, we will use [tl::expected](https://github.com/TartanLlama/expected) to return error
+values. tl::expected is essentially the same as std::experimental::expected, but with some
+functional extensions similar to Rust's Result<T, E>.
 
