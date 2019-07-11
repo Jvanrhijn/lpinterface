@@ -11,7 +11,7 @@ class GurobiSolver : public LinearProgramSolver {
 
     ~GurobiSolver() override = default;
 
-    virtual int solve() override;
+    virtual LpError solve() override;
 
 };
 
