@@ -9,9 +9,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wctor-dtor-privacy -Wdisabled-optimizat
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-promo -Wstrict-overflow=5 -Wswitch-default")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wundef -Werror -Wno-unused")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-unused")
 
-set(INCLUDE_DIRECTORIES src)
+include_directories(src)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 
@@ -19,5 +19,6 @@ add_subdirectory(src)
 
 if (TESTING)
   include(cmake/gtest.cmake)
+  include(cmake/gmock.cmake)
   add_subdirectory(tests)
 endif()

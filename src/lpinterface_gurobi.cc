@@ -1,3 +1,3 @@
-#include "lpinterface_gurobi.h"
+#include "lpinterface_gurobi.hpp"
 
-int GurobiSolver::solve() { return 0; }
+int GurobiSolver::solve() { return 0; }  

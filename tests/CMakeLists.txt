@@ -10,4 +10,4 @@ set(test_files
   test.cc)
 
 add_executable(${UNIT_TESTS} ${test_files})
-target_link_libraries(${UNIT_TESTS} PRIVATE gtest Threads::Threads)
+target_link_libraries(${UNIT_TESTS} PRIVATE gtest gmock Threads::Threads lpinterface)

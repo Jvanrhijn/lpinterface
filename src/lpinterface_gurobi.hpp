@@ -1,7 +1,7 @@
 #ifndef LPINTERFACE_LPINTERFACE_GUROBI_H
 #define LPINTERFACE_LPINTERFACE_GUROBI_H
 
-#include "lpinterface.h"
+#include "lpinterface.hpp"
 
 class GurobiSolver : public LinearProgramSolver {
 
@@ -9,7 +9,7 @@ class GurobiSolver : public LinearProgramSolver {
     // placeholder stuff for now
     GurobiSolver() = default;
 
-    ~GurobiSolver() = default;
+    ~GurobiSolver() override = default;
 
     virtual int solve() override;
 
