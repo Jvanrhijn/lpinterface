@@ -1,3 +1,6 @@
+#ifndef LPINTERFACE_LP_H
+#define LPINTERFACE_LP_H
+
 #include <vector>
 
 #include "errors.hpp"
@@ -16,3 +19,5 @@ class LinearProgram {
 };
 
 }
+
+#endif // LPINTERFACE_LP_H

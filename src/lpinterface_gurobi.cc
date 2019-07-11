@@ -2,6 +2,6 @@
 
 namespace lpint {
 
-LpError GurobiSolver::solve() { return LpError::SolveSuccess; }  
+LpError GurobiSolver::solve_primal() { return LpError::SolveSuccess; }  
 
 }

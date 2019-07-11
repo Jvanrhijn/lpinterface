@@ -1,22 +1,17 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include "lpinterface.hpp"
+
+#include "mock_lpsolver.hpp"
+#include "mock_lp.hpp"
 
 using ::testing::AtLeast;
 using namespace lpint;
 
-class MockLpSolver : public LinearProgramSolver {
-  public:
-    MOCK_METHOD0(solve, LpError());
-    MOCK_METHOD0(add_rows, LpError());
-    MOCK_METHOD1(add_columns, LpError(const std::vector<Column>&));
-};
-
-TEST(MockingTest, Solve) {
+TEST(MockingTest, GetSolution) {
   MockLpSolver lp;
-  EXPECT_CALL(lp, solve()).Times(AtLeast(1));
+  EXPECT_CALL(lp, get_solution()).Times(AtLeast(1));
 
-  lp.solve();
+  lp.get_solution();
 }
 
 int main(int argc, char *argv[]) {
