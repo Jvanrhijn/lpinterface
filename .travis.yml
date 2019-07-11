@@ -23,6 +23,7 @@ addons:
       - binutils-dev
       - libiberty-dev
       - cmake
+      - libc++-dev
 
 script:
   - mkdir build && cd build
