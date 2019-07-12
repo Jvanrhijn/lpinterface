@@ -3,7 +3,7 @@
 
 #include "lpinterface.hpp"
 
-#include "expected.hpp"
+#include "common.hpp"
 
 namespace lpint {
 
@@ -14,9 +14,9 @@ class GurobiSolver : public LinearProgramSolver {
 
   ~GurobiSolver() override = default;
 
-  virtual tl::expected<void, LpError> solve_primal() override;
+  virtual expected<void, LpError> solve_primal() override;
 
-  virtual tl::expected<void, LpError> solve_dual() override;
+  virtual expected<void, LpError> solve_dual() override;
 };
 
 }  // namespace lpint

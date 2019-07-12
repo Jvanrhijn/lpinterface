@@ -17,6 +17,7 @@ endif()
 
 include_directories(src)
 include_directories(lib)
+include_directories(include)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 

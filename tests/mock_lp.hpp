@@ -4,8 +4,8 @@
 #include "data_objects.hpp"
 #include "errors.hpp"
 #include "lp.hpp"
+#include "common.hpp"
 
-#include "expected.hpp"
 #include "gmock/gmock.h"
 
 #include <vector>
@@ -15,8 +15,8 @@ namespace lpint {
 class MockLinearProgram : public LinearProgram {
  public:
   MOCK_METHOD1(add_columns,
-               tl::expected<void, LpError>(const std::vector<Column>&));
-  MOCK_METHOD1(add_rows, tl::expected<void, LpError>(const std::vector<Row>&));
+               expected<void, LpError>(const std::vector<Column>&));
+  MOCK_METHOD1(add_rows, expected<void, LpError>(const std::vector<Row>&));
 };
 
 }  // namespace lpint

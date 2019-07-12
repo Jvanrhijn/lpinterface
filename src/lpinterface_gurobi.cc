@@ -2,8 +2,8 @@
 
 namespace lpint {
 
-tl::expected<void, LpError> GurobiSolver::solve_primal() {
-  return tl::unexpected<LpError>(LpError::SolveSuccess);
+expected<void, LpError> GurobiSolver::solve_primal() {
+  return unexpected<LpError>(LpError::SolveSuccess);
 }
 
 }  // namespace lpint

@@ -7,7 +7,7 @@
 #include "errors.hpp"
 #include "lp.hpp"
 
-#include "expected.hpp"
+#include "common.hpp"
 
 namespace lpint {
 
@@ -31,13 +31,13 @@ class LinearProgramSolver {
    * @brief Solve the primal linear program
    *
    */
-  virtual tl::expected<void, LpError> solve_primal() = 0;
+  virtual expected<void, LpError> solve_primal() = 0;
 
   /**
    * @brief Solve the dual linear program
    *
    */
-  virtual tl::expected<void, LpError> solve_dual() = 0;
+  virtual expected<void, LpError> solve_dual() = 0;
 
   /**
    * @brief Get the solution of the linear program
