@@ -43,7 +43,7 @@ class LinearProgramSolver {
    * @brief Get the solution of the linear program
    *
    */
-  virtual std::vector<double> get_solution() = 0;
+  virtual expected<std::vector<double>, LpError> get_solution() const = 0;
 };
 
 }  // namespace lpint

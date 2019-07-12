@@ -1,10 +1,10 @@
 #ifndef LPINTERFACE_TESTS_MOCK_LP_H
 #define LPINTERFACE_TESTS_MOCK_LP_H
 
+#include "common.hpp"
 #include "data_objects.hpp"
 #include "errors.hpp"
 #include "lp.hpp"
-#include "common.hpp"
 
 #include "gmock/gmock.h"
 
