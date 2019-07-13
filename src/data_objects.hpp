@@ -11,7 +11,7 @@ class Column {
   std::vector<size_t> nonzero_indices_;
   std::vector<double> lower_bounds_;
   std::vector<double> upper_bounds_;
-  size_t nnz_;  // number of nonzero entries to be added to constraint matrix
+  std::size_t nnz_;  // number of nonzero entries to be added to constraint matrix
 };
 
 class Row {};
