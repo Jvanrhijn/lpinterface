@@ -29,7 +29,7 @@ class MatrixEntry {
 
   virtual ~MatrixEntry() = default;
 
-  T operator[](std::size_t index) {
+  T operator[](const std::size_t index) const {
     auto index_in_data =
         std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
     if (index_in_data == nonzero_indices_.end()) {
@@ -84,6 +84,7 @@ class SparseMatrix {
       for (const auto& entry : columns) {
         entries_.emplace_back(entry);
       }
+      return expected<void, LpError>();
     }
   }
 
@@ -94,14 +95,15 @@ class SparseMatrix {
       for (const auto& entry : rows) {
         entries_.emplace_back(entry);
       }
+      return expected<void, LpError>();
     }
   }
 
-  T operator()(std::size_t i, std::size_t j) const {
-    if (type_ = SparseMatrixType::ColumnWise) {
-      return entries_[i][j];
-    } else {
+  T operator()(const std::size_t i, const std::size_t j) const {
+    if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
+    } else {
+      return entries_[i][j];
     }
   }
 
