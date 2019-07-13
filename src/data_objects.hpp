@@ -2,6 +2,7 @@
 #define LPINTERFACE_DATA_OBJECTS_H
 
 #include <vector>
+#include <cstddef>
 
 namespace lpint {
 
