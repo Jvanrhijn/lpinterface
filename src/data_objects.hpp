@@ -1,13 +1,13 @@
 #ifndef LPINTERFACE_DATA_OBJECTS_H
 #define LPINTERFACE_DATA_OBJECTS_H
 
+#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include <vector>
-#include <algorithm>
 
-#include "errors.hpp"
 #include "common.hpp"
+#include "errors.hpp"
 
 namespace lpint {
 
@@ -23,14 +23,15 @@ template <typename T,
               typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 class MatrixEntry {
  public:
-  MatrixEntry(const std::vector<T>& values, const std::vector<std::size_t>& indices) 
-    : values_(values), nonzero_indices_(indices) 
-  {}
+  MatrixEntry(const std::vector<T>& values,
+              const std::vector<std::size_t>& indices)
+      : values_(values), nonzero_indices_(indices) {}
 
   virtual ~MatrixEntry() = default;
 
   T operator[](std::size_t index) {
-    auto index_in_data = std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
+    auto index_in_data =
+        std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
     if (index_in_data == nonzero_indices_.end()) {
       return T();
     } else {
@@ -39,8 +40,12 @@ class MatrixEntry {
     }
   }
 
-  T lower_bound() const { return std::min_element(values_.begin(), values_.end()); }
-  T upper_bound() const { return std::max_element(values_.begin(), values_.end()); }
+  T lower_bound() const {
+    return std::min_element(values_.begin(), values_.end());
+  }
+  T upper_bound() const {
+    return std::max_element(values_.begin(), values_.end());
+  }
   std::size_t num_nonzero() const { return values_.size(); }
 
  private:
@@ -52,17 +57,16 @@ template <typename T>
 class Column : public MatrixEntry<T> {
  public:
   Column(const std::vector<T>& values, const std::vector<std::size_t>& indices)
-    : MatrixEntry<T>(values, indices) {}
+      : MatrixEntry<T>(values, indices) {}
   Column(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
   Column() = default;
-
 };
 
 template <typename T>
 class Row : public MatrixEntry<T> {
  public:
   Row(const std::vector<T>& values, const std::vector<std::size_t>& indices)
-    : MatrixEntry<T>(values, indices) {}
+      : MatrixEntry<T>(values, indices) {}
 
   Row(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
   Row() = default;
@@ -77,7 +81,7 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::ColumnWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
-      for (const auto& entry: columns) {
+      for (const auto& entry : columns) {
         entries_.emplace_back(entry);
       }
     }
@@ -87,7 +91,7 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::RowWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
-      for (const auto& entry: rows) {
+      for (const auto& entry : rows) {
         entries_.emplace_back(entry);
       }
     }
@@ -105,7 +109,7 @@ class SparseMatrix {
 
  private:
   SparseMatrixType type_;
-  std::vector<std::size_t> begin_indices_;  // e
+  std::vector<std::size_t> begin_indices_; 
   std::vector<MatrixEntry<T>> entries_;
 };
 
