@@ -19,13 +19,14 @@ class LinearProgram {
    *
    */
   virtual expected<void, LpError> add_columns(
-      const std::vector<Column>& columns) = 0;
+      const std::vector<Column<double>>& columns) = 0;
 
   /**
    * @brief Add rows to the LP
    *
    */
-  virtual expected<void, LpError> add_rows(const std::vector<Row>& rows) = 0;
+  virtual expected<void, LpError> add_rows(
+      const std::vector<Row<double>>& rows) = 0;
 
   /**
    * @brief Set the objective function to be used

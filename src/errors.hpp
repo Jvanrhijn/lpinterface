@@ -5,6 +5,7 @@ namespace lpint {
 
 enum class LpError {
   SolveSuccess,
+  MatrixTypeError,
 };
 
 }

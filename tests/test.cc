@@ -7,10 +7,11 @@
 using ::testing::AtLeast;
 using namespace lpint;
 
+#include "test_sparse_matrix.cc"
+
 TEST(MockingTest, GetSolution) {
   MockLpSolver lp;
   EXPECT_CALL(lp, get_solution()).Times(AtLeast(1));
-
   lp.get_solution();
 }
 

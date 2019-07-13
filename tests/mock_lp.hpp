@@ -15,8 +15,9 @@ namespace lpint {
 class MockLinearProgram : public LinearProgram {
  public:
   MOCK_METHOD1(add_columns,
-               expected<void, LpError>(const std::vector<Column>&));
-  MOCK_METHOD1(add_rows, expected<void, LpError>(const std::vector<Row>&));
+               expected<void, LpError>(const std::vector<Column<double>>&));
+  MOCK_METHOD1(add_rows,
+               expected<void, LpError>(const std::vector<Row<double>>&));
 };
 
 }  // namespace lpint
