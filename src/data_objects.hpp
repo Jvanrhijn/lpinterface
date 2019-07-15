@@ -18,6 +18,15 @@ enum class SparseMatrixType {
 
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
+/**
+ * @brief Matrix entry type, for use in sparse matrix.
+ * The matrix entry base class is specialized as Row and Column,
+ * for the two sparse matrix representations. The class
+ * thus represents a row or column vector with mostly zero
+ * entries. Its operator[] is overloaded to provide
+ * access as if it is a dense vector. Access using operator[]
+ * is O(n) in time, with n the number of nonzero entries.
+ */
 template <typename T>
 class MatrixEntry {
   static_assert(std::is_arithmetic<T>::value,
@@ -74,6 +83,13 @@ class Row : public MatrixEntry<T> {
   Row() = default;
 };
 
+/**
+ * @brief Represents a sparse matrix.
+ * This class represents either a row or column oriented
+ * sparse matrix. In order to access matrix elements, use 
+ * operator(), i.e. `double x = matrix(3, 5);`. Access
+ * is O(n) in time.
+ */
 template <typename T>
 class SparseMatrix {
  public:

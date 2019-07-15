@@ -73,7 +73,7 @@ LinearProgram& GurobiSolver::linear_program() { return *linear_program_; }
 
 // TODO: actually do something here
 expected<std::vector<double>, LpError> GurobiSolver::get_solution() const {
-  return expected<std::vector<double>, LpError>(std::vector<double>());
+  return unexpected<LpError>(LpError::ModelNotSolvedError);
 }
 
 }  // namespace lpint

@@ -7,7 +7,6 @@
 
 #include "lp.hpp"
 #include "lpinterface.hpp"
-
 #include "common.hpp"
 #include "data_objects.hpp"
 

@@ -3,6 +3,14 @@
 
 namespace lpint {
 
+/**
+ * @brief Enum class representing an error result.
+ * The linear program interface can return errors at many
+ * points, for various reasons. This enum represents the
+ * cause of such an error. Whenever an error occurs, it
+ * will be returned from the failing function inside of
+ * an expected<T, E>.
+ */
 enum class LpError {
   //! LP solution ran succesfully
   SolveSuccess,
