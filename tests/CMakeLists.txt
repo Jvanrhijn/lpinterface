@@ -24,3 +24,8 @@ add_custom_command(TARGET ${UNIT_TESTS} POST_BUILD
     COMMAND ${CMAKE_BINARY_DIR}/tests/${UNIT_TESTS}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Running tests")
+
+if (COVERAGE) 
+  target_compile_options(${UNIT_TESTS} PRIVATE --coverage -g)
+  target_link_libraries(${UNIT_TESTS} PRIVATE --coverage -g)
+endif()
