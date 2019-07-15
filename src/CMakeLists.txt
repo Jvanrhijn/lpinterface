@@ -18,7 +18,8 @@ find_package(GUROBI)
 if (GUROBI_FOUND)
     message(STATUS "Found Gurobi: TRUE")
     include_directories(${GUROBI_INCLUDE_DIRS})
-    set(lpinterface_files ${lpinterface_files} lpinterface_gurobi.cc)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gurobi)
+    set(lpinterface_files ${lpinterface_files} ${CMAKE_CURRENT_SOURCE_DIR}/gurobi/lpinterface_gurobi.cc)
 endif(GUROBI_FOUND)
 
 
