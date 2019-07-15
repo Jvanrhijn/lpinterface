@@ -17,10 +17,10 @@ find_package(GUROBI)
 
 if (GUROBI_FOUND)
     message(STATUS "Gurobi found")
-    #set(lpinterface_files ${lpinterface_files} lpinterface_gurobi.cc)
+    include_directories(${GUROBI_INCLUDE_DIRS})
+    set(lpinterface_files ${lpinterface_files} lpinterface_gurobi.cc)
 endif(GUROBI_FOUND)
 
-include_directories(${GUROBI_INCLUDE_DIRS})
 
 
 set(lpinterface_files lpinterface_gurobi.cc)
