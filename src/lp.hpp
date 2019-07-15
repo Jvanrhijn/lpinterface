@@ -10,6 +10,11 @@
 
 namespace lpint {
 
+enum class OptimizationType {
+    Minimize,
+    Maximize,
+};
+
 class LinearProgram {
  public:
   virtual ~LinearProgram() = default;
@@ -30,6 +35,8 @@ class LinearProgram {
 
   virtual expected<void, LpError> set_matrix(
       const SparseMatrix<double> matrix) = 0;
+
+  virtual OptimizationType optimization_type() const = 0;
 
   /**
    * @brief Set the objective function to be used

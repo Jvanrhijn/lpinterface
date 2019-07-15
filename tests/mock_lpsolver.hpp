@@ -18,6 +18,8 @@ class MockLpSolver : public LinearProgramSolver {
   MOCK_CONST_METHOD0(linear_program, const LinearProgram&());
   MOCK_METHOD0(linear_program, LinearProgram&());
   MOCK_CONST_METHOD0(get_solution, expected<std::vector<double>, LpError>());
+  MOCK_METHOD2(set_parameter, expected<void, LpError>(const Param, const int));
+  MOCK_METHOD2(set_parameter, expected<void, LpError>(const Param, const double));
 };
 
 }  // namespace lpint

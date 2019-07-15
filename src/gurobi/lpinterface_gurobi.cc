@@ -12,6 +12,9 @@ GurobiSolver::GurobiSolver(LinearProgram&& lp)
   GRBloadenv(&env, "");
   // allocate Gurobi model
   GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
+
+  // set optimization type
+  GRBsetintattr(gurobi_model_, "modelsense", linear_program_.optimization_type() == OptimizationType::Maximize? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
 
 GurobiSolver::~GurobiSolver() {
@@ -19,6 +22,15 @@ GurobiSolver::~GurobiSolver() {
   GRBfreemodel(gurobi_model_.get());
   GRBfreeenv(gurobi_env_.get());
 }
+
+expected<void, LpError> GurobiSolver::set_parameter(const Param param, const int value) {
+  return unexpected<LpError>(LpError::InvalidParameterError);
+}
+
+expected<void, LpError> GurobiSolver::set_parameter(const Param param, const double value) {
+  return unexpected<LpError>(LpError::InvalidParameterError);
+}
+
 
 // TODO: actually do something here
 expected<void, LpError> GurobiSolver::update_program() {

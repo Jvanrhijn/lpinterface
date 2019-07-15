@@ -6,6 +6,7 @@
 #include "data_objects.hpp"
 #include "errors.hpp"
 #include "lp.hpp"
+#include "parameter_type.hpp"
 
 #include "common.hpp"
 
@@ -26,6 +27,10 @@ class LinearProgramSolver {
    *
    */
   virtual LinearProgram& linear_program() = 0;
+
+   virtual expected<void, LpError> set_parameter(const Param param, const int value) = 0;
+
+   virtual expected<void, LpError> set_parameter(const Param param, const double value) = 0;
 
   virtual expected<void, LpError> update_program() = 0;
 

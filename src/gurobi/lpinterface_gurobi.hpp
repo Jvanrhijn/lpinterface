@@ -25,6 +25,10 @@ class GurobiSolver : public LinearProgramSolver {
   GurobiSolver operator=(const GurobiSolver&) = delete;
   GurobiSolver operator=(GurobiSolver&&) = delete;
 
+  virtual expected<void, LpError> set_parameter(const Param param, const int value);
+
+  virtual expected<void, LpError> set_parameter(const Param param, const double value);
+
   expected<void, LpError> update_program() override;
 
   expected<void, LpError> solve_primal() override;
