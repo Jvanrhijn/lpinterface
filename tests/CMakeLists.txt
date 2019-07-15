@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wctor-dtor-privacy -Wdisable
 set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast)
 set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion)
 set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wsign-promo -Wstrict-overflow=5 -Wswitch-default)
-set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wno-unused)
+set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wno-unused -Werror -Wsign-compare)
 
 find_package(Threads REQUIRED)
 
