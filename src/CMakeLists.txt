@@ -23,6 +23,5 @@ endif(GUROBI_FOUND)
 
 
 
-set(lpinterface_files lpinterface_gurobi.cc)
 add_library(${TARGET} STATIC ${lpinterface_files})
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})

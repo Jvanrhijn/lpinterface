@@ -18,10 +18,9 @@ enum class SparseMatrixType {
 
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
-template <typename T,
-          typename =
-              typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+template <typename T>
 class MatrixEntry {
+  static_assert(std::is_arithmetic<T>::value, "MatrixEntry<T> requires T to be arithmetic");
  public:
   MatrixEntry(const std::vector<T>& values,
               const std::vector<std::size_t>& indices)
