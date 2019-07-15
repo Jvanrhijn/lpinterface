@@ -19,9 +19,9 @@ enum class OptimizationType {
  * @brief Interface representing linear program formulation.
  * This interface represents linear programs of the form
  * \f[
-      *\{\min, \max\} c^T x, \\
-      *Ax \leq b,\\
-      *x \geq 0,
+      \{\min, \max\} c^T x, \\
+      Ax \leq b,\\
+      x \geq 0,
  * \f]
  * where \f$c \in \mathbb{R}^{n}\f$, \f$x \in \mathbb{R}^n\f$,
  * \f$b \in \mathbb{R}^{m}\f$, and \f$A \in \mathbb{R}^{m \times n}\f$.
