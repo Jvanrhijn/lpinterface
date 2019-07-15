@@ -11,8 +11,8 @@
 namespace lpint {
 
 enum class OptimizationType {
-    Minimize,
-    Maximize,
+  Minimize,
+  Maximize,
 };
 
 class LinearProgram {

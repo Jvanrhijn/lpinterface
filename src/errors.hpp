@@ -15,7 +15,7 @@ enum class LpError {
   //! Model has not yet been solved
   ModelNotSolvedError,
   //! Invalid parameter
-  InvalidParameterError,
+  UnsupportedParameterError,
 };
 
 }

@@ -20,7 +20,9 @@ enum class SparseMatrixType {
 // arithmetic types i.e. numbers
 template <typename T>
 class MatrixEntry {
-  static_assert(std::is_arithmetic<T>::value, "MatrixEntry<T> requires T to be arithmetic");
+  static_assert(std::is_arithmetic<T>::value,
+                "MatrixEntry<T> requires T to be arithmetic");
+
  public:
   MatrixEntry(const std::vector<T>& values,
               const std::vector<std::size_t>& indices)

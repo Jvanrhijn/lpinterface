@@ -8,8 +8,8 @@
 #include "lp.hpp"
 #include "lpinterface.hpp"
 
-#include "data_objects.hpp"
 #include "common.hpp"
+#include "data_objects.hpp"
 
 namespace lpint {
 
@@ -25,9 +25,11 @@ class GurobiSolver : public LinearProgramSolver {
   GurobiSolver operator=(const GurobiSolver&) = delete;
   GurobiSolver operator=(GurobiSolver&&) = delete;
 
-  virtual expected<void, LpError> set_parameter(const Param param, const int value);
+  virtual expected<void, LpError> set_parameter(const Param param,
+                                                const int value) override;
 
-  virtual expected<void, LpError> set_parameter(const Param param, const double value);
+  virtual expected<void, LpError> set_parameter(const Param param,
+                                                const double value) override;
 
   expected<void, LpError> update_program() override;
 
