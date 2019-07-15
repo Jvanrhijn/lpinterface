@@ -11,6 +11,18 @@ set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Woverloaded-virtual -Wredundant-
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wsign-promo -Wstrict-overflow=5 -Wswitch-default)
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused -Werror -Wreturn-type -Wunused-variable -Wno-sign-compare)
 
+set(lpinterface_files)
+
+find_package(GUROBI)
+
+if (GUROBI_FOUND)
+    message(STATUS "Gurobi found")
+    #set(lpinterface_files ${lpinterface_files} lpinterface_gurobi.cc)
+endif(GUROBI_FOUND)
+
+include_directories(${GUROBI_INCLUDE_DIRS})
+
+
 set(lpinterface_files lpinterface_gurobi.cc)
 add_library(${TARGET} STATIC ${lpinterface_files})
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
