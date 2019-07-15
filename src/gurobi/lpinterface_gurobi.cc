@@ -31,8 +31,10 @@ expected<void, LpError> GurobiSolver::set_parameter(const Param param,
   switch (param) {
     case Param::GrbOutputFlag:
       GRBsetintparam(GRBgetenv(gurobi_model_.get()), "outputflag", value);
+      break;
     case Param::GrbThreads:
       GRBsetintparam(GRBgetenv(gurobi_model_.get()), "threads", value);
+      break;
     default:
       return unexpected<LpError>(LpError::UnsupportedParameterError);
   }
@@ -44,6 +46,7 @@ expected<void, LpError> GurobiSolver::set_parameter(const Param param,
   switch (param) {
     case Param::GrbCutoff:
       GRBsetdblparam(GRBgetenv(gurobi_model_.get()), "Cutoff", value);
+      break;
     default:
       return unexpected<LpError>(LpError::UnsupportedParameterError);
   }

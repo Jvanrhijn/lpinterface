@@ -8,6 +8,9 @@ using ::testing::AtLeast;
 using namespace lpint;
 
 #include "test_sparse_matrix.cc"
+#if GUROBI_FOUND
+  #include "test_gurobi.cc"
+#endif
 
 TEST(MockingTest, GetSolution) {
   MockLpSolver lp;
