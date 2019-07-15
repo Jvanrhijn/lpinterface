@@ -25,15 +25,17 @@ class GurobiSolver : public LinearProgramSolver {
   GurobiSolver operator=(const GurobiSolver&) = delete;
   GurobiSolver operator=(GurobiSolver&&) = delete;
 
-  virtual expected<void, LpError> solve_primal() override;
+  expected<void, LpError> update_program() override;
 
-  virtual expected<void, LpError> solve_dual() override;
+  expected<void, LpError> solve_primal() override;
 
-  virtual const LinearProgram& linear_program() const override;
+  expected<void, LpError> solve_dual() override;
 
-  virtual LinearProgram& linear_program() override;
+  const LinearProgram& linear_program() const override;
 
-  virtual expected<std::vector<double>, LpError> get_solution() const override;
+  LinearProgram& linear_program() override;
+
+  expected<std::vector<double>, LpError> get_solution() const override;
 
  private:
   //! The linear program to solve

@@ -27,6 +27,8 @@ class LinearProgramSolver {
    */
   virtual LinearProgram& linear_program() = 0;
 
+  virtual expected<void, LpError> update_program() = 0;
+
   /**
    * @brief Solve the primal linear program
    *
