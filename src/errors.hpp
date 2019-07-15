@@ -12,6 +12,8 @@ enum class LpError {
   NotImplementedError,
   //! Feature not available in this solver backend
   FeatureNotAvailableError,
+  //! Model has not yet been solved
+  ModelNotSolvedError
 };
 
 }
