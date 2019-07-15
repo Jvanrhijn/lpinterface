@@ -28,6 +28,9 @@ class LinearProgram {
   virtual expected<void, LpError> add_rows(
       const std::vector<Row<double>>& rows) = 0;
 
+  virtual expected<void, LpError> set_matrix(
+      const SparseMatrix<double> matrix) = 0;
+
   /**
    * @brief Set the objective function to be used
    *

@@ -36,7 +36,7 @@ class MatrixEntry {
       return T();
     } else {
       // TODO replace with safe indexing in debug case
-      return values_[index_in_data - nonzero_indices_.begin()];
+      return values_[static_cast<std::size_t>(index_in_data - nonzero_indices_.begin())];
     }
   }
 
@@ -75,7 +75,7 @@ class Row : public MatrixEntry<T> {
 template <typename T>
 class SparseMatrix {
  public:
-  SparseMatrix(SparseMatrixType type) : type_(type) {}
+  SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
   expected<void, LpError> add_columns(const std::vector<Column<T>>& columns) {
     if (type_ != SparseMatrixType::ColumnWise) {
