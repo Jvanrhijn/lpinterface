@@ -19,3 +19,8 @@ set(test_files
 add_executable(${UNIT_TESTS} ${test_files})
 target_link_libraries(${UNIT_TESTS} PUBLIC lpinterface gtest gmock Threads::Threads rapidcheck)
 target_compile_options(${UNIT_TESTS} PRIVATE ${CMAKE_CXX_FLAGS_TESTS})
+
+add_custom_command(TARGET ${UNIT_TESTS} POST_BUILD 
+    COMMAND ${CMAKE_BINARY_DIR}/tests/${UNIT_TESTS}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running tests")
