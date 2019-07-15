@@ -16,8 +16,9 @@ std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
 }
 
 template <typename T, size_t N>
-std::vector<std::vector<T>> transpose(const std::array<std::array<T, N>, N> &v) {
-  std::size_t m = v.size(); // number of rows
+std::vector<std::vector<T>> transpose(
+    const std::array<std::array<T, N>, N>& v) {
+  std::size_t m = v.size();  // number of rows
   if (m == 0) {
     return std::vector<std::vector<T>>(0);
   }
@@ -48,8 +49,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
     rows.emplace_back(nonzeros, get_nonzero_indices(v));
   }
   sp.add_rows(rows);
-  for (std::size_t i =0; i < m; i++) {
-    for (std::size_t j =0; j < n; j++) {
+  for (std::size_t i = 0; i < m; i++) {
+    for (std::size_t j = 0; j < n; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }
@@ -75,8 +76,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
 
   sp.add_columns(cols);
 
-  for (std::size_t i =0; i < m; i++) {
-    for (std::size_t j =0; j < n; j++) {
+  for (std::size_t i = 0; i < m; i++) {
+    for (std::size_t j = 0; j < n; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }

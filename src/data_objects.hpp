@@ -36,7 +36,8 @@ class MatrixEntry {
       return T();
     } else {
       // TODO replace with safe indexing in debug case
-      return values_[static_cast<std::size_t>(index_in_data - nonzero_indices_.begin())];
+      return values_[static_cast<std::size_t>(index_in_data -
+                                              nonzero_indices_.begin())];
     }
   }
 
@@ -111,7 +112,7 @@ class SparseMatrix {
 
  private:
   SparseMatrixType type_;
-  std::vector<std::size_t> begin_indices_; 
+  std::vector<std::size_t> begin_indices_;
   std::vector<MatrixEntry<T>> entries_;
 };
 
