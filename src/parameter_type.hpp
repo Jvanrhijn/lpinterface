@@ -16,6 +16,6 @@ enum class Param {
   GrbCutoff,
 };
 
-}
+}  // namespace lpint
 
 #endif  // LPINTERFACE_PARAMETER_TYPE_H

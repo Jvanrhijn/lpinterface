@@ -2,7 +2,7 @@
 
 namespace lpint {
 
-GurobiSolver::GurobiSolver(LinearProgram&& lp) : linear_program_(&lp) {
+GurobiSolver::GurobiSolver(LinearProgramInterface&& lp) : linear_program_(&lp) {
   auto env = gurobi_env_.get();
   auto model = gurobi_model_.get();
 
@@ -68,11 +68,13 @@ expected<void, LpError> GurobiSolver::solve_dual() {
   return unexpected<LpError>(LpError::SolveSuccess);
 }
 
-const LinearProgram& GurobiSolver::linear_program() const {
+const LinearProgramInterface& GurobiSolver::linear_program() const {
   return *linear_program_;
 }
 
-LinearProgram& GurobiSolver::linear_program() { return *linear_program_; }
+LinearProgramInterface& GurobiSolver::linear_program() {
+  return *linear_program_;
+}
 
 // TODO: actually do something here
 expected<std::vector<double>, LpError> GurobiSolver::get_solution() const {

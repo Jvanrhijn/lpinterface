@@ -3,11 +3,11 @@
 
 #include <vector>
 
+#include "common.hpp"
 #include "data_objects.hpp"
 #include "errors.hpp"
 #include "lp.hpp"
 #include "parameter_type.hpp"
-#include "common.hpp"
 
 namespace lpint {
 
@@ -15,7 +15,7 @@ namespace lpint {
  * @brief Interface to internal linear program solver.
  * This interface is the most important interface within
  * lpinterface. It allows one to generically use various
- * different linear program solvers polymorphically. 
+ * different linear program solvers polymorphically.
  * See the documentation of its methods and the implementations
  * this interface for usage information.
  */
@@ -26,12 +26,12 @@ class LinearProgramSolver {
   /**
    * @brief Get immutable access to the underlying Linear Program object.
    */
-  virtual const LinearProgram& linear_program() const = 0;
+  virtual const LinearProgramInterface& linear_program() const = 0;
 
   /**
    * @brief Get mutable access to the underlying Linear Program object
    */
-  virtual LinearProgram& linear_program() = 0;
+  virtual LinearProgramInterface& linear_program() = 0;
 
   /**
    * @brief Set an integer-valued parameter in the internal LP solver.
@@ -42,7 +42,6 @@ class LinearProgramSolver {
    */
   virtual expected<void, LpError> set_parameter(const Param param,
                                                 const int value) = 0;
-
 
   /**
    * @brief Set a double-valued parameter in the internal LP solver

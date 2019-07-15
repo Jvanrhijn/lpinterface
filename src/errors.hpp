@@ -26,6 +26,6 @@ enum class LpError {
   UnsupportedParameterError,
 };
 
-}
+}  // namespace lpint
 
 #endif  // LPINTERFACE_ERRORS_H

@@ -86,7 +86,7 @@ class Row : public MatrixEntry<T> {
 /**
  * @brief Represents a sparse matrix.
  * This class represents either a row or column oriented
- * sparse matrix. In order to access matrix elements, use 
+ * sparse matrix. In order to access matrix elements, use
  * operator(), i.e. `double x = matrix(3, 5);`. Access
  * is O(n) in time.
  */

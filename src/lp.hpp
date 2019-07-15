@@ -28,10 +28,9 @@ enum class OptimizationType {
  * The interface provides methods to modify the LP internally, as well
  * access the LP structure.
  */
-class LinearProgram {
+class LinearProgramInterface {
  public:
-  virtual ~LinearProgram() = default;
-
+  virtual ~LinearProgramInterface() = default;
   /**
    * @brief Add columns to the LP.
    */
@@ -45,13 +44,13 @@ class LinearProgram {
       const std::vector<Row<double>>& rows) = 0;
 
   /**
-   * @brief Set the LP matrix \f$A\f$.
+   * @brief Set the linear program matrix.
    */
   virtual expected<void, LpError> set_matrix(
       const SparseMatrix<double> matrix) = 0;
 
   /**
-   * @brief Retrieve the optimization type of this LinearProgram.
+   * @brief Retrieve the optimization type of this LinearProgramInterface.
    * The Optimization type can be either Type::Minimize or
    * Type::Maximize, which correspond to the LP formulations
    * min c^T * x and max c^T * x, respectively.

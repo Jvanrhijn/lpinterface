@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Woverloaded-virtual -Wredundant-
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wsign-promo -Wstrict-overflow=5 -Wswitch-default)
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused -Werror -Wreturn-type -Wunused-variable -Wno-sign-compare)
 
-set(lpinterface_files lpinterface_lib.cc)
+set(lpinterface_files lp_impl.cc)
 
 find_package(GUROBI)
 

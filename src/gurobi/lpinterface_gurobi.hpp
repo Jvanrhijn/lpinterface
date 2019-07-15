@@ -5,16 +5,16 @@
 
 #include "gurobi_c.h"
 
-#include "lp.hpp"
-#include "lpinterface.hpp"
 #include "common.hpp"
 #include "data_objects.hpp"
+#include "lp.hpp"
+#include "lpinterface.hpp"
 
 namespace lpint {
 
 class GurobiSolver : public LinearProgramSolver {
  public:
-  GurobiSolver(LinearProgram&& lp);
+  GurobiSolver(LinearProgramInterface&& lp);
 
   ~GurobiSolver();
 
@@ -36,15 +36,15 @@ class GurobiSolver : public LinearProgramSolver {
 
   expected<void, LpError> solve_dual() override;
 
-  const LinearProgram& linear_program() const override;
+  const LinearProgramInterface& linear_program() const override;
 
-  LinearProgram& linear_program() override;
+  LinearProgramInterface& linear_program() override;
 
   expected<std::vector<double>, LpError> get_solution() const override;
 
  private:
   //! The linear program to solve
-  std::shared_ptr<LinearProgram> linear_program_;
+  std::shared_ptr<LinearProgramInterface> linear_program_;
 
   //! The gurobi environment object
   std::shared_ptr<GRBenv> gurobi_env_;

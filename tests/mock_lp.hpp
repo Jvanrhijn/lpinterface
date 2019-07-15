@@ -12,7 +12,7 @@
 
 namespace lpint {
 
-class MockLinearProgram : public LinearProgram {
+class MockLinearProgram : public LinearProgramInterface {
  public:
   MOCK_METHOD1(add_columns,
                expected<void, LpError>(const std::vector<Column<double>>&));
