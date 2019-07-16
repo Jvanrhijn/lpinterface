@@ -22,7 +22,5 @@ if (GUROBI_FOUND)
     set(lpinterface_files ${lpinterface_files} ${CMAKE_CURRENT_SOURCE_DIR}/gurobi/lpinterface_gurobi.cc)
 endif(GUROBI_FOUND)
 
-
-
 add_library(${TARGET} STATIC ${lpinterface_files})
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})

@@ -14,7 +14,9 @@ set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wno-unused -Werror -Wsign-co
 find_package(Threads REQUIRED)
 
 set(test_files
-  test.cc)
+  test.cc
+  test_sparse_matrix.cc
+  test_gurobi.cc)
 
 add_executable(${UNIT_TESTS} ${test_files})
 target_link_libraries(${UNIT_TESTS} PUBLIC lpinterface gtest gmock Threads::Threads rapidcheck)

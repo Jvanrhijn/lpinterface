@@ -14,10 +14,13 @@ endif()
 include_directories(src)
 include_directories(lib)
 include_directories(include)
+include_directories(src/gurobi)
 
 include(cmake/clang-cxx-dev-tools.cmake)
 
 add_subdirectory(src)
+
+find_package(GUROBI)
 
 if (TESTING)
   include(cmake/gtest.cmake)

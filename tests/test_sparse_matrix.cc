@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
-#include "data_objects.hpp"
 
 #include "data_objects.hpp"
+
+using namespace lpint;
 
 template <typename T>
 std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
