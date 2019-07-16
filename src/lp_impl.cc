@@ -22,6 +22,12 @@ expected<void, LpError> LinearProgram::set_matrix(
   return expected<void, LpError>();
 }
 
+expected<void, LpError> LinearProgram::add_constraints(
+    const std::vector<Constraint<double>>& constraints) {
+  constraints_ = constraints;
+  return expected<void, LpError>();
+}
+
 OptimizationType LinearProgram::optimization_type() const { return opt_type_; }
 
 expected<void, LpError> LinearProgram::set_objective(

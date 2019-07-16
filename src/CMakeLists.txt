@@ -20,5 +20,9 @@ if (GUROBI_FOUND)
 endif(GUROBI_FOUND)
 
 add_library(${TARGET} STATIC ${lpinterface_files})
-target_link_libraries(${TARGET} gurobi81)
+
+if (GUROBI_FOUND)
+    target_link_libraries(${TARGET} gurobi81)
+endif(GUROBI_FOUND)
+
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})

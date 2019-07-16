@@ -148,15 +148,15 @@ class SparseMatrix {
    Ax <\mathrm{cmp}> b,
  \f]
  where \f$<cmp>\f$ represents an elementwise comparison operator,
- such as \f$\leq\f$. This struct represents the right-hand side of
- such constraints, together with the elementwise comparisons.
+ such as \f$\leq\f$. This struct represents one element of the right-hand side
+ of such a constraint, together with the elementwise comparison.
  */
 template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
-  std::vector<Ordering> ordering;
-  std::vector<T> values;
+  Ordering ordering;
+  T value;
 };
 
 class Objective {};

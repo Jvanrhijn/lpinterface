@@ -53,7 +53,7 @@ class LinearProgramInterface {
    * @brief Add a set of constraints to the LP formulation.
    */
   virtual expected<void, LpError> add_constraints(
-    const std::vector<Constraint<double>>& constraints) = 0;
+      const std::vector<Constraint<double>>& constraints) = 0;
 
   /**
    * @brief Retrieve the optimization type of this LinearProgramInterface.
