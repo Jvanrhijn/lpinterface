@@ -143,7 +143,8 @@ class SparseMatrix {
 
 template <typename T>
 struct Constraint {
-  static_assert(std::is_arithmetic<T>::value, "T must be arithmetic in order to be ordered");
+  static_assert(std::is_arithmetic<T>::value,
+                "T must be arithmetic in order to be ordered");
   std::vector<Ordering> ordering;
   std::vector<T> values;
 };

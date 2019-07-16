@@ -50,10 +50,10 @@ class GurobiSolver : public LinearProgramSolver {
   std::shared_ptr<LinearProgramInterface> linear_program_;
 
   //! The gurobi environment object
-  GRBenv *gurobi_env_;
+  GRBenv* gurobi_env_;
 
   //! The gurobi model object
-  GRBmodel *gurobi_model_;
+  GRBmodel* gurobi_model_;
 
   // copy-and-swap idiom
   friend void swap(GurobiSolver& first, GurobiSolver& second) noexcept {

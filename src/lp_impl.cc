@@ -2,7 +2,9 @@
 
 namespace lpint {
 
-LinearProgram::LinearProgram(const OptimizationType opt_type, const SparseMatrixType sptype) : matrix_(sptype), opt_type_(opt_type)  {}
+LinearProgram::LinearProgram(const OptimizationType opt_type,
+                             const SparseMatrixType sptype)
+    : matrix_(sptype), opt_type_(opt_type) {}
 
 expected<void, LpError> LinearProgram::add_columns(
     const std::vector<Column<double>>& columns) {
@@ -14,18 +16,18 @@ expected<void, LpError> LinearProgram::add_rows(
   return matrix_.add_rows(rows);
 }
 
-expected<void, LpError> LinearProgram::set_matrix(const SparseMatrix<double> matrix) {
+expected<void, LpError> LinearProgram::set_matrix(
+    const SparseMatrix<double> matrix) {
   matrix_ = matrix;
   return expected<void, LpError>();
 }
 
-OptimizationType LinearProgram::optimization_type() const {
-    return opt_type_;
-}
+OptimizationType LinearProgram::optimization_type() const { return opt_type_; }
 
-expected<void, LpError> LinearProgram::set_objective(const Objective& objective) {
-    objective_ = objective;
-    return expected<void, LpError>();
+expected<void, LpError> LinearProgram::set_objective(
+    const Objective& objective) {
+  objective_ = objective;
+  return expected<void, LpError>();
 }
 
 }  // namespace lpint

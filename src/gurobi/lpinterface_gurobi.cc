@@ -2,13 +2,13 @@
 
 namespace lpint {
 
-GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp) : linear_program_(lp) {
-
+GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
+    : linear_program_(lp) {
   // load environment
   GRBloadenv(&gurobi_env_, "");
   // allocate Gurobi model
-  GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
-              nullptr);
+  GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
+              nullptr, nullptr, nullptr);
 
   // set optimization type
   GRBsetintattr(
@@ -19,8 +19,7 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp) : linear_
 }
 
 GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
-  : linear_program_(other.linear_program_)
-{
+    : linear_program_(other.linear_program_) {
   gurobi_model_ = GRBcopymodel(other.gurobi_model_);
   gurobi_env_ = GRBgetenv(gurobi_model_);
 }
@@ -30,9 +29,7 @@ GurobiSolver& GurobiSolver::operator=(GurobiSolver other) noexcept {
   return *this;
 }
 
-GurobiSolver::GurobiSolver(GurobiSolver&& other) noexcept 
-  : GurobiSolver()
-{
+GurobiSolver::GurobiSolver(GurobiSolver&& other) noexcept : GurobiSolver() {
   swap(*this, other);
 }
 
