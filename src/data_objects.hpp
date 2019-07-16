@@ -103,8 +103,21 @@ class Row : public MatrixEntry<T> {
  */
 template <typename T>
 class SparseMatrix {
+ private:
+  using iterator = typename std::vector<MatrixEntry<T>>::iterator;
+
+ public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = std::vector<T>;
+  using difference_type = int;
+  using pointer = value_type*;
+  using reference = value_type&;
+
  public:
   SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
+
+  iterator begin() { return entries_.begin(); }
+  iterator end() { return entries_.end(); }
 
   expected<void, LpError> add_columns(const std::vector<Column<T>>& columns) {
     if (type_ != SparseMatrixType::ColumnWise) {

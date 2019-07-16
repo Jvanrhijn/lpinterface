@@ -5,6 +5,9 @@
 
 using namespace lpint;
 
+constexpr std::size_t M = 10;
+constexpr std::size_t N = 10;
+
 template <typename T>
 std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
   std::vector<std::size_t> nz;
@@ -17,14 +20,10 @@ std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
 }
 
 template <typename T, size_t N, size_t M>
-std::vector<std::vector<T>> transpose(
+//std::vector<std::vector<T>> transpose(
+std::array<std::array<T, M>, N> transpose(
     const std::array<std::array<T, N>, M>& v) {
-  if (M == 0) {
-    return std::vector<std::vector<T>>(0);
-  }
-
-  std::vector<std::vector<T>> out(N, std::vector<T>(M));
-
+  std::array<std::array<T, M>, N> out;
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < M; j++) {
       out[i][j] = v[j][i];
@@ -33,11 +32,31 @@ std::vector<std::vector<T>> transpose(
   return out;
 }
 
-RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
-              (const std::array<std::array<double, 7>, 10> mat)) {
-  constexpr std::size_t m = 10;
-  constexpr std::size_t n = 7;
+template <typename T, size_t N, size_t M>
+SparseMatrix<T> build_sparse_matrix(std::array<std::array<T, N>, M> mat, SparseMatrixType sptype) {
+  SparseMatrix<T> sp(sptype);
 
+  if (sptype == SparseMatrixType::ColumnWise) {
+    mat = transpose(mat);
+  }
+
+  std::vector<MatrixEntry<T>> entries;
+  for (const auto& entry : mat) {
+    std::vector<T> nonzeros;
+    std::vector<T> v(entry.begin(), entry.end());
+    std::copy_if(entry.begin(), entry.end(), std::back_inserter(nonzeros),
+                 [](T x) { return x != T(); });
+    entries.emplace_back(nonzeros, get_nonzero_indices(v));
+  }
+  if (sptype == SparseMatrixType::RowWise) {
+    sp.add_rows(static_cast<std::vector<Row<T>>>(entries));
+  } else {
+    sp.add_columns(static_cast<std::vector<Column<T>>>(entries));
+  }
+}
+
+RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
+              (const std::array<std::array<double, N>, M> mat)) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
   std::vector<Row<double>> rows;
   for (const auto& row : mat) {
@@ -48,18 +67,16 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
     rows.emplace_back(nonzeros, get_nonzero_indices(v));
   }
   sp.add_rows(rows);
-  for (std::size_t i = 0; i < m; i++) {
-    for (std::size_t j = 0; j < n; j++) {
+  //auto sp = build_sparse_matrix(mat, SparseMatrixType::RowWise);
+  for (std::size_t i = 0; i < M; i++) {
+    for (std::size_t j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
-              (const std::array<std::array<double, 7>, 10> mat)) {
-  constexpr std::size_t m = 10;
-  constexpr std::size_t n = 7;
-
+              (const std::array<std::array<double, N>, M> mat)) {
   SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
   std::vector<Column<double>> cols;
 
@@ -75,9 +92,14 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
 
   sp.add_columns(cols);
 
-  for (std::size_t i = 0; i < m; i++) {
-    for (std::size_t j = 0; j < n; j++) {
+  for (std::size_t i = 0; i < M; i++) {
+    for (std::size_t j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }
 }
+
+//RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable, 
+//  (const std::array<std::array<double, N>, M> mat)) {
+//  SparseMatrix<double> s
+//}
