@@ -16,8 +16,10 @@ GurobiSolver create_grb() {
     return grb;
 }
 
-TEST(Gurobi, Gurobi) {
+TEST(Gurobi, SetParameters) {
     auto grb = create_grb();
     auto err = grb.set_parameter(Param::GrbThreads, 1);
+    ASSERT_TRUE(err);
+    err = grb.set_parameter(Param::GrbOutputFlag, 0);
     ASSERT_TRUE(err);
 }

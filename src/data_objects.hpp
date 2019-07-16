@@ -16,6 +16,14 @@ enum class SparseMatrixType {
   ColumnWise,
 };
 
+enum class Ordering {
+  LT,
+  GT,
+  EQ,
+  LEQ,
+  GEQ,
+};
+
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
 /**
@@ -131,6 +139,13 @@ class SparseMatrix {
   SparseMatrixType type_;
   std::vector<std::size_t> begin_indices_;
   std::vector<MatrixEntry<T>> entries_;
+};
+
+template <typename T>
+struct Constraint {
+  static_assert(std::is_arithmetic<T>::value, "T must be arithmetic in order to be ordered");
+  std::vector<Ordering> ordering;
+  std::vector<T> values;
 };
 
 class Objective {};

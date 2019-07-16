@@ -22,6 +22,12 @@ add_subdirectory(src)
 
 find_package(GUROBI)
 
+if (GUROBI_FOUND)
+    message(STATUS "Found Gurobi: TRUE")
+    include_directories(${GUROBI_INCLUDE_DIRS})
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gurobi)
+endif(GUROBI_FOUND)
+
 if (TESTING)
   include(cmake/gtest.cmake)
   include(cmake/gmock.cmake)

@@ -16,11 +16,9 @@ set(lpinterface_files lp_impl.cc)
 find_package(GUROBI)
 
 if (GUROBI_FOUND)
-    message(STATUS "Found Gurobi: TRUE")
-    include_directories(${GUROBI_INCLUDE_DIRS})
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gurobi)
     set(lpinterface_files ${lpinterface_files} ${CMAKE_CURRENT_SOURCE_DIR}/gurobi/lpinterface_gurobi.cc)
 endif(GUROBI_FOUND)
 
 add_library(${TARGET} STATIC ${lpinterface_files})
+target_link_libraries(${TARGET} gurobi81)
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
