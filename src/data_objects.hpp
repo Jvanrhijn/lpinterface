@@ -141,6 +141,16 @@ class SparseMatrix {
   std::vector<MatrixEntry<T>> entries_;
 };
 
+/**
+ * @brief Struct to represent right-hand side of LP constraints.
+ * In linear programming, we have constraints of the form
+ \f[
+   Ax <\mathrm{cmp}> b,
+ \f]
+ where \f$<cmp>\f$ represents an elementwise comparison operator,
+ such as \f$\leq\f$. This struct represents the right-hand side of
+ such constraints, together with the elementwise comparisons.
+ */
 template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,

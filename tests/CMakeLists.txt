@@ -15,11 +15,21 @@ find_package(Threads REQUIRED)
 
 set(test_files
   test.cc
-  test_sparse_matrix.cc
-  test_gurobi.cc)
+  test_sparse_matrix.cc)
+
+find_package(GUROBI)
+if (GUROBI_FOUND)
+  set(${test_files} test_gurobi.cc)
+endif (GUROBI_FOUND)
 
 add_executable(${UNIT_TESTS} ${test_files})
-target_link_libraries(${UNIT_TESTS} PUBLIC lpinterface gurobi81 gtest gmock Threads::Threads rapidcheck)
+
+if (GUROBI_FOUND)
+  target_link_libraries(${UNIT_TESTS} PUBLIC lpinterface gurobi81 gtest gmock Threads::Threads rapidcheck)
+else()
+  target_link_libraries(${UNIT_TESTS} PUBLIC lpinterface gtest gmock Threads::Threads rapidcheck)
+endif(GUROBI_FOUND)
+
 target_compile_options(${UNIT_TESTS} PRIVATE ${CMAKE_CXX_FLAGS_TESTS})
 
 add_custom_command(TARGET ${UNIT_TESTS} POST_BUILD 
