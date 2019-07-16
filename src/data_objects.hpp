@@ -66,9 +66,12 @@ class MatrixEntry {
     return std::max_element(values_.begin(), values_.end());
   }
   std::size_t num_nonzero() const { return values_.size(); }
+  
+  const std::vector<T>& values() const { return values_; }
+  const std::vector<std::size_t>& nonzero_indices() const { return nonzero_indices_; }
 
  private:
-  std::vector<double> values_;
+  std::vector<T> values_;
   std::vector<std::size_t> nonzero_indices_;  // indices of nonzero entries
 };
 
