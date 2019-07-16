@@ -2,38 +2,54 @@
 
 namespace lpint {
 
-GurobiSolver::GurobiSolver(LinearProgramInterface&& lp) : linear_program_(&lp) {
-  auto env = gurobi_env_.get();
-  auto model = gurobi_model_.get();
+GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp) : linear_program_(lp) {
 
   // load environment
-  GRBloadenv(&env, "");
+  GRBloadenv(&gurobi_env_, "");
   // allocate Gurobi model
-  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
+  GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
               nullptr);
 
   // set optimization type
   GRBsetintattr(
-      gurobi_model_.get(), "modelsense",
+      gurobi_model_, "modelsense",
       linear_program_->optimization_type() == OptimizationType::Maximize
           ? GRB_MAXIMIZE
           : GRB_MINIMIZE);
 }
 
+GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
+  : linear_program_(other.linear_program_)
+{
+  gurobi_model_ = GRBcopymodel(other.gurobi_model_);
+  gurobi_env_ = GRBgetenv(gurobi_model_);
+}
+
+GurobiSolver& GurobiSolver::operator=(GurobiSolver other) noexcept {
+  swap(*this, other);
+  return *this;
+}
+
+GurobiSolver::GurobiSolver(GurobiSolver&& other) noexcept 
+  : GurobiSolver()
+{
+  swap(*this, other);
+}
+
 GurobiSolver::~GurobiSolver() {
   // Free Gurobi resources
-  GRBfreemodel(gurobi_model_.get());
-  GRBfreeenv(gurobi_env_.get());
+  GRBfreeenv(GRBgetenv(gurobi_model_));
+  GRBfreemodel(gurobi_model_);
 }
 
 expected<void, LpError> GurobiSolver::set_parameter(const Param param,
                                                     const int value) {
   switch (param) {
     case Param::GrbOutputFlag:
-      GRBsetintparam(GRBgetenv(gurobi_model_.get()), "outputflag", value);
+      GRBsetintparam(GRBgetenv(gurobi_model_), "outputflag", value);
       break;
     case Param::GrbThreads:
-      GRBsetintparam(GRBgetenv(gurobi_model_.get()), "threads", value);
+      GRBsetintparam(GRBgetenv(gurobi_model_), "threads", value);
       break;
     default:
       return unexpected<LpError>(LpError::UnsupportedParameterError);
@@ -45,7 +61,7 @@ expected<void, LpError> GurobiSolver::set_parameter(const Param param,
                                                     const double value) {
   switch (param) {
     case Param::GrbCutoff:
-      GRBsetdblparam(GRBgetenv(gurobi_model_.get()), "Cutoff", value);
+      GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value);
       break;
     default:
       return unexpected<LpError>(LpError::UnsupportedParameterError);

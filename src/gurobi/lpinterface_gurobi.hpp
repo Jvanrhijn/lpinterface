@@ -14,15 +14,18 @@ namespace lpint {
 
 class GurobiSolver : public LinearProgramSolver {
  public:
-  GurobiSolver(LinearProgramInterface&& lp);
+  // delete the default constructor to prevent
+  // deleting invalid memory in destructor
+  GurobiSolver() = default;
+  GurobiSolver(std::shared_ptr<LinearProgramInterface> lp);
 
   ~GurobiSolver();
 
   // rule of five: should implement/delete these
-  GurobiSolver(const GurobiSolver&) = delete;
-  GurobiSolver(GurobiSolver&&) = delete;
-  GurobiSolver operator=(const GurobiSolver&) = delete;
-  GurobiSolver operator=(GurobiSolver&&) = delete;
+  GurobiSolver(const GurobiSolver&) noexcept;
+  GurobiSolver(GurobiSolver&&) noexcept;
+  GurobiSolver& operator=(GurobiSolver) noexcept;
+  GurobiSolver& operator=(GurobiSolver&&) noexcept = delete;
 
   virtual expected<void, LpError> set_parameter(const Param param,
                                                 const int value) override;
@@ -47,10 +50,17 @@ class GurobiSolver : public LinearProgramSolver {
   std::shared_ptr<LinearProgramInterface> linear_program_;
 
   //! The gurobi environment object
-  std::shared_ptr<GRBenv> gurobi_env_;
+  GRBenv *gurobi_env_;
 
   //! The gurobi model object
-  std::shared_ptr<GRBmodel> gurobi_model_;
+  GRBmodel *gurobi_model_;
+
+  // copy-and-swap idiom
+  friend void swap(GurobiSolver& first, GurobiSolver& second) noexcept {
+    using std::swap;
+    swap(first.linear_program_, second.linear_program_);
+    swap(first.gurobi_env_, second.gurobi_env_);
+  }
 };
 
 }  // namespace lpint

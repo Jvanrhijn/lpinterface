@@ -21,6 +21,8 @@ namespace lpint {
  */
 class LinearProgramSolver {
  public:
+  LinearProgramSolver() = default;
+
   virtual ~LinearProgramSolver() = default;
 
   /**
