@@ -5,11 +5,10 @@
 using namespace lpint;
 
 GurobiSolver create_grb() {
-  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
-  std::vector<Row<double>> rows = {Row<double>({1.0, 1.0, 2.0}, {0, 1, 2}),
+  LinearProgram lp(OptimizationType::Maximize, 
+                                  {Row<double>({1.0, 1.0, 2.0}, {0, 1, 2}),
                                    Row<double>({1.0, 2.0, 3.0}, {0, 1, 2}),
-                                   Row<double>({1, 0, 1.0}, {0, 1})};
-  lp.add_rows(rows);
+                                   Row<double>({1, 0, 1.0}, {0, 1})});
   GurobiSolver grb(std::make_shared<LinearProgram>(lp));
   return grb;
 }
@@ -22,4 +21,7 @@ TEST(Gurobi, SetParameters) {
   ASSERT_TRUE(err);
 }
 
-TEST(Gurobi, AddConstraints) { auto grb = create_grb(); }
+TEST(Gurobi, AddConstraints) { 
+  auto grb = create_grb(); 
+  
+}
