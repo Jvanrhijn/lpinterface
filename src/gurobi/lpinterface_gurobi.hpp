@@ -46,6 +46,8 @@ class GurobiSolver : public LinearProgramSolver {
   expected<Solution<double>, LpError> get_solution() const override;
 
  private:
+  static expected<std::vector<char>, LpError> convert_variable_type(const std::vector<VarType>& var_types);
+
   //! The linear program to solve
   std::shared_ptr<LinearProgramInterface> linear_program_;
 

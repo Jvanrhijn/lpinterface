@@ -4,14 +4,7 @@
 #include "mock_lp.hpp"
 #include "mock_lpsolver.hpp"
 
-using ::testing::AtLeast;
 using namespace lpint;
-
-TEST(MockingTest, GetSolution) {
-  MockLpSolver lp;
-  EXPECT_CALL(lp, get_solution()).Times(AtLeast(1));
-  lp.get_solution();
-}
 
 int main(int argc, char *argv[]) {
   testing::InitGoogleTest(&argc, argv);

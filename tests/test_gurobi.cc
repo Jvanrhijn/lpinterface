@@ -2,6 +2,7 @@
 #include <iostream>
 #include "lp_impl.hpp"
 #include "lpinterface_gurobi.hpp"
+#include "mock_lp.hpp"
 
 using namespace lpint;
 
@@ -11,11 +12,7 @@ GurobiSolver create_grb(const LinearProgram& lp) {
 }
 
 TEST(Gurobi, SetParameters) {
-  LinearProgram lp(OptimizationType::Maximize,
-                   {Row<double>({1.0, 1.0, 2.0}, {0, 1, 2}),
-                    Row<double>({1.0, 2.0, 3.0}, {0, 1, 2}),
-                    Row<double>({1, 0, 1.0}, {0, 1})});
-  auto grb = create_grb(lp);
+  GurobiSolver grb(std::make_shared<MockLinearProgram>());
   auto err = grb.set_parameter(Param::GrbThreads, 1);
   ASSERT_TRUE(err);
   err = grb.set_parameter(Param::GrbOutputFlag, 0);

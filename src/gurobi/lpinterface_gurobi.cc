@@ -74,34 +74,14 @@ expected<void, LpError> GurobiSolver::update_program() {
   auto objective = linear_program_->objective();
   std::size_t num_vars = objective.values.size();
   std::vector<double> obj(objective.values.begin(), objective.values.end());
-  std::vector<char> value_type(num_vars);
-  for (std::size_t i = 0; i < num_vars; i++) {
-    char vtype;
-    switch (objective.variable_types[i]) {
-      case VarType::Binary:
-        vtype = GRB_BINARY;
-        break;
-      case VarType::Integer:
-        vtype = GRB_INTEGER;
-        break;
-      case VarType::Real:
-        vtype = GRB_CONTINUOUS;
-        break;
-      case VarType::SemiReal:
-        vtype = GRB_SEMICONT;
-        break;
-      case VarType::SemiInteger:
-        vtype = GRB_SEMIINT;
-        break;
-      default:
-        return unexpected<LpError>(LpError::UnsupportedVariableTypeError);
-    }
-    value_type[i] = vtype;
+  auto err_vt = convert_variable_type(objective.variable_types);
+  if (!err_vt) {
+    return unexpected<LpError>(err_vt.error());
   }
   auto err =
       GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
-                 obj.data(), nullptr, nullptr, value_type.data(), nullptr);
-  if (err) {
+                 obj.data(), nullptr, nullptr, err_vt.value().data(), nullptr);
+  if (err != 0) {
     return unexpected<LpError>(LpError(err));
   }
   // set constraints
@@ -182,6 +162,35 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 expected<Solution<double>, LpError> GurobiSolver::get_solution() const {
   return expected<Solution<double>, LpError>(solution_);
+}
+
+expected<std::vector<char>, LpError> GurobiSolver::convert_variable_type(const std::vector<VarType>& var_types) {
+  auto num_vars = var_types.size();
+  std::vector<char> value_type(num_vars);
+  for (std::size_t i = 0; i < num_vars; i++) {
+    char vtype;
+    switch (var_types[i]) {
+      case VarType::Binary:
+        vtype = GRB_BINARY;
+        break;
+      case VarType::Integer:
+        vtype = GRB_INTEGER;
+        break;
+      case VarType::Real:
+        vtype = GRB_CONTINUOUS;
+        break;
+      case VarType::SemiReal:
+        vtype = GRB_SEMICONT;
+        break;
+      case VarType::SemiInteger:
+        vtype = GRB_SEMIINT;
+        break;
+      default:
+        return unexpected<LpError>(LpError::UnsupportedVariableTypeError);
+    }
+    value_type[i] = vtype;
+  }
+  return expected<std::vector<char>, LpError>(value_type);
 }
 
 }  // namespace lpint
