@@ -24,6 +24,13 @@ enum class Ordering {
   GEQ,
 };
 
+enum class VarType {
+    Binary,
+    Integer,
+    Real,
+};
+
+
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
 /**
@@ -211,7 +218,11 @@ struct Constraint {
   T value;
 };
 
-class Objective {};
+template <typename T>
+struct Objective {
+  std::vector<T> values;
+  std::vector<VarType> variable_types;
+};
 
 }  // namespace lpint
 

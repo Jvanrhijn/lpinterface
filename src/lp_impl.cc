@@ -40,7 +40,7 @@ expected<void, LpError> LinearProgram::add_constraints(
 OptimizationType LinearProgram::optimization_type() const { return opt_type_; }
 
 expected<void, LpError> LinearProgram::set_objective(
-    const Objective& objective) {
+    const Objective<double>& objective) {
   objective_ = objective;
   return expected<void, LpError>();
 }

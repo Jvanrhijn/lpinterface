@@ -66,7 +66,7 @@ class LinearProgramInterface {
   /**
    * @brief Set the objective function to be used.
    */
-  virtual expected<void, LpError> set_objective(const Objective& objective) = 0;
+  virtual expected<void, LpError> set_objective(const Objective<double>& objective) = 0;
 };
 
 }  // namespace lpint

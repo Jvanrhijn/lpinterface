@@ -34,10 +34,10 @@ class LinearProgram : public LinearProgramInterface {
 
   OptimizationType optimization_type() const override;
 
-  expected<void, LpError> set_objective(const Objective& objective) override;
+  expected<void, LpError> set_objective(const Objective<double>& objective) override;
 
  private:
-  Objective objective_;
+  Objective<double> objective_;
   SparseMatrix<double> matrix_;
   std::vector<Constraint<double>> constraints_;
   OptimizationType opt_type_;
