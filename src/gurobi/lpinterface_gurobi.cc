@@ -10,6 +10,7 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
   // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
+  set_parameter(Param::GrbOutputFlag, 0);
 
   // set optimization type
   GRBsetintattr(
