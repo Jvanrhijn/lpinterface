@@ -5,6 +5,11 @@
 
 namespace lpint {
 
+enum ErrorKind {
+  LpInterface = 00000,
+  Gurobi = 10001,
+};
+
 /**
  * @brief Enum class representing an error result.
  * The linear program interface can return errors at many
@@ -15,7 +20,7 @@ namespace lpint {
  */
 enum class LpError : int {
   //! LP solution ran succesfully
-  SolveSuccess,
+  SolveSuccess = ErrorKind::LpInterface,
   //! Wrong matrix type (column- or row-wise) assumed
   MatrixTypeError,
   //! Feature not (yet) implemented
@@ -32,37 +37,12 @@ enum class LpError : int {
   InvalidMatrixEntryError,
   //! Unsupported variable type
   UnsupportedVariableTypeError,
-  //! Out of memory
-  OutOfMemoryError,
-  //! Required parameter not given
-  RequiredParameterError,
-  //! Invalid argument was provided
-  InvalidArgumentError,
-  //! Attempted to query an attribute with out-of-range index
-  IndexOutOfRangeError,
-  //! Internal Gurobi error
-  InternalGurobiError,
+  //! Gurobi errors
+  GurobiError = ErrorKind::Gurobi,
 };
 
 inline std::ostream& operator<<(std::ostream& s, LpError err) {
   return s << static_cast<int>(err);
-}
-
-inline LpError convert_gurobi_error(const int gurobi_error) {
-  // TODO: add support for all errors
-  // https://www.gurobi.com/documentation/8.1/refman/error_codes.html#sec:ErrorCodes
-  switch (gurobi_error) {
-    case (10001):
-      return LpError::OutOfMemoryError;
-    case (10002):
-      return LpError::RequiredParameterError;
-    case (10003):
-      return LpError::InvalidArgumentError;
-    case (10006):
-      return LpError::IndexOutOfRangeError;
-    default:
-      return LpError::InternalGurobiError;
-  }
 }
 
 }  // namespace lpint

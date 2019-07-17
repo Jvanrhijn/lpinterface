@@ -101,7 +101,7 @@ expected<void, LpError> GurobiSolver::update_program() {
       GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
                  obj.data(), nullptr, nullptr, value_type.data(), nullptr);
   if (err) {
-    return unexpected<LpError>(convert_gurobi_error(err));
+    return unexpected<LpError>(LpError(err));
   }
   // set constraints
   auto matrix = linear_program_->matrix();
@@ -135,7 +135,7 @@ expected<void, LpError> GurobiSolver::update_program() {
                        values.data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
-        return unexpected<LpError>(convert_gurobi_error(error));
+        return unexpected<LpError>(LpError(error));
       }
       idx++;
     }
@@ -149,19 +149,19 @@ expected<void, LpError> GurobiSolver::update_program() {
 expected<void, LpError> GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
-    return unexpected<LpError>(convert_gurobi_error(error));
+    return unexpected<LpError>(LpError(error));
   }
   // retrieve solution information from gurobi
   // TODO: check solution status
   error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL, &solution_.objective_value);
   if (error) {
-    return unexpected<LpError>(convert_gurobi_error(error));
+    return unexpected<LpError>(LpError(error));
   } 
   std::size_t num_vars = linear_program_->objective().values.size();
   solution_.values.resize(num_vars);
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars, solution_.values.data());
   if (error) {
-    return unexpected<LpError>(convert_gurobi_error(error));
+    return unexpected<LpError>(LpError(error));
   } 
   return expected<void, LpError>();
 }
