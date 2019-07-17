@@ -93,6 +93,20 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
   std::size_t i = 0;
   for (const auto& row : sp) {
     std::vector<double> vec(mat[i].begin(), mat[i].end());
-    RC_ASSERT(row == vec);
+    for (std::size_t j : row.nonzero_indices()) {
+      RC_ASSERT(row[j] == vec[j]);
+    }
+    i++;
+  }
+
+  auto spc = build_sparse_matrix_col(mat);
+  auto matc = transpose(mat);
+  i = 0;
+  for (const auto& col : spc) {
+    std::vector<double> vec(matc[i].begin(), matc[i].end());
+    for (std::size_t j : col.nonzero_indices()) {
+      RC_ASSERT(col[j] == vec[j]);
+    }
+    i++;
   }
 }

@@ -15,11 +15,12 @@ find_package(Threads REQUIRED)
 
 set(test_files
   test.cc
-  test_sparse_matrix.cc)
+  test_sparse_matrix.cc
+  test_gurobi.cc)
 
 find_package(GUROBI)
 if (GUROBI_FOUND)
-  set(${test_files} test_gurobi.cc)
+  set(test_files ${test_files} test_gurobi.cc)
 endif (GUROBI_FOUND)
 
 add_executable(${UNIT_TESTS} ${test_files})
