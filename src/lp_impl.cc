@@ -1,4 +1,4 @@
-#include "lp_impl.hpp"
+#include "lpinterface/lp_impl.hpp"
 
 namespace lpint {
 

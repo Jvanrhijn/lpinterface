@@ -1,4 +1,4 @@
-#include "lpinterface_gurobi.hpp"
+#include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include <iostream>
 
 namespace lpint {

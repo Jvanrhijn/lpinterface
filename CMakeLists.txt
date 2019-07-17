@@ -58,3 +58,8 @@ if (GUROBI_FOUND)
 endif(GUROBI_FOUND)
 
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
+
+target_include_directories(lpinterface PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include>  # <prefix>/include
+)

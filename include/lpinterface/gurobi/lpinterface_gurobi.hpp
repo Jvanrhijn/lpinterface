@@ -5,10 +5,10 @@
 
 #include "gurobi_c.h"
 
-#include "common.hpp"
-#include "data_objects.hpp"
-#include "lp.hpp"
-#include "lpinterface.hpp"
+#include "lpinterface/common.hpp"
+#include "lpinterface/data_objects.hpp"
+#include "lpinterface/lp.hpp"
+#include "lpinterface/lpinterface.hpp"
 
 namespace lpint {
 
