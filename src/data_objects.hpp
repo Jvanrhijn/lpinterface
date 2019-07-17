@@ -117,6 +117,16 @@ class SparseMatrix {
  public:
   SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
+  SparseMatrix(const std::initializer_list<Column<T>>&& columns)
+      : type_(SparseMatrixType::ColumnWise) {
+    add_columns(std::forward<decltype(columns)>(columns));
+  }
+
+  SparseMatrix(const std::initializer_list<Row<T>>&& rows)
+      : type_(SparseMatrixType::RowWise) {
+    add_rows(std::forward<decltype(rows)>(rows));
+  }
+
   iterator begin() { return entries_.begin(); }
   iterator end() { return entries_.end(); }
 

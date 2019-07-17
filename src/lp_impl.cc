@@ -7,16 +7,13 @@ LinearProgram::LinearProgram(const OptimizationType opt_type,
     : matrix_(sptype), opt_type_(opt_type) {}
 
 LinearProgram::LinearProgram(const OptimizationType opt_type,
-                             std::initializer_list<Row<double>> rows)
-    : matrix_(SparseMatrixType::RowWise), opt_type_(opt_type) {
-    matrix_.add_rows(rows);
-}
+                             const std::initializer_list<Row<double>>&& rows)
+    : matrix_(std::forward<decltype(rows)>(rows)), opt_type_(opt_type) {}
 
-LinearProgram::LinearProgram(const OptimizationType opt_type,
-                             std::initializer_list<Column<double>> columns)
-    : matrix_(SparseMatrixType::ColumnWise), opt_type_(opt_type) {
-    matrix_.add_columns(columns);
-}
+LinearProgram::LinearProgram(
+    const OptimizationType opt_type,
+    const std::initializer_list<Column<double>>&& columns)
+    : matrix_(std::forward<decltype(columns)>(columns)), opt_type_(opt_type) {}
 
 expected<void, LpError> LinearProgram::add_columns(
     const std::vector<Column<double>>& columns) {

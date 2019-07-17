@@ -13,10 +13,10 @@ class LinearProgram : public LinearProgramInterface {
   LinearProgram(const OptimizationType opt_type, const SparseMatrixType sptype);
 
   LinearProgram(const OptimizationType opt_type,
-                std::initializer_list<Row<double>> rows);
+                const std::initializer_list<Row<double>>&& rows);
 
   LinearProgram(const OptimizationType opt_type,
-                std::initializer_list<Column<double>> columns);
+                const std::initializer_list<Column<double>>&& columns);
 
   ~LinearProgram() = default;
 
