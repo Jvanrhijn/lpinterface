@@ -87,7 +87,12 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
   }
 }
 
-//RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable, 
-//  (const std::array<std::array<double, N>, M> mat)) {
-//  SparseMatrix<double> s
-//}
+RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable, 
+  (const std::array<std::array<double, N>, M> mat)) {
+  auto sp = build_sparse_matrix_row(mat);
+  std::size_t i = 0;
+  for (const auto& row : sp) {
+    std::vector<double> vec(mat[i].begin(), mat[i].end());
+    RC_ASSERT(row == vec);
+  }
+}
