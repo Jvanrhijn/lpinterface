@@ -126,7 +126,6 @@ expected<void, LpError> GurobiSolver::update_program() {
   return expected<void, LpError>();
 }
 
-// TODO: actually do something here
 expected<void, LpError> GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
