@@ -15,8 +15,7 @@ find_package(Threads REQUIRED)
 
 set(test_files
   test.cc
-  test_sparse_matrix.cc
-  test_gurobi.cc)
+  test_sparse_matrix.cc)
 
 find_package(GUROBI)
 if (GUROBI_FOUND)
