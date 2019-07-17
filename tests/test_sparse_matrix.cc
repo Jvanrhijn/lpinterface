@@ -33,41 +33,43 @@ std::array<std::array<T, M>, N> transpose(
 }
 
 template <typename T, size_t N, size_t M>
-SparseMatrix<T> build_sparse_matrix(std::array<std::array<T, N>, M> mat, SparseMatrixType sptype) {
+SparseMatrix<T> build_sparse_matrix_base(const std::array<std::array<T, N>, M>& mat, SparseMatrixType sptype) {
   SparseMatrix<T> sp(sptype);
-
-  if (sptype == SparseMatrixType::ColumnWise) {
-    mat = transpose(mat);
-  }
-
-  std::vector<MatrixEntry<T>> entries;
+  std::vector<Row<T>> rows;
+  std::vector<Column<T>> cols;
   for (const auto& entry : mat) {
     std::vector<T> nonzeros;
     std::vector<T> v(entry.begin(), entry.end());
     std::copy_if(entry.begin(), entry.end(), std::back_inserter(nonzeros),
                  [](T x) { return x != T(); });
-    entries.emplace_back(nonzeros, get_nonzero_indices(v));
+    if (sptype == SparseMatrixType::RowWise) {
+      rows.emplace_back(nonzeros, get_nonzero_indices(v));
+    } else {
+      cols.emplace_back(nonzeros, get_nonzero_indices(v));
+    }
   }
   if (sptype == SparseMatrixType::RowWise) {
-    sp.add_rows(static_cast<std::vector<Row<T>>>(entries));
+    sp.add_rows(rows);
   } else {
-    sp.add_columns(static_cast<std::vector<Column<T>>>(entries));
+    sp.add_columns(cols);
   }
+  return sp;
+}
+
+template <typename T, size_t N, size_t M>
+SparseMatrix<T> build_sparse_matrix_col(std::array<std::array<T, N>, M> mat) {
+  auto mat_ = transpose(mat);
+  return build_sparse_matrix_base(mat_, SparseMatrixType::ColumnWise);
+}
+
+template <typename T, size_t N, size_t M>
+SparseMatrix<T> build_sparse_matrix_row(std::array<std::array<T, N>, M> mat) {
+  return build_sparse_matrix_base(mat, SparseMatrixType::RowWise);
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
               (const std::array<std::array<double, N>, M> mat)) {
-  SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  std::vector<Row<double>> rows;
-  for (const auto& row : mat) {
-    std::vector<double> nonzeros;
-    std::vector<double> v(row.begin(), row.end());
-    std::copy_if(row.begin(), row.end(), std::back_inserter(nonzeros),
-                 [](double x) { return x != 0.0; });
-    rows.emplace_back(nonzeros, get_nonzero_indices(v));
-  }
-  sp.add_rows(rows);
-  //auto sp = build_sparse_matrix(mat, SparseMatrixType::RowWise);
+  auto sp = build_sparse_matrix_row(mat);
   for (std::size_t i = 0; i < M; i++) {
     for (std::size_t j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
@@ -77,21 +79,7 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
               (const std::array<std::array<double, N>, M> mat)) {
-  SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
-  std::vector<Column<double>> cols;
-
-  auto mat_transpose = transpose(mat);
-
-  for (const auto& col : mat_transpose) {
-    std::vector<double> nonzeros;
-    std::vector<double> v(col.begin(), col.end());
-    std::copy_if(col.begin(), col.end(), std::back_inserter(nonzeros),
-                 [](double x) { return x != 0.0; });
-    cols.emplace_back(nonzeros, get_nonzero_indices(v));
-  }
-
-  sp.add_columns(cols);
-
+  auto sp = build_sparse_matrix_col(mat);
   for (std::size_t i = 0; i < M; i++) {
     for (std::size_t j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
