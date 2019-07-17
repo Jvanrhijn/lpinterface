@@ -20,7 +20,7 @@ std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
 }
 
 template <typename T, size_t N, size_t M>
-//std::vector<std::vector<T>> transpose(
+// std::vector<std::vector<T>> transpose(
 std::array<std::array<T, M>, N> transpose(
     const std::array<std::array<T, N>, M>& v) {
   std::array<std::array<T, M>, N> out;
@@ -33,7 +33,8 @@ std::array<std::array<T, M>, N> transpose(
 }
 
 template <typename T, size_t N, size_t M>
-SparseMatrix<T> build_sparse_matrix_base(const std::array<std::array<T, N>, M>& mat, SparseMatrixType sptype) {
+SparseMatrix<T> build_sparse_matrix_base(
+    const std::array<std::array<T, N>, M>& mat, SparseMatrixType sptype) {
   SparseMatrix<T> sp(sptype);
   std::vector<Row<T>> rows;
   std::vector<Column<T>> cols;
@@ -89,14 +90,12 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
 
 TEST(SparseMatrix, ErrorIfDuplicateNonzeroIndices) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  auto err = sp.add_rows({
-    Row<double>({1, 2, 3}, {0, 0, 1})  
-  });
-  ASSERT_EQ(err.error(), LpError::InvalidMatrixEntryError); 
+  auto err = sp.add_rows({Row<double>({1, 2, 3}, {0, 0, 1})});
+  ASSERT_EQ(err.error(), LpError::InvalidMatrixEntryError);
 }
 
-RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable, 
-  (const std::array<std::array<double, N>, M> mat)) {
+RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
+              (const std::array<std::array<double, N>, M> mat)) {
   auto sp = build_sparse_matrix_row(mat);
   std::size_t i = 0;
   for (const auto& row : sp) {

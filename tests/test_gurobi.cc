@@ -22,7 +22,4 @@ TEST(Gurobi, SetParameters) {
   ASSERT_TRUE(err);
 }
 
-TEST(Gurobi, AddConstraints) {
-  auto grb = create_grb();
-  
-}
+TEST(Gurobi, AddConstraints) { auto grb = create_grb(); }

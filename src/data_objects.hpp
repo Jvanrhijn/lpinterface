@@ -65,9 +65,11 @@ class MatrixEntry {
     return std::max_element(values_.begin(), values_.end());
   }
   std::size_t num_nonzero() const { return values_.size(); }
-  
+
   const std::vector<T>& values() const { return values_; }
-  const std::vector<std::size_t>& nonzero_indices() const { return nonzero_indices_; }
+  const std::vector<std::size_t>& nonzero_indices() const {
+    return nonzero_indices_;
+  }
 
  private:
   std::vector<T> values_;
@@ -122,6 +124,7 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::ColumnWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
+      // TODO better upcasting
       std::vector<MatrixEntry<T>> entries;
       for (const auto& c : columns) {
         entries.push_back(c);
@@ -134,6 +137,7 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::RowWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
+      // TODO better upcasting
       std::vector<MatrixEntry<T>> entries;
       for (const auto& r : rows) {
         entries.push_back(r);
@@ -141,7 +145,6 @@ class SparseMatrix {
       return add_entries(entries);
     }
   }
-
 
   T operator()(const std::size_t i, const std::size_t j) const {
     if (type_ == SparseMatrixType::ColumnWise) {
@@ -154,7 +157,8 @@ class SparseMatrix {
   SparseMatrixType type() const { return type_; }
 
  private:
-  expected<void, LpError> add_entries(const std::vector<MatrixEntry<T>>& entries) {
+  expected<void, LpError> add_entries(
+      const std::vector<MatrixEntry<T>>& entries) {
     for (const auto& entry : entries) {
       // entries are invalid if there are two duplicate
       // nonzero indices present
