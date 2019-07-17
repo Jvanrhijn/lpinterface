@@ -17,7 +17,7 @@ class GurobiSolver : public LinearProgramSolver {
   // delete the default constructor to prevent
   // deleting invalid memory in destructor
   GurobiSolver() = default;
-  GurobiSolver(std::shared_ptr<LinearProgramInterface> lp);
+  explicit GurobiSolver(std::shared_ptr<LinearProgramInterface> lp);
 
   ~GurobiSolver();
 
