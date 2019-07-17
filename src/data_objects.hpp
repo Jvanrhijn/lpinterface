@@ -25,11 +25,11 @@ enum class Ordering {
 };
 
 enum class VarType {
-    Binary,
-    Integer,
-    Real,
-    SemiReal,
-    SemiInteger,
+  Binary,
+  Integer,
+  Real,
+  SemiReal,
+  SemiInteger,
 };
 
 // matrix entry is templated over T, with T restricted to

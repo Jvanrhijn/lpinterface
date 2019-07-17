@@ -38,7 +38,8 @@ class LinearProgram : public LinearProgramInterface {
 
   OptimizationType optimization_type() const override;
 
-  expected<void, LpError> set_objective(const Objective<double>& objective) override;
+  expected<void, LpError> set_objective(
+      const Objective<double>& objective) override;
 
   const Objective<double>& objective() const override;
 

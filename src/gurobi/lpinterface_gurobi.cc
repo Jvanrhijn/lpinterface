@@ -97,19 +97,9 @@ expected<void, LpError> GurobiSolver::update_program() {
     }
     value_type[i] = vtype;
   }
-  auto err = GRBaddvars(
-    gurobi_model_,
-    num_vars,
-    0,
-    nullptr,
-    nullptr,
-    nullptr,
-    obj.data(),
-    nullptr,
-    nullptr,
-    value_type.data(),
-    nullptr
-  );
+  auto err =
+      GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
+                 obj.data(), nullptr, nullptr, value_type.data(), nullptr);
   if (err) {
     return unexpected<LpError>(convert_gurobi_error(err));
   }
@@ -135,20 +125,17 @@ expected<void, LpError> GurobiSolver::update_program() {
       }
       // need to do this since gurobi wants int* for indices
       // for some ungodly reason
-      std::vector<int> nonzero_indices(row.nonzero_indices().begin(), row.nonzero_indices().end());
-      // need to do this since gurobi takes double* rather than const double* const
+      std::vector<int> nonzero_indices(row.nonzero_indices().begin(),
+                                       row.nonzero_indices().end());
+      // need to do this since gurobi takes double* rather than const double*
+      // const
       std::vector<double> values(row.values().begin(), row.values().end());
-      auto error = GRBaddconstr(
-        gurobi_model_, 
-        row.num_nonzero(), 
-        nonzero_indices.data(),
-        values.data(),
-        ord,
-        constraints[idx].value,
-        ("constr" + std::to_string(idx)).c_str()
-      );
+      auto error =
+          GRBaddconstr(gurobi_model_, row.num_nonzero(), nonzero_indices.data(),
+                       values.data(), ord, constraints[idx].value,
+                       ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
-        return unexpected<LpError>(convert_gurobi_error(error));  
+        return unexpected<LpError>(convert_gurobi_error(error));
       }
       idx++;
     }
