@@ -21,3 +21,8 @@ TEST(Gurobi, SetParameters) {
   err = grb.set_parameter(Param::GrbOutputFlag, 0);
   ASSERT_TRUE(err);
 }
+
+TEST(Gurobi, AddConstraints) {
+  auto grb = create_grb();
+  
+}

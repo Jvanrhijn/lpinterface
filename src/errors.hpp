@@ -24,6 +24,8 @@ enum class LpError {
   ModelNotSolvedError,
   //! Invalid parameter
   UnsupportedParameterError,
+  //! Invalid matrix entry, e.g. if duplicates in nonzero indices
+  InvalidMatrixEntryError,
 };
 
 }  // namespace lpint

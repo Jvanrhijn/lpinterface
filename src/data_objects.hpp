@@ -44,7 +44,6 @@ class MatrixEntry {
   MatrixEntry(const std::vector<T>& values,
               const std::vector<std::size_t>& indices)
       : values_(values), nonzero_indices_(indices) {}
-
   virtual ~MatrixEntry() = default;
 
   T operator[](const std::size_t index) const {
@@ -123,10 +122,11 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::ColumnWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
-      for (const auto& entry : columns) {
-        entries_.emplace_back(entry);
+      std::vector<MatrixEntry<T>> entries;
+      for (const auto& c : columns) {
+        entries.push_back(c);
       }
-      return expected<void, LpError>();
+      return add_entries(entries);
     }
   }
 
@@ -134,12 +134,14 @@ class SparseMatrix {
     if (type_ != SparseMatrixType::RowWise) {
       return unexpected<LpError>(LpError::MatrixTypeError);
     } else {
-      for (const auto& entry : rows) {
-        entries_.emplace_back(entry);
+      std::vector<MatrixEntry<T>> entries;
+      for (const auto& r : rows) {
+        entries.push_back(r);
       }
-      return expected<void, LpError>();
+      return add_entries(entries);
     }
   }
+
 
   T operator()(const std::size_t i, const std::size_t j) const {
     if (type_ == SparseMatrixType::ColumnWise) {
@@ -152,6 +154,26 @@ class SparseMatrix {
   SparseMatrixType type() const { return type_; }
 
  private:
+  expected<void, LpError> add_entries(const std::vector<MatrixEntry<T>>& entries) {
+    for (const auto& entry : entries) {
+      // entries are invalid if there are two duplicate
+      // nonzero indices present
+      auto nonzero_ind = entry.nonzero_indices();
+      const std::size_t nnz = entry.num_nonzero();
+      // remove sequential duplicates from sorted nonzero-indices
+      std::sort(nonzero_ind.begin(), nonzero_ind.end());
+      auto last = std::unique(nonzero_ind.begin(), nonzero_ind.end());
+      nonzero_ind.erase(last, nonzero_ind.end());
+      // if unduplicated nonzero-indices is not equal to nnz,
+      // there were duplicate nonzero-indices -> entry invalid
+      if (nonzero_ind.size() != nnz) {
+        return unexpected<LpError>(LpError::InvalidMatrixEntryError);
+      }
+      entries_.emplace_back(entry);
+    }
+    return expected<void, LpError>();
+  }
+
   SparseMatrixType type_;
   std::vector<std::size_t> begin_indices_;
   std::vector<MatrixEntry<T>> entries_;
