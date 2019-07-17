@@ -1,8 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "mock_lp.hpp"
-#include "mock_lpsolver.hpp"
+#include "lpinterface.hpp"
 
 using namespace lpint;
 

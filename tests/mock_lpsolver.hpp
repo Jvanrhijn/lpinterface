@@ -1,9 +1,6 @@
 #ifndef LPINTERFACE_TESTS_MOCK_LPSOLVER_H
 #define LPINTERFACE_TESTS_MOCK_LPSOLVER_H
 
-#include "common.hpp"
-#include "gmock/gmock.h"
-#include "lp.hpp"
 #include "lpinterface.hpp"
 
 #include <vector>

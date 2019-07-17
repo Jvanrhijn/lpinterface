@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
-#include "data_objects.hpp"
+#include "lpinterface.hpp"
 
 using namespace lpint;
 

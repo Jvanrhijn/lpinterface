@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "lp_impl.hpp"
-#include "lpinterface_gurobi.hpp"
+#include "lpinterface.hpp"
+#include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "mock_lp.hpp"
 
 using namespace lpint;
