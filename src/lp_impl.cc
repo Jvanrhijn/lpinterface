@@ -26,7 +26,7 @@ expected<void, LpError> LinearProgram::add_rows(
 }
 
 expected<void, LpError> LinearProgram::set_matrix(
-    const SparseMatrix<double> matrix) {
+    const SparseMatrix<double>& matrix) {
   matrix_ = matrix;
   return expected<void, LpError>();
 }

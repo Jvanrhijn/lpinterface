@@ -27,7 +27,7 @@ class LinearProgram : public LinearProgramInterface {
       const std::vector<Row<double>>& rows) override;
 
   expected<void, LpError> set_matrix(
-      const SparseMatrix<double> matrix) override;
+      const SparseMatrix<double>& matrix) override;
 
   const SparseMatrix<double>& matrix() const override;
 
