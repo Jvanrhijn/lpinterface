@@ -225,6 +225,12 @@ struct Objective {
   std::vector<VarType> variable_types;
 };
 
+template <typename T>
+struct Solution {
+  std::vector<T> values;
+  T objective_value;
+};
+
 }  // namespace lpint
 
 #endif  // LPINTERFACE_DATA_OBJECTS_H

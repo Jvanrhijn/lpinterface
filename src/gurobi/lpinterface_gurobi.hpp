@@ -43,7 +43,7 @@ class GurobiSolver : public LinearProgramSolver {
 
   LinearProgramInterface& linear_program() override;
 
-  expected<std::vector<double>, LpError> get_solution() const override;
+  expected<Solution<double>, LpError> get_solution() const override;
 
  private:
   //! The linear program to solve
@@ -54,6 +54,9 @@ class GurobiSolver : public LinearProgramSolver {
 
   //! The gurobi model object
   GRBmodel* gurobi_model_;
+
+  //! The solution vector
+  Solution<double> solution_;
 
   // copy-and-swap idiom
   friend void swap(GurobiSolver& first, GurobiSolver& second) noexcept {

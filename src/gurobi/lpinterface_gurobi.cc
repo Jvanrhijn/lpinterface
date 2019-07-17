@@ -151,7 +151,19 @@ expected<void, LpError> GurobiSolver::solve_primal() {
   if (error) {
     return unexpected<LpError>(convert_gurobi_error(error));
   }
-  return unexpected<LpError>(LpError::SolveSuccess);
+  // retrieve solution information from gurobi
+  // TODO: check solution status
+  error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL, &solution_.objective_value);
+  if (error) {
+    return unexpected<LpError>(convert_gurobi_error(error));
+  } 
+  std::size_t num_vars = linear_program_->objective().values.size();
+  solution_.values.resize(num_vars);
+  error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars, solution_.values.data());
+  if (error) {
+    return unexpected<LpError>(convert_gurobi_error(error));
+  } 
+  return expected<void, LpError>();
 }
 
 // TODO: actually do something here
@@ -167,9 +179,8 @@ LinearProgramInterface& GurobiSolver::linear_program() {
   return *linear_program_;
 }
 
-// TODO: actually do something here
-expected<std::vector<double>, LpError> GurobiSolver::get_solution() const {
-  return unexpected<LpError>(LpError::ModelNotSolvedError);
+expected<Solution<double>, LpError> GurobiSolver::get_solution() const {
+  return expected<Solution<double>, LpError>(solution_);
 }
 
 }  // namespace lpint

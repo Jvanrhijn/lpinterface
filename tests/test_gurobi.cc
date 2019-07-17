@@ -38,4 +38,12 @@ TEST(Gurobi, FullProblem) {
   auto grb = create_grb(lp);
   err = grb.update_program();
   ASSERT_TRUE(err);
+  err = grb.solve_primal();
+  ASSERT_TRUE(err);
+  // check solution value
+  auto err_sol = grb.get_solution();
+  ASSERT_TRUE(err_sol);
+  auto solution = err_sol.value();
+  ASSERT_EQ(solution.values, (std::vector<double>{1.0, 0.0, 1.0}));
+  ASSERT_EQ(solution.objective_value, 3.0);
 }

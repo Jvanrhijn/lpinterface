@@ -1,6 +1,8 @@
 #ifndef LPINTERFACE_ERRORS_H
 #define LPINTERFACE_ERRORS_H
 
+#include <iostream>
+
 namespace lpint {
 
 /**
@@ -11,7 +13,7 @@ namespace lpint {
  * will be returned from the failing function inside of
  * an expected<T, E>.
  */
-enum class LpError {
+enum class LpError : int {
   //! LP solution ran succesfully
   SolveSuccess,
   //! Wrong matrix type (column- or row-wise) assumed
@@ -41,6 +43,10 @@ enum class LpError {
   //! Internal Gurobi error
   InternalGurobiError,
 };
+
+inline std::ostream& operator<<(std::ostream& s, LpError err) {
+  return s << static_cast<int>(err);
+}
 
 inline LpError convert_gurobi_error(const int gurobi_error) {
   // TODO: add support for all errors

@@ -77,7 +77,7 @@ class LinearProgramSolver {
    * This method will fail with LpError::ModelNotsolvedError
    * if the solution has not (yet) been found.
    */
-  virtual expected<std::vector<double>, LpError> get_solution() const = 0;
+  virtual expected<Solution<double>, LpError> get_solution() const = 0;
 };
 
 }  // namespace lpint
