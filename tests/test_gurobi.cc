@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "lp_impl.hpp"
 #include "lpinterface_gurobi.hpp"
+#include <iostream>
 
 using namespace lpint;
 
@@ -42,4 +43,6 @@ TEST(Gurobi, FullProblem) {
   err = lp.set_objective(obj);
   ASSERT_TRUE(err);
   auto grb = create_grb(lp);
+  err = grb.update_program();
+  ASSERT_TRUE(err);
 }

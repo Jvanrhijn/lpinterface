@@ -28,8 +28,9 @@ enum class VarType {
     Binary,
     Integer,
     Real,
+    SemiReal,
+    SemiInteger,
 };
-
 
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers

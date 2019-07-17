@@ -1,4 +1,5 @@
 #include "lpinterface_gurobi.hpp"
+#include <iostream>
 
 namespace lpint {
 
@@ -68,11 +69,101 @@ expected<void, LpError> GurobiSolver::set_parameter(const Param param,
 
 // TODO: actually do something here
 expected<void, LpError> GurobiSolver::update_program() {
+  // first add variables to Gurobi
+  auto objective = linear_program_->objective();
+  std::size_t num_vars = objective.values.size();
+  std::vector<double> obj(objective.values.begin(), objective.values.end());
+  std::vector<char> value_type(num_vars);
+  for (std::size_t i = 0; i < num_vars; i++) {
+    char vtype;
+    switch (objective.variable_types[i]) {
+      case VarType::Binary:
+        vtype = GRB_BINARY;
+        break;
+      case VarType::Integer:
+        vtype = GRB_INTEGER;
+        break;
+      case VarType::Real:
+        vtype = GRB_CONTINUOUS;
+        break;
+      case VarType::SemiReal:
+        vtype = GRB_SEMICONT;
+        break;
+      case VarType::SemiInteger:
+        vtype = GRB_SEMIINT;
+        break;
+      default:
+        return unexpected<LpError>(LpError::UnsupportedVariableTypeError);
+    }
+    value_type[i] = vtype;
+  }
+  auto err = GRBaddvars(
+    gurobi_model_,
+    num_vars,
+    0,
+    nullptr,
+    nullptr,
+    nullptr,
+    obj.data(),
+    nullptr,
+    nullptr,
+    value_type.data(),
+    nullptr
+  );
+  if (err) {
+    return unexpected<LpError>(convert_gurobi_error(err));
+  }
+  // set constraints
+  auto matrix = linear_program_->matrix();
+  auto constraints = linear_program_->constraints();
+  std::size_t idx = 0;
+  if (matrix.type() == SparseMatrixType::RowWise) {
+    for (const auto& row : matrix) {
+      char ord;
+      switch (constraints[idx].ordering) {
+        case Ordering::LEQ:
+          ord = GRB_LESS_EQUAL;
+          break;
+        case Ordering::GEQ:
+          ord = GRB_GREATER_EQUAL;
+          break;
+        case Ordering::EQ:
+          ord = GRB_EQUAL;
+          break;
+        default:
+          return unexpected<LpError>(LpError::UnsupportedConstraintError);
+      }
+      // need to do this since gurobi wants int* for indices
+      // for some ungodly reason
+      std::vector<int> nonzero_indices(row.nonzero_indices().begin(), row.nonzero_indices().end());
+      // need to do this since gurobi takes double* rather than const double* const
+      std::vector<double> values(row.values().begin(), row.values().end());
+      auto error = GRBaddconstr(
+        gurobi_model_, 
+        row.num_nonzero(), 
+        nonzero_indices.data(),
+        values.data(),
+        ord,
+        constraints[idx].value,
+        ("constr" + std::to_string(idx)).c_str()
+      );
+      if (error != 0) {
+        return unexpected<LpError>(convert_gurobi_error(error));  
+      }
+      idx++;
+    }
+  } else {
+    return unexpected<LpError>(LpError::MatrixTypeError);
+  }
   return expected<void, LpError>();
 }
 
 // TODO: actually do something here
 expected<void, LpError> GurobiSolver::solve_primal() {
+  auto error = GRBoptimize(gurobi_model_);
+  if (error) {
+    return unexpected<LpError>(convert_gurobi_error(error));
+  }
   return unexpected<LpError>(LpError::SolveSuccess);
 }
 

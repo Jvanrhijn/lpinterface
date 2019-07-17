@@ -31,6 +31,15 @@ expected<void, LpError> LinearProgram::set_matrix(
   return expected<void, LpError>();
 }
 
+const SparseMatrix<double>& LinearProgram::matrix() const {
+  return matrix_;
+}
+
+
+const std::vector<Constraint<double>>& LinearProgram::constraints() const {
+  return constraints_;
+}
+
 expected<void, LpError> LinearProgram::add_constraints(
     const std::vector<Constraint<double>>& constraints) {
   constraints_ = constraints;
@@ -43,6 +52,10 @@ expected<void, LpError> LinearProgram::set_objective(
     const Objective<double>& objective) {
   objective_ = objective;
   return expected<void, LpError>();
+}
+
+const Objective<double>& LinearProgram::objective() const {
+  return objective_;
 }
 
 }  // namespace lpint

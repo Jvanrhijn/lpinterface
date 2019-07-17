@@ -49,6 +49,14 @@ class LinearProgramInterface {
   virtual expected<void, LpError> set_matrix(
       const SparseMatrix<double> matrix) = 0;
 
+  
+  /**
+   * @brief Get immutable access to the constraint matrix
+   */
+  virtual const SparseMatrix<double>& matrix() const = 0;
+
+  virtual const std::vector<Constraint<double>>& constraints() const = 0;
+
   /**
    * @brief Add a set of constraints to the LP formulation.
    */
@@ -67,6 +75,8 @@ class LinearProgramInterface {
    * @brief Set the objective function to be used.
    */
   virtual expected<void, LpError> set_objective(const Objective<double>& objective) = 0;
+
+  virtual const Objective<double>& objective() const = 0;
 };
 
 }  // namespace lpint
