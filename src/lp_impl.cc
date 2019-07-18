@@ -15,20 +15,19 @@ LinearProgram::LinearProgram(
     const std::initializer_list<Column<double>>&& columns)
     : matrix_(std::forward<decltype(columns)>(columns)), opt_type_(opt_type) {}
 
-expected<void, LpError> LinearProgram::add_columns(
+void LinearProgram::add_columns(
     const std::vector<Column<double>>& columns) {
   return matrix_.add_columns(columns);
 }
 
-expected<void, LpError> LinearProgram::add_rows(
+void LinearProgram::add_rows(
     const std::vector<Row<double>>& rows) {
   return matrix_.add_rows(rows);
 }
 
-expected<void, LpError> LinearProgram::set_matrix(
+void LinearProgram::set_matrix(
     const SparseMatrix<double>& matrix) {
   matrix_ = matrix;
-  return expected<void, LpError>();
 }
 
 const SparseMatrix<double>& LinearProgram::matrix() const { return matrix_; }
@@ -37,18 +36,16 @@ const std::vector<Constraint<double>>& LinearProgram::constraints() const {
   return constraints_;
 }
 
-expected<void, LpError> LinearProgram::add_constraints(
+void LinearProgram::add_constraints(
     const std::vector<Constraint<double>>& constraints) {
   constraints_ = constraints;
-  return expected<void, LpError>();
 }
 
 OptimizationType LinearProgram::optimization_type() const { return opt_type_; }
 
-expected<void, LpError> LinearProgram::set_objective(
+void LinearProgram::set_objective(
     const Objective<double>& objective) {
   objective_ = objective;
-  return expected<void, LpError>();
 }
 
 const Objective<double>& LinearProgram::objective() const { return objective_; }

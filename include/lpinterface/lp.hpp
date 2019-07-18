@@ -34,19 +34,19 @@ class LinearProgramInterface {
   /**
    * @brief Add columns to the LP.
    */
-  virtual expected<void, LpError> add_columns(
+  virtual void add_columns(
       const std::vector<Column<double>>& columns) = 0;
 
   /**
    * @brief Add rows to the LP.
    */
-  virtual expected<void, LpError> add_rows(
+  virtual void add_rows(
       const std::vector<Row<double>>& rows) = 0;
 
   /**
    * @brief Set the linear program matrix.
    */
-  virtual expected<void, LpError> set_matrix(
+  virtual void set_matrix(
       const SparseMatrix<double>& matrix) = 0;
 
   /**
@@ -59,7 +59,7 @@ class LinearProgramInterface {
   /**
    * @brief Add a set of constraints to the LP formulation.
    */
-  virtual expected<void, LpError> add_constraints(
+  virtual void add_constraints(
       const std::vector<Constraint<double>>& constraints) = 0;
 
   /**
@@ -73,7 +73,7 @@ class LinearProgramInterface {
   /**
    * @brief Set the objective function to be used.
    */
-  virtual expected<void, LpError> set_objective(
+  virtual void set_objective(
       const Objective<double>& objective) = 0;
 
   virtual const Objective<double>& objective() const = 0;

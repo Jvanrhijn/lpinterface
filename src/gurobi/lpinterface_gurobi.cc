@@ -41,7 +41,7 @@ GurobiSolver::~GurobiSolver() {
   GRBfreemodel(gurobi_model_);
 }
 
-expected<void, LpError> GurobiSolver::set_parameter(const Param param,
+void GurobiSolver::set_parameter(const Param param,
                                                     const int value) {
   switch (param) {
     case Param::GrbOutputFlag:
@@ -51,38 +51,33 @@ expected<void, LpError> GurobiSolver::set_parameter(const Param param,
       GRBsetintparam(GRBgetenv(gurobi_model_), "threads", value);
       break;
     default:
-      return unexpected<LpError>(LpError::UnsupportedParameterError);
+      throw UnsupportedParameterException();
   }
-  return expected<void, LpError>();
 }
 
-expected<void, LpError> GurobiSolver::set_parameter(const Param param,
+void GurobiSolver::set_parameter(const Param param,
                                                     const double value) {
   switch (param) {
     case Param::GrbCutoff:
       GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value);
       break;
     default:
-      return unexpected<LpError>(LpError::UnsupportedParameterError);
+      throw UnsupportedParameterException();
   }
-  return expected<void, LpError>();
 }
 
 // TODO: actually do something here
-expected<void, LpError> GurobiSolver::update_program() {
+void GurobiSolver::update_program() {
   // first add variables to Gurobi
   auto objective = linear_program_->objective();
   std::size_t num_vars = objective.values.size();
   std::vector<double> obj(objective.values.begin(), objective.values.end());
-  auto err_vt = convert_variable_type(objective.variable_types);
-  if (!err_vt) {
-    return unexpected<LpError>(err_vt.error());
-  }
+  auto vt = convert_variable_type(objective.variable_types);
   auto err =
       GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
-                 obj.data(), nullptr, nullptr, err_vt.value().data(), nullptr);
+                 obj.data(), nullptr, nullptr, vt.data(), nullptr);
   if (err != 0) {
-    return unexpected<LpError>(LpError(err));
+    throw GurobiException(err);
   }
   // set constraints
   auto matrix = linear_program_->matrix();
@@ -102,7 +97,7 @@ expected<void, LpError> GurobiSolver::update_program() {
           ord = GRB_EQUAL;
           break;
         default:
-          return unexpected<LpError>(LpError::UnsupportedConstraintError);
+          throw UnsupportedConstraintException();
       }
       // need to do this since gurobi wants int* for indices
       // for some ungodly reason
@@ -113,40 +108,37 @@ expected<void, LpError> GurobiSolver::update_program() {
                        row.values().data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
-        return unexpected<LpError>(LpError(error));
+        throw GurobiException(error);
       }
       idx++;
     }
   } else {
-    return unexpected<LpError>(LpError::MatrixTypeError);
+    throw MatrixTypeException();
   }
-  return expected<void, LpError>();
 }
 
-expected<void, LpError> GurobiSolver::solve_primal() {
+// TODO: have these return status codes instead of void
+void GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
-    return unexpected<LpError>(LpError(error));
+    throw GurobiException(error);
   }
   // retrieve solution information from gurobi
   // TODO: check solution status
   error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL, &solution_.objective_value);
   if (error) {
-    return unexpected<LpError>(LpError(error));
+    throw GurobiException(error);
   } 
   std::size_t num_vars = linear_program_->objective().values.size();
   solution_.values.resize(num_vars);
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars, solution_.values.data());
   if (error) {
-    return unexpected<LpError>(LpError(error));
+    throw GurobiException(error);
   } 
-  return expected<void, LpError>();
 }
 
 // TODO: actually do something here
-expected<void, LpError> GurobiSolver::solve_dual() {
-  return unexpected<LpError>(LpError::SolveSuccess);
-}
+void GurobiSolver::solve_dual() {}
 
 const LinearProgramInterface& GurobiSolver::linear_program() const {
   return *linear_program_;
@@ -156,11 +148,11 @@ LinearProgramInterface& GurobiSolver::linear_program() {
   return *linear_program_;
 }
 
-expected<Solution<double>, LpError> GurobiSolver::get_solution() const {
-  return expected<Solution<double>, LpError>(solution_);
+const Solution<double>& GurobiSolver::get_solution() const {
+  return solution_;
 }
 
-expected<std::vector<char>, LpError> GurobiSolver::convert_variable_type(const std::vector<VarType>& var_types) {
+std::vector<char> GurobiSolver::convert_variable_type(const std::vector<VarType>& var_types) {
   auto num_vars = var_types.size();
   std::vector<char> value_type(num_vars);
   for (std::size_t i = 0; i < num_vars; i++) {
@@ -182,11 +174,11 @@ expected<std::vector<char>, LpError> GurobiSolver::convert_variable_type(const s
         vtype = GRB_SEMIINT;
         break;
       default:
-        return unexpected<LpError>(LpError::UnsupportedVariableTypeError);
+        throw UnsupportedVariableTypeException();
     }
     value_type[i] = vtype;
   }
-  return expected<std::vector<char>, LpError>(value_type);
+  return value_type;
 }
 
 }  // namespace lpint

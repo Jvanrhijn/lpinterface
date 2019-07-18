@@ -9,6 +9,7 @@
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lpinterface.hpp"
+#include "lpinterface/errors.hpp"
 
 namespace lpint {
 
@@ -27,26 +28,26 @@ class GurobiSolver : public LinearProgramSolver {
   GurobiSolver& operator=(GurobiSolver) noexcept;
   GurobiSolver& operator=(GurobiSolver&&) noexcept = delete;
 
-  virtual expected<void, LpError> set_parameter(const Param param,
+  virtual void set_parameter(const Param param,
                                                 const int value) override;
 
-  virtual expected<void, LpError> set_parameter(const Param param,
+  virtual void set_parameter(const Param param,
                                                 const double value) override;
 
-  expected<void, LpError> update_program() override;
+  void update_program() override;
 
-  expected<void, LpError> solve_primal() override;
+  void solve_primal() override;
 
-  expected<void, LpError> solve_dual() override;
+  void solve_dual() override;
 
   const LinearProgramInterface& linear_program() const override;
 
   LinearProgramInterface& linear_program() override;
 
-  expected<Solution<double>, LpError> get_solution() const override;
+  const Solution<double>& get_solution() const override;
 
  private:
-  static expected<std::vector<char>, LpError> convert_variable_type(const std::vector<VarType>& var_types);
+  static std::vector<char> convert_variable_type(const std::vector<VarType>& var_types);
 
   //! The linear program to solve
   std::shared_ptr<LinearProgramInterface> linear_program_;

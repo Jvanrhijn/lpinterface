@@ -42,7 +42,7 @@ class LinearProgramSolver {
    * @param param The parameter to change.
    * @param value The value to which to set the parameter.
    */
-  virtual expected<void, LpError> set_parameter(const Param param,
+  virtual void set_parameter(const Param param,
                                                 const int value) = 0;
 
   /**
@@ -52,7 +52,7 @@ class LinearProgramSolver {
    * @param param The parameter to change.
    * @param value The value to which to set the parameter.
    */
-  virtual expected<void, LpError> set_parameter(const Param param,
+  virtual void set_parameter(const Param param,
                                                 const double value) = 0;
 
   /**
@@ -60,24 +60,24 @@ class LinearProgramSolver {
    * Use this method after changing configuration of the LinearProgram
    * object contained in this object.
    */
-  virtual expected<void, LpError> update_program() = 0;
+  virtual void update_program() = 0;
 
   /**
    * @brief Solve the primal linear program.
    */
-  virtual expected<void, LpError> solve_primal() = 0;
+  virtual void solve_primal() = 0;
 
   /**
    * @brief Solve the dual linear program.
    */
-  virtual expected<void, LpError> solve_dual() = 0;
+  virtual void solve_dual() = 0;
 
   /**
    * @brief Get the solution of the linear program.
    * This method will fail with LpError::ModelNotsolvedError
    * if the solution has not (yet) been found.
    */
-  virtual expected<Solution<double>, LpError> get_solution() const = 0;
+  virtual const Solution<double>& get_solution() const = 0;
 };
 
 }  // namespace lpint

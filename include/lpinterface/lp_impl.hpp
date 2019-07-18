@@ -20,25 +20,25 @@ class LinearProgram : public LinearProgramInterface {
 
   ~LinearProgram() = default;
 
-  expected<void, LpError> add_columns(
+  void add_columns(
       const std::vector<Column<double>>& columns) override;
 
-  expected<void, LpError> add_rows(
+  void add_rows(
       const std::vector<Row<double>>& rows) override;
 
-  expected<void, LpError> set_matrix(
+  void set_matrix(
       const SparseMatrix<double>& matrix) override;
 
   const SparseMatrix<double>& matrix() const override;
 
   const std::vector<Constraint<double>>& constraints() const override;
 
-  expected<void, LpError> add_constraints(
+  void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
 
   OptimizationType optimization_type() const override;
 
-  expected<void, LpError> set_objective(
+  void set_objective(
       const Objective<double>& objective) override;
 
   const Objective<double>& objective() const override;
