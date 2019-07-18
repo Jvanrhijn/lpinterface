@@ -89,7 +89,7 @@ expected<void, LpError> GurobiSolver::update_program() {
   auto constraints = linear_program_->constraints();
   std::size_t idx = 0;
   if (matrix.type() == SparseMatrixType::RowWise) {
-    for (const auto& row : matrix) {
+    for (auto& row : matrix) {
       char ord;
       switch (constraints[idx].ordering) {
         case Ordering::LEQ:
@@ -108,12 +108,9 @@ expected<void, LpError> GurobiSolver::update_program() {
       // for some ungodly reason
       std::vector<int> nonzero_indices(row.nonzero_indices().begin(),
                                        row.nonzero_indices().end());
-      // need to do this since gurobi takes double* rather than const double*
-      // const
-      std::vector<double> values(row.values().begin(), row.values().end());
       auto error =
           GRBaddconstr(gurobi_model_, row.num_nonzero(), nonzero_indices.data(),
-                       values.data(), ord, constraints[idx].value,
+                       row.values().data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
         return unexpected<LpError>(LpError(error));

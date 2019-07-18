@@ -12,7 +12,8 @@ GurobiSolver create_grb(const LinearProgram& lp) {
 }
 
 TEST(Gurobi, SetParameters) {
-  GurobiSolver grb(std::make_shared<MockLinearProgram>());
+  auto lp = std::make_shared<MockLinearProgram>();
+  GurobiSolver grb(lp);
   auto err = grb.set_parameter(Param::GrbThreads, 1);
   ASSERT_TRUE(err);
   err = grb.set_parameter(Param::GrbOutputFlag, 0);

@@ -75,6 +75,7 @@ class MatrixEntry {
   std::size_t num_nonzero() const { return values_.size(); }
 
   const std::vector<T>& values() const { return values_; }
+  std::vector<T>& values() { return values_; }
   const std::vector<std::size_t>& nonzero_indices() const {
     return nonzero_indices_;
   }
