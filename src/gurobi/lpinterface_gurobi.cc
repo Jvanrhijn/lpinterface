@@ -141,8 +141,9 @@ Status GurobiSolver::solve_primal() {
   if (error) {
     throw GurobiException(error);
   }
-  std::size_t num_vars = linear_program_->objective().values.size();
-  solution_.values.resize(num_vars);
+  int num_vars;
+  error== GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
+  solution_.values.resize(static_cast<std::size_t>(num_vars));
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
                              solution_.values.data());
   if (error) {
@@ -220,7 +221,7 @@ void GurobiSolver::add_rows(std::vector<double>& values,
                             std::vector<Ordering>& ord,
                             std::vector<double>& rhs) {
   auto error =
-      GRBaddconstrs(gurobi_model_, values.size(), start_indices.size(),
+      GRBaddconstrs(gurobi_model_, start_indices.size(), values.size(),
                     start_indices.data(), col_indices.data(), values.data(),
                     convert_ordering(ord).data(), rhs.data(), nullptr);
   if (error) {

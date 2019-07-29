@@ -14,43 +14,68 @@ namespace lpint {
  * control over various error paths.
  */
 class LpException : public std::exception {
+ public:
   virtual const char *what() const throw() { return msg; }
 
   const char *msg;
 };
 
 class MatrixTypeException : public LpException {
-  const char *msg = "Wrong matrix type assumed";
+   public:
+  virtual const char *what() const throw() {
+    return "Wrong matrix type assumed";
+  }
 };
 
 class NotImplementedError : public LpException {
-  const char *msg = "Feature not implemented";
+   public:
+  virtual const char *what() const throw() {
+    return "Feature not implemented";
+  }
 };
 
 class ModelNotSolvedException : public LpException {
-  const char *msg = "Model has not yet been solved";
+   public:
+  virtual const char *what() const throw() {
+    return "Model has not yet been solved";
+  }
 };
 
 class UnsupportedParameterException : public LpException {
-  const char *msg = "Invalid parameter was supplied";
+   public:
+  virtual const char *what() const throw() {
+    return "Invalid parameter was supplied";
+  }
 };
 
 class UnsupportedConstraintException : public LpException {
-  const char *msg = "Unsupported constraint type was supplied";
+   public:
+  virtual const char *what() const throw() {
+    return "Unsupported constraint type was supplied";
+  }
 };
 
 class InvalidMatrixEntryException : public LpException {
-  const char *msg =
-      "Invalid matrix entry; does your row/column contain duplicate indices?";
+   public:
+  virtual const char *what() const throw() {
+    return "Invalid matrix entry; does your row/column contain duplicate indices?";
+  }
 };
 
 class UnsupportedVariableTypeException : public LpException {
-  const char *msg = "Unsupported variable type for this backend";
+ public:
+  virtual const char *what() const throw() {
+    return "Unsupported variable type for this backend";
+  }
 };
 
 class GurobiException : public LpException {
+ public:
   virtual const char *what() const throw() {
-    return ("Error occured in Gurobi: code " + std::to_string(code_)).c_str();
+    // TODO find better way to do this
+    char *message = new char[100];
+    snprintf(message, 99, "Error occured in Gurobi, code %d", code_);
+    return message;
   }
 
  public:
@@ -61,11 +86,17 @@ class GurobiException : public LpException {
 };
 
 class UknownStatusException : public LpException {
-  const char *msg = "Unknown status code encountered";
+   public:
+  virtual const char *what() const throw() {
+    return "Unknown status code encountered";
+  }
 };
 
 class UnsupportedFeatureException : public LpException {
-  const char *msg = "Feature not available for this solver backend";
+   public:
+  virtual const char *what() const throw() {
+    return "Feature not available for this solver backend";
+  }
 };
 
 enum class Status {
