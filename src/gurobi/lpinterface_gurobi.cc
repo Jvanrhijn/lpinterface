@@ -118,13 +118,15 @@ void GurobiSolver::update_program() {
 }
 
 // TODO: have these return status codes instead of void
-void GurobiSolver::solve_primal() {
+Status GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
     throw GurobiException(error);
   }
   // retrieve solution information from gurobi
-  // TODO: check solution status
+  if (error) {
+    throw GurobiException(error);
+  }
   error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL, &solution_.objective_value);
   if (error) {
     throw GurobiException(error);
@@ -135,10 +137,55 @@ void GurobiSolver::solve_primal() {
   if (error) {
     throw GurobiException(error);
   } 
+  return solution_status();
 }
 
 // TODO: actually do something here
-void GurobiSolver::solve_dual() {}
+Status GurobiSolver::solve_dual() {
+  return Status::NoInformation;
+}
+
+Status GurobiSolver::solution_status() const {
+  int status;
+  auto error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_STATUS, &status);
+  if (error) {
+    throw GurobiException(error);
+  }
+  switch (status) {
+    case GRB_LOADED: 
+      return Status::NoInformation;
+    case GRB_OPTIMAL:
+      return Status::Optimal;
+    case GRB_INFEASIBLE:
+      return Status::Infeasible;
+    case GRB_INF_OR_UNBD:
+      return Status::InfeasibleOrUnbounded;
+    case GRB_UNBOUNDED:
+      return Status::Unbounded;
+    case GRB_CUTOFF:
+      return Status::Cutoff;
+    case GRB_ITERATION_LIMIT:
+      return Status::IterationLimit;
+    case GRB_NODE_LIMIT:
+      return Status::NodeLimit;
+    case GRB_TIME_LIMIT:
+      return Status::TimeOut;
+    case GRB_SOLUTION_LIMIT:
+      return Status::SolutionLimit;
+    case GRB_INTERRUPTED:
+      return Status::Interrupted;
+    case GRB_NUMERIC:
+      return Status::NumericFailure;
+    case GRB_SUBOPTIMAL:
+      return Status::SuboptimalSolution;
+    case GRB_INPROGRESS:
+      return Status::InProgress;
+    case GRB_USER_OBJ_LIMIT:
+      return Status::UserObjectiveLimit;
+    default:
+      throw UknownStatusException();
+  }
+}
 
 const LinearProgramInterface& GurobiSolver::linear_program() const {
   return *linear_program_;

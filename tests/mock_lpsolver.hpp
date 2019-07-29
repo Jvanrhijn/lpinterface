@@ -9,8 +9,8 @@ namespace lpint {
 
 class MockLpSolver : public LinearProgramSolver {
  public:
-  MOCK_METHOD0(solve_primal, void());
-  MOCK_METHOD0(solve_dual, void());
+  MOCK_METHOD0(solve_primal, Status());
+  MOCK_METHOD0(solve_dual, Status ());
   MOCK_METHOD0(update_program, void());
   MOCK_CONST_METHOD0(linear_program, const LinearProgramInterface&());
   MOCK_METHOD0(linear_program, LinearProgramInterface&());

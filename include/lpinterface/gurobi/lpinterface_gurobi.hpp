@@ -36,9 +36,11 @@ class GurobiSolver : public LinearProgramSolver {
 
   void update_program() override;
 
-  void solve_primal() override;
+  Status solve_primal() override;
 
-  void solve_dual() override;
+  Status solve_dual() override;
+
+  Status solution_status() const override;
 
   const LinearProgramInterface& linear_program() const override;
 

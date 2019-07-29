@@ -65,12 +65,17 @@ class LinearProgramSolver {
   /**
    * @brief Solve the primal linear program.
    */
-  virtual void solve_primal() = 0;
+  virtual Status solve_primal() = 0;
 
   /**
    * @brief Solve the dual linear program.
    */
-  virtual void solve_dual() = 0;
+  virtual Status solve_dual() = 0;
+
+  /**
+   * @brief Query the LP solver for the solution status
+   */
+  virtual Status solution_status() const = 0;
 
   /**
    * @brief Get the solution of the linear program.

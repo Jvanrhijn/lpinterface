@@ -63,10 +63,45 @@ class NotImplementedError : public LpException {
 
  };
 
-enum ErrorKind {
-  LpInterface = 00000,
-  Gurobi = 10001,
-};
+ class UknownStatusException : public LpException {
+   const char *msg = "Unknown status code encountered";
+ };
+
+ enum class Status {
+   //! No solution information available.
+   NoInformation,
+   //! Model was solved to optimality, solution available.
+   Optimal,
+   //! Model was proven to be infeasible.
+   Infeasible,
+   //! Model was proven to be either infeasible or unbounded.
+   InfeasibleOrUnbounded,
+   //! Model was proven to be unbounded.
+   Unbounded,
+   //! Optimal objective for model was proven to be worse 
+   //! than the value specified in the Cutoff parameter.
+   Cutoff,
+   //! Number of iterations exceeded user-specified iteration limit.
+   IterationLimit,
+   //! Total number of branch-and-cut nodes explored exceeded user-specified
+   //! node limit.
+   NodeLimit,
+   //! Time limit reached.
+   TimeOut,
+   //! Solutions found exceeded solution limit.
+   SolutionLimit,
+   //! Optimization interrupted by user.
+   Interrupted,
+   //! Optimizer ran into unrecoverable numerical difficulties.
+   NumericFailure,
+   //! Could not satisfy tolerances; sub-optimal solution is available.
+   SuboptimalSolution,
+   //! Optimization is currently in progress; encountered when optimization is ran
+   //! asynchronously.
+   InProgress,
+   //! User-specified objective limit has been reached.
+   UserObjectiveLimit,
+ };
 
 }  // namespace lpint
 
