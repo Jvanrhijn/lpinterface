@@ -20,6 +20,21 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
           : GRB_MINIMIZE);
 }
 
+GurobiSolver::GurobiSolver(OptimizationType opt_type) {
+  GRBloadenv(&gurobi_env_, "");
+  // allocate Gurobi model
+  GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
+              nullptr, nullptr, nullptr);
+  set_parameter(Param::GrbOutputFlag, 0);
+
+  // set optimization type
+  GRBsetintattr(
+      gurobi_model_, "modelsense",
+      opt_type == OptimizationType::Maximize
+          ? GRB_MAXIMIZE
+          : GRB_MINIMIZE);
+}
+
 GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
     : linear_program_(other.linear_program_) {
   gurobi_model_ = GRBcopymodel(other.gurobi_model_);
@@ -192,12 +207,43 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-void GurobiSolver::add_columns(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& row_indices, std::vector<double>& objective_values) {
+void GurobiSolver::add_columns(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& row_indices, std::vector<Ordering>& ord, std::vector<double>& rhs) {
   throw UnsupportedFeatureException();
 }
 
-void GurobiSolver::add_rows(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& col_indices, std::vector<double>& objective_values) {
-
+void GurobiSolver::add_rows(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& col_indices, std::vector<Ordering>& ord, std::vector<double>& rhs) {
+  auto error = GRBaddconstrs(
+    gurobi_model_,
+    values.size(),
+    start_indices.size(),
+    start_indices.data(),
+    col_indices.data(),
+    values.data(),
+    convert_ordering(ord).data(),
+    rhs.data(),
+    nullptr
+  );
+  if (error) {
+    throw GurobiException(error);
+  }
+}
+void GurobiSolver::add_variables(std::vector<double>& objective_values, std::vector<VarType>& var_types) {
+  auto error = GRBaddvars(
+    gurobi_model_,
+    objective_values.size(),
+    0,
+    nullptr,
+    nullptr,
+    nullptr,
+    objective_values.data(),
+    nullptr,
+    nullptr,
+    convert_variable_type(var_types).data(),
+    nullptr
+  );
+  if (error) {
+    throw GurobiException(error);
+  }
 }
 
 std::vector<char> GurobiSolver::convert_variable_type(
@@ -228,6 +274,28 @@ std::vector<char> GurobiSolver::convert_variable_type(
     value_type[i] = vtype;
   }
   return value_type;
+}
+
+std::vector<char> GurobiSolver::convert_ordering(const std::vector<Ordering>& ord) {
+  std::size_t idx = 0;
+  std::vector<char> out(ord.size());
+  for (const auto& ordering : ord) {
+      switch (ordering) {
+        case Ordering::LEQ:
+          out[idx] = GRB_LESS_EQUAL;
+          break;
+        case Ordering::GEQ:
+          out[idx] = GRB_GREATER_EQUAL;
+          break;
+        case Ordering::EQ:
+          out[idx] = GRB_EQUAL;
+          break;
+        default:
+          throw UnsupportedConstraintException();
+      }
+      idx++;
+  }
+  return out;
 }
 
 }  // namespace lpint
