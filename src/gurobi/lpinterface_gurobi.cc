@@ -150,47 +150,20 @@ Status GurobiSolver::solution_status() const {
   if (error) {
     throw GurobiException(error);
   }
-  switch (status) {
-    case GRB_LOADED:
-      return Status::NoInformation;
-    case GRB_OPTIMAL:
-      return Status::Optimal;
-    case GRB_INFEASIBLE:
-      return Status::Infeasible;
-    case GRB_INF_OR_UNBD:
-      return Status::InfeasibleOrUnbounded;
-    case GRB_UNBOUNDED:
-      return Status::Unbounded;
-    case GRB_CUTOFF:
-      return Status::Cutoff;
-    case GRB_ITERATION_LIMIT:
-      return Status::IterationLimit;
-    case GRB_NODE_LIMIT:
-      return Status::NodeLimit;
-    case GRB_TIME_LIMIT:
-      return Status::TimeOut;
-    case GRB_SOLUTION_LIMIT:
-      return Status::SolutionLimit;
-    case GRB_INTERRUPTED:
-      return Status::Interrupted;
-    case GRB_NUMERIC:
-      return Status::NumericFailure;
-    case GRB_SUBOPTIMAL:
-      return Status::SuboptimalSolution;
-    case GRB_INPROGRESS:
-      return Status::InProgress;
-    case GRB_USER_OBJ_LIMIT:
-      return Status::UserObjectiveLimit;
-    default:
-      throw UknownStatusException();
-  }
+  return convert_gurobi_status(status);
 }
 
 const LinearProgramInterface& GurobiSolver::linear_program() const {
+  if (!linear_program_->is_initialized()) {
+    throw LinearProgramNotInitializedException();
+  }
   return *linear_program_;
 }
 
 LinearProgramInterface& GurobiSolver::linear_program() {
+  if (!linear_program_->is_initialized()) {
+    throw LinearProgramNotInitializedException();
+  }
   return *linear_program_;
 }
 
@@ -273,6 +246,43 @@ char GurobiSolver::convert_ordering(
       return GRB_EQUAL;
     default:
       throw UnsupportedConstraintException();
+  }
+}
+
+Status GurobiSolver::convert_gurobi_status(int status) {
+  switch (status) {
+    case GRB_LOADED:
+      return Status::NoInformation;
+    case GRB_OPTIMAL:
+      return Status::Optimal;
+    case GRB_INFEASIBLE:
+      return Status::Infeasible;
+    case GRB_INF_OR_UNBD:
+      return Status::InfeasibleOrUnbounded;
+    case GRB_UNBOUNDED:
+      return Status::Unbounded;
+    case GRB_CUTOFF:
+      return Status::Cutoff;
+    case GRB_ITERATION_LIMIT:
+      return Status::IterationLimit;
+    case GRB_NODE_LIMIT:
+      return Status::NodeLimit;
+    case GRB_TIME_LIMIT:
+      return Status::TimeOut;
+    case GRB_SOLUTION_LIMIT:
+      return Status::SolutionLimit;
+    case GRB_INTERRUPTED:
+      return Status::Interrupted;
+    case GRB_NUMERIC:
+      return Status::NumericFailure;
+    case GRB_SUBOPTIMAL:
+      return Status::SuboptimalSolution;
+    case GRB_INPROGRESS:
+      return Status::InProgress;
+    case GRB_USER_OBJ_LIMIT:
+      return Status::UserObjectiveLimit;
+    default:
+      throw UknownStatusException();
   }
 }
 
