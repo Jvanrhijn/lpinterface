@@ -113,7 +113,6 @@ void GurobiSolver::update_program() {
   }
 }
 
-// TODO: have these return status codes instead of void
 Status GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
@@ -192,6 +191,14 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 }
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
+
+void GurobiSolver::add_columns(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& row_indices, std::vector<double>& objective_values) {
+  throw UnsupportedFeatureException();
+}
+
+void GurobiSolver::add_rows(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& col_indices, std::vector<double>& objective_values) {
+
+}
 
 std::vector<char> GurobiSolver::convert_variable_type(
     const std::vector<VarType>& var_types) {

@@ -64,6 +64,10 @@ class UknownStatusException : public LpException {
   const char *msg = "Unknown status code encountered";
 };
 
+class UnsupportedFeatureException : public LpException {
+  const char *msg = "Feature not available for this solver backend";
+};
+
 enum class Status {
   //! No solution information available.
   NoInformation,

@@ -10,10 +10,11 @@
 #include "lpinterface/errors.hpp"
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lpinterface.hpp"
+#include "lpinterface/lp_flush_raw_data.hpp"
 
 namespace lpint {
 
-class GurobiSolver : public LinearProgramSolver {
+class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   // delete the default constructor to prevent
   // deleting invalid memory in destructor
@@ -45,6 +46,9 @@ class GurobiSolver : public LinearProgramSolver {
   LinearProgramInterface& linear_program() override;
 
   const Solution<double>& get_solution() const override;
+
+  void add_columns(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& row_indices, std::vector<double>& objective_values) override;
+  void add_rows(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& col_indices, std::vector<double>& objective_values) override;
 
  private:
   static std::vector<char> convert_variable_type(
