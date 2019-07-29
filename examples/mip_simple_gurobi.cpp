@@ -44,6 +44,11 @@ int main() {
           }
       );
 
+      // Set the objective vector. The objective consists of the
+      // coefficients of the elements of x in the expression
+      // c^T x, as well as the variable types of the elements
+      // of x. These can generally be real, integer, binary, semi-real or
+      // semi-integer.
       lp.set_objective(
           Objective<double>{
               {1.0, 1.0, 2.0},
@@ -56,6 +61,13 @@ int main() {
       GurobiSolver grb(std::make_shared<LinearProgram>(lp));
 
       // Flush LP data to internal solver.
+      // This process keeps the internal LP object intact,
+      // so a copy of the coefficient matrix is kept.
+      // This may become prohibitively expensive if the
+      // coefficient matrix is very large. In such cases,
+      // one can use the methods LinearProgramSolver::add_rows()
+      // or LinearProgramSolver::add_columns() to directly
+      // flush data to the internal solver backend.
       grb.update_program();
 
       // Solve the primal LP problem:
@@ -80,6 +92,10 @@ int main() {
 
 template <typename T>
 void print_vector(const std::vector<T>& v) {
+    if (v.size() == 0) {
+        std::cout << "[]";
+        return;
+    }
     std::cout << "[";
     for (const auto& el: v) {
         std::cout << el << ", ";
