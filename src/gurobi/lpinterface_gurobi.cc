@@ -41,8 +41,7 @@ GurobiSolver::~GurobiSolver() {
   GRBfreemodel(gurobi_model_);
 }
 
-void GurobiSolver::set_parameter(const Param param,
-                                                    const int value) {
+void GurobiSolver::set_parameter(const Param param, const int value) {
   switch (param) {
     case Param::GrbOutputFlag:
       GRBsetintparam(GRBgetenv(gurobi_model_), "outputflag", value);
@@ -55,8 +54,7 @@ void GurobiSolver::set_parameter(const Param param,
   }
 }
 
-void GurobiSolver::set_parameter(const Param param,
-                                                    const double value) {
+void GurobiSolver::set_parameter(const Param param, const double value) {
   switch (param) {
     case Param::GrbCutoff:
       GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value);
@@ -73,9 +71,8 @@ void GurobiSolver::update_program() {
   std::size_t num_vars = objective.values.size();
   std::vector<double> obj(objective.values.begin(), objective.values.end());
   auto vt = convert_variable_type(objective.variable_types);
-  auto err =
-      GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
-                 obj.data(), nullptr, nullptr, vt.data(), nullptr);
+  auto err = GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
+                        obj.data(), nullptr, nullptr, vt.data(), nullptr);
   if (err != 0) {
     throw GurobiException(err);
   }
@@ -127,23 +124,23 @@ Status GurobiSolver::solve_primal() {
   if (error) {
     throw GurobiException(error);
   }
-  error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL, &solution_.objective_value);
+  error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL,
+                        &solution_.objective_value);
   if (error) {
     throw GurobiException(error);
-  } 
+  }
   std::size_t num_vars = linear_program_->objective().values.size();
   solution_.values.resize(num_vars);
-  error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars, solution_.values.data());
+  error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
+                             solution_.values.data());
   if (error) {
     throw GurobiException(error);
-  } 
+  }
   return solution_status();
 }
 
 // TODO: actually do something here
-Status GurobiSolver::solve_dual() {
-  return Status::NoInformation;
-}
+Status GurobiSolver::solve_dual() { return Status::NoInformation; }
 
 Status GurobiSolver::solution_status() const {
   int status;
@@ -152,7 +149,7 @@ Status GurobiSolver::solution_status() const {
     throw GurobiException(error);
   }
   switch (status) {
-    case GRB_LOADED: 
+    case GRB_LOADED:
       return Status::NoInformation;
     case GRB_OPTIMAL:
       return Status::Optimal;
@@ -195,11 +192,10 @@ LinearProgramInterface& GurobiSolver::linear_program() {
   return *linear_program_;
 }
 
-const Solution<double>& GurobiSolver::get_solution() const {
-  return solution_;
-}
+const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-std::vector<char> GurobiSolver::convert_variable_type(const std::vector<VarType>& var_types) {
+std::vector<char> GurobiSolver::convert_variable_type(
+    const std::vector<VarType>& var_types) {
   auto num_vars = var_types.size();
   std::vector<char> value_type(num_vars);
   for (std::size_t i = 0; i < num_vars; i++) {

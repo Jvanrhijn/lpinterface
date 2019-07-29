@@ -42,8 +42,7 @@ class LinearProgramSolver {
    * @param param The parameter to change.
    * @param value The value to which to set the parameter.
    */
-  virtual void set_parameter(const Param param,
-                                                const int value) = 0;
+  virtual void set_parameter(const Param param, const int value) = 0;
 
   /**
    * @brief Set a double-valued parameter in the internal LP solver
@@ -52,8 +51,7 @@ class LinearProgramSolver {
    * @param param The parameter to change.
    * @param value The value to which to set the parameter.
    */
-  virtual void set_parameter(const Param param,
-                                                const double value) = 0;
+  virtual void set_parameter(const Param param, const double value) = 0;
 
   /**
    * @brief Update the linear program in the internal LP solver.

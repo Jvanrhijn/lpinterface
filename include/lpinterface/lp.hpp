@@ -34,20 +34,17 @@ class LinearProgramInterface {
   /**
    * @brief Add columns to the LP.
    */
-  virtual void add_columns(
-      const std::vector<Column<double>>& columns) = 0;
+  virtual void add_columns(const std::vector<Column<double>>& columns) = 0;
 
   /**
    * @brief Add rows to the LP.
    */
-  virtual void add_rows(
-      const std::vector<Row<double>>& rows) = 0;
+  virtual void add_rows(const std::vector<Row<double>>& rows) = 0;
 
   /**
    * @brief Set the linear program matrix.
    */
-  virtual void set_matrix(
-      const SparseMatrix<double>& matrix) = 0;
+  virtual void set_matrix(const SparseMatrix<double>& matrix) = 0;
 
   /**
    * @brief Get immutable access to the constraint matrix
@@ -73,8 +70,7 @@ class LinearProgramInterface {
   /**
    * @brief Set the objective function to be used.
    */
-  virtual void set_objective(
-      const Objective<double>& objective) = 0;
+  virtual void set_objective(const Objective<double>& objective) = 0;
 
   virtual const Objective<double>& objective() const = 0;
 };

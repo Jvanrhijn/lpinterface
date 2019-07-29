@@ -15,18 +15,15 @@ LinearProgram::LinearProgram(
     const std::initializer_list<Column<double>>&& columns)
     : matrix_(std::forward<decltype(columns)>(columns)), opt_type_(opt_type) {}
 
-void LinearProgram::add_columns(
-    const std::vector<Column<double>>& columns) {
+void LinearProgram::add_columns(const std::vector<Column<double>>& columns) {
   return matrix_.add_columns(columns);
 }
 
-void LinearProgram::add_rows(
-    const std::vector<Row<double>>& rows) {
+void LinearProgram::add_rows(const std::vector<Row<double>>& rows) {
   return matrix_.add_rows(rows);
 }
 
-void LinearProgram::set_matrix(
-    const SparseMatrix<double>& matrix) {
+void LinearProgram::set_matrix(const SparseMatrix<double>& matrix) {
   matrix_ = matrix;
 }
 
@@ -43,8 +40,7 @@ void LinearProgram::add_constraints(
 
 OptimizationType LinearProgram::optimization_type() const { return opt_type_; }
 
-void LinearProgram::set_objective(
-    const Objective<double>& objective) {
+void LinearProgram::set_objective(const Objective<double>& objective) {
   objective_ = objective;
 }
 

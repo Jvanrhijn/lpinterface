@@ -10,4 +10,4 @@ constexpr double LPINT_INFINITY = std::numeric_limits<double>::infinity();
 
 }  // namespace lpint
 
-#endif // LPINTERCACE_COMMON_H
+#endif  // LPINTERCACE_COMMON_H

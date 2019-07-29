@@ -90,7 +90,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
 
 TEST(SparseMatrix, ErrorIfDuplicateNonzeroIndices) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  ASSERT_THROW(sp.add_rows({Row<double>({1, 2, 3}, {0, 0, 1})}), InvalidMatrixEntryException);
+  ASSERT_THROW(sp.add_rows({Row<double>({1, 2, 3}, {0, 0, 1})}),
+               InvalidMatrixEntryException);
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,

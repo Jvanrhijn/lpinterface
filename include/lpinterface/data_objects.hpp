@@ -176,8 +176,7 @@ class SparseMatrix {
   SparseMatrixType type() const { return type_; }
 
  private:
-  void add_entries(
-      const std::vector<MatrixEntry<T>>& entries) {
+  void add_entries(const std::vector<MatrixEntry<T>>& entries) {
     for (const auto& entry : entries) {
       // entries are invalid if there are two duplicate
       // nonzero indices present
