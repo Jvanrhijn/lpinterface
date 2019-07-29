@@ -75,6 +75,8 @@ class LinearProgramInterface {
   virtual const Objective<double>& objective() const = 0;
 
   virtual Objective<double>& objective() = 0;
+
+  virtual bool is_initialized() const = 0;
 };
 
 }  // namespace lpint

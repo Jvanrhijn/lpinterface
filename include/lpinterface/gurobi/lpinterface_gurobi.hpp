@@ -60,7 +60,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  private:
   static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
-  static std::vector<char> convert_ordering(const std::vector<Ordering>& ord);
+  static char convert_ordering(const Ordering ord);
 
   //! The linear program to solve
   std::shared_ptr<LinearProgramInterface> linear_program_;

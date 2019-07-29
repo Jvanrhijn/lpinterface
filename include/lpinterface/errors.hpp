@@ -99,6 +99,13 @@ class UnsupportedFeatureException : public LpException {
   }
 };
 
+class LinearProgramNotInitializedException : public LpException {
+   public:
+  virtual const char *what() const throw() {
+    return "Attempt to access data of un-initialized linear program";
+  }
+};
+
 enum class Status {
   //! No solution information available.
   NoInformation,

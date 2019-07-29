@@ -10,6 +10,8 @@ namespace lpint {
 
 class LinearProgram : public LinearProgramInterface {
  public:
+  LinearProgram();
+
   LinearProgram(const OptimizationType opt_type, const SparseMatrixType sptype);
 
   LinearProgram(const OptimizationType opt_type,
@@ -41,11 +43,15 @@ class LinearProgram : public LinearProgramInterface {
 
   Objective<double>& objective() override;
 
+  bool is_initialized() const override;
+
  private:
   Objective<double> objective_;
   SparseMatrix<double> matrix_;
   std::vector<Constraint<double>> constraints_;
   OptimizationType opt_type_;
+  bool initialized_;
+
 };
 
 }  // namespace lpint

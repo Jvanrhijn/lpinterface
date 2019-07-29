@@ -77,8 +77,10 @@ void GurobiSolver::set_parameter(const Param param, const double value) {
   }
 }
 
-// TODO: actually do something here
 void GurobiSolver::update_program() {
+  if (!linear_program_->is_initialized()) {
+    throw LinearProgramNotInitializedException();
+  }
   // first add variables to Gurobi
   auto objective = linear_program_->objective();
   std::size_t num_vars = objective.values.size();
@@ -95,20 +97,7 @@ void GurobiSolver::update_program() {
   std::size_t idx = 0;
   if (matrix.type() == SparseMatrixType::RowWise) {
     for (auto& row : matrix) {
-      char ord;
-      switch (constraints[idx].ordering) {
-        case Ordering::LEQ:
-          ord = GRB_LESS_EQUAL;
-          break;
-        case Ordering::GEQ:
-          ord = GRB_GREATER_EQUAL;
-          break;
-        case Ordering::EQ:
-          ord = GRB_EQUAL;
-          break;
-        default:
-          throw UnsupportedConstraintException();
-      }
+      char ord = convert_ordering(constraints[idx].ordering);
       // need to do this since gurobi wants int* for indices
       // for some ungodly reason
       std::vector<int> nonzero_indices(row.nonzero_indices().begin(),
@@ -220,10 +209,14 @@ void GurobiSolver::add_rows(std::vector<double>& values,
                             std::vector<int>& col_indices,
                             std::vector<Ordering>& ord,
                             std::vector<double>& rhs) {
+  std::vector<char> ord_grb;
+  for (const auto& ordering : ord) {
+    ord_grb.push_back(convert_ordering(ordering));
+  }
   auto error =
       GRBaddconstrs(gurobi_model_, start_indices.size(), values.size(),
                     start_indices.data(), col_indices.data(), values.data(),
-                    convert_ordering(ord).data(), rhs.data(), nullptr);
+                    ord_grb.data(), rhs.data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }
@@ -269,27 +262,18 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-std::vector<char> GurobiSolver::convert_ordering(
-    const std::vector<Ordering>& ord) {
-  std::size_t idx = 0;
-  std::vector<char> out(ord.size());
-  for (const auto& ordering : ord) {
-    switch (ordering) {
-      case Ordering::LEQ:
-        out[idx] = GRB_LESS_EQUAL;
-        break;
-      case Ordering::GEQ:
-        out[idx] = GRB_GREATER_EQUAL;
-        break;
-      case Ordering::EQ:
-        out[idx] = GRB_EQUAL;
-        break;
-      default:
-        throw UnsupportedConstraintException();
-    }
-    idx++;
+char GurobiSolver::convert_ordering(
+  const Ordering ord) {
+  switch (ord) {
+    case Ordering::LEQ:
+      return GRB_LESS_EQUAL;
+    case Ordering::GEQ:
+      return GRB_GREATER_EQUAL;
+    case Ordering::EQ:
+      return GRB_EQUAL;
+    default:
+      throw UnsupportedConstraintException();
   }
-  return out;
 }
 
 }  // namespace lpint

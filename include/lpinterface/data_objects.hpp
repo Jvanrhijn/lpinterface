@@ -124,6 +124,8 @@ class SparseMatrix {
   using reference = value_type&;
 
  public:
+  SparseMatrix() : type_(SparseMatrixType::RowWise) {}
+
   SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
   SparseMatrix(const std::initializer_list<Column<T>>&& columns)
