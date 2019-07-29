@@ -17,7 +17,7 @@ namespace lpint {
  * lpinterface. It allows one to generically use various
  * different linear program solvers polymorphically.
  * See the documentation of its methods and the implementations
- * this interface for usage information.
+ * of this interface for usage information.
  */
 class LinearProgramSolver {
  public:

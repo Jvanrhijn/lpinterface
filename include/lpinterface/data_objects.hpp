@@ -141,6 +141,11 @@ class SparseMatrix {
   iterator begin() { return entries_.begin(); }
   iterator end() { return entries_.end(); }
 
+  /**
+   * @brief Add columns to the sparse matrix.
+   * 
+   * @param columns Vector of columns to add. Ownership of the data is transferred to the matrix.
+   */
   void add_columns(std::vector<Column<T>>&& columns) {
     if (type_ != SparseMatrixType::ColumnWise) {
       throw MatrixTypeException();
@@ -152,6 +157,11 @@ class SparseMatrix {
     }
   }
 
+  /**
+   * @brief Add rows to the sparse matrix.
+   * 
+   * @param rows Vector of rows to add. Ownership of the data is transferred to the matrix.
+   */
   void add_rows(std::vector<Row<T>>&& rows) {
     if (type_ != SparseMatrixType::RowWise) {
       throw MatrixTypeException();
@@ -165,6 +175,13 @@ class SparseMatrix {
     }
   }
 
+  /**
+   * @brief Matrix indexing operator.
+   * 
+   * @param i Row index of element to access.
+   * @param j Column index of element to access.
+   * @return T Element at matrix position A_{ij}.
+   */
   T operator()(const std::size_t i, const std::size_t j) const {
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
@@ -228,19 +245,40 @@ template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
+  //! Ordering type of this constraint, see Ordering for possible variants.
   Ordering ordering;
+  //! Value of right-hand-side vector of constraints.
   T value;
 };
 
+/**
+ * @brief Struct representing the objective vector.
+ * A linear program has the canonical form
+ * \f[
+ *    \max c^T x.
+ * \f]
+ * This structure represents the vector \f$c\f$.
+ * @tparam T Type of elements in the objective vector.
+ */
 template <typename T>
 struct Objective {
+  //! Values of elements in the objective vector.
   std::vector<T> values;
+  //! Variable type the objective assigns to each
+  //! variable the linear program optimizes.
   std::vector<VarType> variable_types;
 };
 
+/**
+ * @brief Struct representing the solution of a linear program.
+ * 
+ * @tparam T Type of elements in the solution vector \f$x\f$.
+ */
 template <typename T>
 struct Solution {
+  //! Values in the solution vector.
   std::vector<T> values;
+  //! Value of the objective \f$c^T x\f$.
   T objective_value;
 };
 

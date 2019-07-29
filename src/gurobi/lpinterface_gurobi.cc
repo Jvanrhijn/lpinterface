@@ -170,11 +170,11 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-void GurobiSolver::add_columns(std::vector<double>& values,
-                               std::vector<int>& start_indices,
-                               std::vector<int>& row_indices,
-                               std::vector<Ordering>& ord,
-                               std::vector<double>& rhs) {
+void GurobiSolver::add_columns(__attribute__((unused)) std::vector<double>& values,
+                               __attribute__((unused)) std::vector<int>& start_indices,
+                               __attribute__((unused)) std::vector<int>& row_indices,
+                               __attribute__((unused)) std::vector<Ordering>& ord,
+                               __attribute__((unused)) std::vector<double>& rhs) {
   throw UnsupportedFeatureException();
 }
 
