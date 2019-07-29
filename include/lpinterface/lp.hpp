@@ -34,12 +34,12 @@ class LinearProgramInterface {
   /**
    * @brief Add columns to the LP.
    */
-  virtual void add_columns(const std::vector<Column<double>>& columns) = 0;
+  virtual void add_columns(std::vector<Column<double>>&& columns) = 0;
 
   /**
    * @brief Add rows to the LP.
    */
-  virtual void add_rows(const std::vector<Row<double>>& rows) = 0;
+  virtual void add_rows(std::vector<Row<double>>&& rows) = 0;
 
   /**
    * @brief Set the linear program matrix.

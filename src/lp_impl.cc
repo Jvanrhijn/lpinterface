@@ -19,12 +19,12 @@ LinearProgram::LinearProgram(
     const std::initializer_list<Column<double>>&& columns)
     : matrix_(std::forward<decltype(columns)>(columns)), opt_type_(opt_type), initialized_(true) {}
 
-void LinearProgram::add_columns(const std::vector<Column<double>>& columns) {
-  return matrix_.add_columns(columns);
+void LinearProgram::add_columns(std::vector<Column<double>>&& columns) {
+  return matrix_.add_columns(std::move(columns));
 }
 
-void LinearProgram::add_rows(const std::vector<Row<double>>& rows) {
-  return matrix_.add_rows(rows);
+void LinearProgram::add_rows(std::vector<Row<double>>&& rows) {
+  return matrix_.add_rows(std::move(rows));
 }
 
 void LinearProgram::set_matrix(const SparseMatrix<double>& matrix) {

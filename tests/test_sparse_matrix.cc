@@ -50,9 +50,9 @@ SparseMatrix<T> build_sparse_matrix_base(
     }
   }
   if (sptype == SparseMatrixType::RowWise) {
-    sp.add_rows(rows);
+    sp.add_rows(std::move(rows));
   } else {
-    sp.add_columns(cols);
+    sp.add_columns(std::move(cols));
   }
   return sp;
 }

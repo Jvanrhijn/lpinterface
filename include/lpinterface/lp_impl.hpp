@@ -22,9 +22,9 @@ class LinearProgram : public LinearProgramInterface {
 
   ~LinearProgram() = default;
 
-  void add_columns(const std::vector<Column<double>>& columns) override;
+  void add_columns(std::vector<Column<double>>&& columns) override;
 
-  void add_rows(const std::vector<Row<double>>& rows) override;
+  void add_rows(std::vector<Row<double>>&& rows) override;
 
   void set_matrix(const SparseMatrix<double>& matrix) override;
 

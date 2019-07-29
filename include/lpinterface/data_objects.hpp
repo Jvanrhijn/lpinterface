@@ -141,29 +141,27 @@ class SparseMatrix {
   iterator begin() { return entries_.begin(); }
   iterator end() { return entries_.end(); }
 
-  void add_columns(const std::vector<Column<T>>& columns) {
+  void add_columns(std::vector<Column<T>>&& columns) {
     if (type_ != SparseMatrixType::ColumnWise) {
       throw MatrixTypeException();
     } else {
-      // TODO better upcasting
-      std::vector<MatrixEntry<T>> entries;
-      for (const auto& c : columns) {
-        entries.push_back(c);
+      for (auto& entry : columns) {
+        check_entry_valid(entry);
+        entries_.emplace_back(std::move(entry));
       }
-      add_entries(entries);
     }
   }
 
-  void add_rows(const std::vector<Row<T>>& rows) {
+  void add_rows(std::vector<Row<T>>&& rows) {
     if (type_ != SparseMatrixType::RowWise) {
       throw MatrixTypeException();
     } else {
-      // TODO better upcasting
-      std::vector<MatrixEntry<T>> entries;
-      for (const auto& r : rows) {
-        entries.push_back(r);
-      }
-      add_entries(entries);
+    for (auto& entry : rows) {
+      // entries are invalid if there are two duplicate
+      // nonzero indices present
+      check_entry_valid(entry);
+      entries_.emplace_back(std::move(entry));
+    }
     }
   }
 
@@ -194,6 +192,20 @@ class SparseMatrix {
         throw InvalidMatrixEntryException();
       }
       entries_.emplace_back(entry);
+    }
+  }
+
+  void check_entry_valid(const MatrixEntry<T> entry) {
+    auto nonzero_ind = entry.nonzero_indices();
+    const std::size_t nnz = entry.num_nonzero();
+    // remove sequential duplicates from sorted nonzero-indices
+    std::sort(nonzero_ind.begin(), nonzero_ind.end());
+    auto last = std::unique(nonzero_ind.begin(), nonzero_ind.end());
+    nonzero_ind.erase(last, nonzero_ind.end());
+    // if unduplicated nonzero-indices is not equal to nnz,
+    // there were duplicate nonzero-indices -> entry invalid
+    if (nonzero_ind.size() != nnz) {
+      throw InvalidMatrixEntryException();
     }
   }
 
