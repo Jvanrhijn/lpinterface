@@ -30,9 +30,7 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type) {
   // set optimization type
   GRBsetintattr(
       gurobi_model_, "modelsense",
-      opt_type == OptimizationType::Maximize
-          ? GRB_MAXIMIZE
-          : GRB_MINIMIZE);
+      opt_type == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
 
 GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
@@ -85,8 +83,9 @@ void GurobiSolver::update_program() {
   auto objective = linear_program_->objective();
   std::size_t num_vars = objective.values.size();
   auto vt = convert_variable_type(objective.variable_types);
-  auto err = GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
-                        objective.values.data(), nullptr, nullptr, vt.data(), nullptr);
+  auto err =
+      GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
+                 objective.values.data(), nullptr, nullptr, vt.data(), nullptr);
   if (err != 0) {
     throw GurobiException(err);
   }
@@ -207,40 +206,33 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-void GurobiSolver::add_columns(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& row_indices, std::vector<Ordering>& ord, std::vector<double>& rhs) {
+void GurobiSolver::add_columns(std::vector<double>& values,
+                               std::vector<int>& start_indices,
+                               std::vector<int>& row_indices,
+                               std::vector<Ordering>& ord,
+                               std::vector<double>& rhs) {
   throw UnsupportedFeatureException();
 }
 
-void GurobiSolver::add_rows(std::vector<double>& values, std::vector<int>& start_indices, std::vector<int>& col_indices, std::vector<Ordering>& ord, std::vector<double>& rhs) {
-  auto error = GRBaddconstrs(
-    gurobi_model_,
-    values.size(),
-    start_indices.size(),
-    start_indices.data(),
-    col_indices.data(),
-    values.data(),
-    convert_ordering(ord).data(),
-    rhs.data(),
-    nullptr
-  );
+void GurobiSolver::add_rows(std::vector<double>& values,
+                            std::vector<int>& start_indices,
+                            std::vector<int>& col_indices,
+                            std::vector<Ordering>& ord,
+                            std::vector<double>& rhs) {
+  auto error =
+      GRBaddconstrs(gurobi_model_, values.size(), start_indices.size(),
+                    start_indices.data(), col_indices.data(), values.data(),
+                    convert_ordering(ord).data(), rhs.data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }
 }
-void GurobiSolver::add_variables(std::vector<double>& objective_values, std::vector<VarType>& var_types) {
-  auto error = GRBaddvars(
-    gurobi_model_,
-    objective_values.size(),
-    0,
-    nullptr,
-    nullptr,
-    nullptr,
-    objective_values.data(),
-    nullptr,
-    nullptr,
-    convert_variable_type(var_types).data(),
-    nullptr
-  );
+void GurobiSolver::add_variables(std::vector<double>& objective_values,
+                                 std::vector<VarType>& var_types) {
+  auto error =
+      GRBaddvars(gurobi_model_, objective_values.size(), 0, nullptr, nullptr,
+                 nullptr, objective_values.data(), nullptr, nullptr,
+                 convert_variable_type(var_types).data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }
@@ -276,24 +268,25 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-std::vector<char> GurobiSolver::convert_ordering(const std::vector<Ordering>& ord) {
+std::vector<char> GurobiSolver::convert_ordering(
+    const std::vector<Ordering>& ord) {
   std::size_t idx = 0;
   std::vector<char> out(ord.size());
   for (const auto& ordering : ord) {
-      switch (ordering) {
-        case Ordering::LEQ:
-          out[idx] = GRB_LESS_EQUAL;
-          break;
-        case Ordering::GEQ:
-          out[idx] = GRB_GREATER_EQUAL;
-          break;
-        case Ordering::EQ:
-          out[idx] = GRB_EQUAL;
-          break;
-        default:
-          throw UnsupportedConstraintException();
-      }
-      idx++;
+    switch (ordering) {
+      case Ordering::LEQ:
+        out[idx] = GRB_LESS_EQUAL;
+        break;
+      case Ordering::GEQ:
+        out[idx] = GRB_GREATER_EQUAL;
+        break;
+      case Ordering::EQ:
+        out[idx] = GRB_EQUAL;
+        break;
+      default:
+        throw UnsupportedConstraintException();
+    }
+    idx++;
   }
   return out;
 }

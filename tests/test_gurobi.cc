@@ -67,38 +67,25 @@ TEST(Gurobi, FullProblemRawData) {
 
   // Create the Gurobi solver from the given LP
   GurobiSolver grb(OptimizationType::Maximize);
-  std::vector<double> values = {
-    1, 2, 3, 1, 1
-  };
-  std::vector<int> start_indices = {
-    0, 3
-  };
-  std::vector<int> col_indices = {
-    0, 1, 2, 0, 1
-  };
-  std::vector<double> rhs = {
-    4.0, 1.0
-  };
-  std::vector<Ordering> ord = {
-    Ordering::LEQ, Ordering::GEQ
-  };
-  std::vector<double> objective = {
-    1.0, 1.0, 2.0
-  };
-  std::vector<VarType> var_type = {
-    VarType::Binary, VarType::Binary, VarType::Binary
-  };
+  std::vector<double> values = {1, 2, 3, 1, 1};
+  std::vector<int> start_indices = {0, 3};
+  std::vector<int> col_indices = {0, 1, 2, 0, 1};
+  std::vector<double> rhs = {4.0, 1.0};
+  std::vector<Ordering> ord = {Ordering::LEQ, Ordering::GEQ};
+  std::vector<double> objective = {1.0, 1.0, 2.0};
+  std::vector<VarType> var_type = {VarType::Binary, VarType::Binary,
+                                   VarType::Binary};
 
   grb.add_variables(objective, var_type);
-  //grb.add_rows(values, start_indices, col_indices, ord, rhs);
+  // grb.add_rows(values, start_indices, col_indices, ord, rhs);
 
   // Solve the primal LP problem
-  //auto status = grb.solve_primal();
-  //ASSERT_EQ(status, Status::Optimal);
+  // auto status = grb.solve_primal();
+  // ASSERT_EQ(status, Status::Optimal);
 
   //// check solution value
-  //auto solution = grb.get_solution();
+  // auto solution = grb.get_solution();
 
-  //ASSERT_EQ(solution.values, (std::vector<double>{1.0, 0.0, 1.0}));
-  //ASSERT_EQ(solution.objective_value, 3.0);
+  // ASSERT_EQ(solution.values, (std::vector<double>{1.0, 0.0, 1.0}));
+  // ASSERT_EQ(solution.objective_value, 3.0);
 }
