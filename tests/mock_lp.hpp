@@ -20,6 +20,7 @@ class MockLinearProgram : public LinearProgramInterface {
   MOCK_CONST_METHOD0(optimization_type, OptimizationType());
   MOCK_METHOD1(set_objective, void(const Objective<double>&));
   MOCK_CONST_METHOD0(objective, const Objective<double>&());
+  MOCK_METHOD0(objective, Objective<double>&());
 };
 
 }  // namespace lpint

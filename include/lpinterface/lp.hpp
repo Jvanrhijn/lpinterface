@@ -73,6 +73,8 @@ class LinearProgramInterface {
   virtual void set_objective(const Objective<double>& objective) = 0;
 
   virtual const Objective<double>& objective() const = 0;
+
+  virtual Objective<double>& objective() = 0;
 };
 
 }  // namespace lpint

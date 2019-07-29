@@ -46,4 +46,6 @@ void LinearProgram::set_objective(const Objective<double>& objective) {
 
 const Objective<double>& LinearProgram::objective() const { return objective_; }
 
+Objective<double>& LinearProgram::objective() { return objective_; }
+
 }  // namespace lpint

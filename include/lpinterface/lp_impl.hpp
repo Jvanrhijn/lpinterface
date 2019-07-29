@@ -39,6 +39,8 @@ class LinearProgram : public LinearProgramInterface {
 
   const Objective<double>& objective() const override;
 
+  Objective<double>& objective() override;
+
  private:
   Objective<double> objective_;
   SparseMatrix<double> matrix_;

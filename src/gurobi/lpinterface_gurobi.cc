@@ -69,10 +69,9 @@ void GurobiSolver::update_program() {
   // first add variables to Gurobi
   auto objective = linear_program_->objective();
   std::size_t num_vars = objective.values.size();
-  std::vector<double> obj(objective.values.begin(), objective.values.end());
   auto vt = convert_variable_type(objective.variable_types);
   auto err = GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
-                        obj.data(), nullptr, nullptr, vt.data(), nullptr);
+                        objective.values.data(), nullptr, nullptr, vt.data(), nullptr);
   if (err != 0) {
     throw GurobiException(err);
   }
