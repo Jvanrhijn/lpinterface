@@ -40,7 +40,8 @@ TEST(Gurobi, FullProblem) {
   grb.update_program();
 
   // Solve the primal LP problem
-  grb.solve_primal();
+  auto status = grb.solve_primal();
+  ASSERT_EQ(status, Status::Optimal);
 
   // check solution value
   auto solution = grb.get_solution();
