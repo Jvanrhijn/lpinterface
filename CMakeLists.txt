@@ -63,3 +63,7 @@ target_include_directories(lpinterface PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
 )
+
+if (ENABLE_EXAMPLES)
+  add_subdirectory(examples)
+endif()

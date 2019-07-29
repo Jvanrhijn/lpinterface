@@ -1,0 +1,2 @@
+add_executable(mip_simple mip_simple.cpp)
+target_link_libraries(mip_simple lpinterface)
