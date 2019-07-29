@@ -141,8 +141,9 @@ Status GurobiSolver::solve_primal() {
   return solution_status();
 }
 
-// TODO: actually do something here
-Status GurobiSolver::solve_dual() { return Status::NoInformation; }
+Status GurobiSolver::solve_dual() { 
+  throw UnsupportedFeatureException();
+}
 
 Status GurobiSolver::solution_status() const {
   int status;
