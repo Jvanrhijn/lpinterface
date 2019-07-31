@@ -1,2 +1,2 @@
-add_executable(mip_simple_gurobi mip_simple_gurobi.cpp)
-target_link_libraries(mip_simple_gurobi lpinterface)
+add_executable(lp_simple lp_simple.cpp)
+target_link_libraries(lp_simple lpinterface)

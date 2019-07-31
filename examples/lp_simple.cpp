@@ -5,7 +5,7 @@ This example shows the setup and solution of the following linear program:
 max x + y + 2z
 x + 2y + 3z <= 4
 x + y >= 1
-x, y, z binary,
+x, y, z real,
 
 using the LinearProgramSolver interface. Switch out the solver
 backend to see the different solvers in action; the output
@@ -15,6 +15,7 @@ and usage will be the same for each solver.
 
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
+#include "lpinterface/soplex/lpinterface_soplex.hpp"
 
 using namespace lpint;
 
@@ -60,8 +61,9 @@ int main() {
     lp->set_objective(Objective<double>{
         {1.0, 1.0, 2.0}, {VarType::Real, VarType::Real, VarType::Real}});
 
-    // Create Gurobi solver object.
-    SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
+    // Create solver object.
+    //SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
+    SolverWrapper wrapper(std::make_shared<SoplexSolver>(lp));
 
     /*
         Alternatively, one can directly flush the data to the LP solver
