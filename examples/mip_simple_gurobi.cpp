@@ -113,7 +113,7 @@ int main() {
     // Check solution content:
     std::cout << "Objective value: " << solution.objective_value << std::endl;
     std::cout << "Solution: ";
-    print_vector(solution.values);
+    print_vector(solution.primal);
 
   } catch (const LpException& e) {
     std::cout << e.what() << std::endl;

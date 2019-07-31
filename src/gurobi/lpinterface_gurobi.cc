@@ -132,9 +132,9 @@ Status GurobiSolver::solve_primal() {
   }
   int num_vars;
   error == GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
-  solution_.values.resize(static_cast<std::size_t>(num_vars));
+  solution_.primal.resize(static_cast<std::size_t>(num_vars));
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
-                             solution_.values.data());
+                             solution_.primal.data());
   if (error) {
     throw GurobiException(error);
   }

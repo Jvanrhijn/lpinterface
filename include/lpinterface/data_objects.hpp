@@ -278,8 +278,10 @@ struct Objective {
  */
 template <typename T>
 struct Solution {
-  //! Values in the solution vector.
-  std::vector<T> values;
+  //! Values in the primal solution vector.
+  std::vector<T> primal;
+  //! Values in the dual solution vector.
+  std::vector<T> dual;
   //! Value of the objective \f$c^T x\f$.
   T objective_value;
 };

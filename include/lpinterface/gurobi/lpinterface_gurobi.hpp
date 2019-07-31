@@ -16,10 +16,8 @@ namespace lpint {
 
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  // delete the default constructor to prevent
-  // deleting invalid memory in destructor
   GurobiSolver() = default;
-  GurobiSolver(OptimizationType optim_type);
+  explicit GurobiSolver(OptimizationType optim_type);
   explicit GurobiSolver(std::shared_ptr<LinearProgramInterface> lp);
 
   ~GurobiSolver();
@@ -30,9 +28,9 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   GurobiSolver& operator=(GurobiSolver) noexcept;
   GurobiSolver& operator=(GurobiSolver&&) noexcept = delete;
 
-  virtual void set_parameter(const Param param, const int value) override;
+  void set_parameter(const Param param, const int value) override;
 
-  virtual void set_parameter(const Param param, const double value) override;
+  void set_parameter(const Param param, const double value) override;
 
   void update_program() override;
 

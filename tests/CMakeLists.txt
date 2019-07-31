@@ -19,8 +19,13 @@ set(test_files
 
 find_package(GUROBI)
 if (GUROBI_FOUND)
-  set(test_files ${test_files} test_gurobi.cc)
+  list(APPEND test_files test_gurobi.cc)
 endif (GUROBI_FOUND)
+
+find_package(SOPLEX)
+if (SOPLEX_FOUND)
+  list(APPEND test_files test_soplex.cc)
+endif (SOPLEX_FOUND)
 
 add_executable(${UNIT_TESTS} ${test_files})
 

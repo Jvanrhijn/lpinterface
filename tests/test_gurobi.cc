@@ -46,7 +46,7 @@ TEST(Gurobi, FullProblem) {
   // check solution value
   auto solution = grb.get_solution();
 
-  ASSERT_EQ(solution.values, (std::vector<double>{1.0, 0.0, 1.0}));
+  ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
   ASSERT_EQ(solution.objective_value, 3.0);
 }
 
@@ -76,6 +76,6 @@ TEST(Gurobi, FullProblemRawData) {
   //// check solution value
   auto solution = grb.get_solution();
 
-  ASSERT_EQ(solution.values, (std::vector<double>{1.0, 0.0, 1.0}));
+  ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
   ASSERT_EQ(solution.objective_value, 3.0);
 }
