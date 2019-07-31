@@ -24,6 +24,7 @@ addons:
       - libiberty-dev
       - cmake
       - libc++-dev
+      - libgmp3-dev
 
 script:
   - mkdir build && cd build
@@ -42,5 +43,5 @@ before_script:
   - cd soplex-4.0.2
   - cmake -H. -Bbuild
   - cmake --build build -- -j4
-  - cd build && make install
+  - cd build && sudo make install
   - cd ${TRAVIS_BUILD_DIR}
