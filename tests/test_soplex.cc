@@ -39,44 +39,43 @@ TEST(Soplex, FullProblem) {
   // Update the internal Gurobi LP
   spl.update_program();
 
- // // Solve the primal LP problem
+  // // Solve the primal LP problem
   auto status = spl.solve_primal();
   ASSERT_EQ(status, Status::Optimal);
 
- // // check solution value
+  // // check solution value
   auto solution = spl.get_solution();
 
   ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
   ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
-// TEST(Soplex, FullProblemRawData) {
-//  // Create the Gurobi solver
-//  SoplexSolver spl(OptimizationType::Maximize);
-//
-//  {
-//    std::vector<double> values = {1, 2, 3, 1, 1};
-//    std::vector<int> start_indices = {0, 3};
-//    std::vector<int> col_indices = {0, 1, 2, 0, 1};
-//    std::vector<double> rhs = {4.0, 1.0};
-//    std::vector<Ordering> ord = {Ordering::LEQ, Ordering::GEQ};
-//    std::vector<double> objective = {1.0, 1.0, 2.0};
-//    std::vector<VarType> var_type = {VarType::Real, VarType::Real,
-//                                     VarType::Real};
-//
-//    spl.add_variables(std::move(objective), std::move(var_type));
-//    spl.add_rows(std::move(values), std::move(start_indices),
-//                 std::move(col_indices), std::move(ord), std::move(rhs));
-//  }
-//
-//  // Solve the primal LP problem
-//  auto status = spl.solve_primal();
-//  ASSERT_EQ(status, Status::Optimal);
-//
-//  //// check solution value
-//  auto solution = spl.get_solution();
-//
-//  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
-//  ASSERT_EQ(solution.objective_value, 4.0);
-//}
-//
+TEST(Soplex, FullProblemRawData) {
+  // Create the Gurobi solver
+  SoplexSolver spl(OptimizationType::Maximize);
+
+  {
+    std::vector<double> values = {1, 2, 3, 1, 1};
+    std::vector<int> start_indices = {0, 3};
+    std::vector<int> col_indices = {0, 1, 2, 0, 1};
+    std::vector<double> rhs = {4.0, 1.0};
+    std::vector<Ordering> ord = {Ordering::LEQ, Ordering::GEQ};
+    std::vector<double> objective = {1.0, 1.0, 2.0};
+    std::vector<VarType> var_type = {VarType::Real, VarType::Real,
+                                     VarType::Real};
+
+    spl.add_variables(std::move(objective), std::move(var_type));
+    spl.add_rows(std::move(values), std::move(start_indices),
+                 std::move(col_indices), std::move(ord), std::move(rhs));
+  }
+
+  // Solve the primal LP problem
+  auto status = spl.solve_primal();
+  ASSERT_EQ(status, Status::Optimal);
+
+  //// check solution value
+  auto solution = spl.get_solution();
+
+  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
+  ASSERT_EQ(solution.objective_value, 4.0);
+}
