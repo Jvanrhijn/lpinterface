@@ -143,8 +143,9 @@ class SparseMatrix {
 
   /**
    * @brief Add columns to the sparse matrix.
-   * 
-   * @param columns Vector of columns to add. Ownership of the data is transferred to the matrix.
+   *
+   * @param columns Vector of columns to add. Ownership of the data is
+   * transferred to the matrix.
    */
   void add_columns(std::vector<Column<T>>&& columns) {
     if (type_ != SparseMatrixType::ColumnWise) {
@@ -159,25 +160,26 @@ class SparseMatrix {
 
   /**
    * @brief Add rows to the sparse matrix.
-   * 
-   * @param rows Vector of rows to add. Ownership of the data is transferred to the matrix.
+   *
+   * @param rows Vector of rows to add. Ownership of the data is transferred to
+   * the matrix.
    */
   void add_rows(std::vector<Row<T>>&& rows) {
     if (type_ != SparseMatrixType::RowWise) {
       throw MatrixTypeException();
     } else {
-    for (auto& entry : rows) {
-      // entries are invalid if there are two duplicate
-      // nonzero indices present
-      check_entry_valid(entry);
-      entries_.emplace_back(std::move(entry));
-    }
+      for (auto& entry : rows) {
+        // entries are invalid if there are two duplicate
+        // nonzero indices present
+        check_entry_valid(entry);
+        entries_.emplace_back(std::move(entry));
+      }
     }
   }
 
   /**
    * @brief Matrix indexing operator.
-   * 
+   *
    * @param i Row index of element to access.
    * @param j Column index of element to access.
    * @return T Element at matrix position A_{ij}.
@@ -271,7 +273,7 @@ struct Objective {
 
 /**
  * @brief Struct representing the solution of a linear program.
- * 
+ *
  * @tparam T Type of elements in the solution vector \f$x\f$.
  */
 template <typename T>

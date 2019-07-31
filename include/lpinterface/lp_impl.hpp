@@ -51,7 +51,6 @@ class LinearProgram : public LinearProgramInterface {
   std::vector<Constraint<double>> constraints_;
   OptimizationType opt_type_;
   bool initialized_;
-
 };
 
 }  // namespace lpint

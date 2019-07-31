@@ -131,7 +131,7 @@ Status GurobiSolver::solve_primal() {
     throw GurobiException(error);
   }
   int num_vars;
-  error== GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
+  error == GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
   solution_.values.resize(static_cast<std::size_t>(num_vars));
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
                              solution_.values.data());
@@ -141,9 +141,7 @@ Status GurobiSolver::solve_primal() {
   return solution_status();
 }
 
-Status GurobiSolver::solve_dual() { 
-  throw UnsupportedFeatureException();
-}
+Status GurobiSolver::solve_dual() { throw UnsupportedFeatureException(); }
 
 Status GurobiSolver::solution_status() const {
   int status;
@@ -170,11 +168,12 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-void GurobiSolver::add_columns(__attribute__((unused)) std::vector<double>&& values,
-                               __attribute__((unused)) std::vector<int>&& start_indices,
-                               __attribute__((unused)) std::vector<int>&& row_indices,
-                               __attribute__((unused)) std::vector<Ordering>&& ord,
-                               __attribute__((unused)) std::vector<double>&& rhs) {
+void GurobiSolver::add_columns(
+    __attribute__((unused)) std::vector<double>&& values,
+    __attribute__((unused)) std::vector<int>&& start_indices,
+    __attribute__((unused)) std::vector<int>&& row_indices,
+    __attribute__((unused)) std::vector<Ordering>&& ord,
+    __attribute__((unused)) std::vector<double>&& rhs) {
   throw UnsupportedFeatureException();
 }
 
@@ -187,10 +186,9 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
   for (const auto& ordering : ord) {
     ord_grb.push_back(convert_ordering(ordering));
   }
-  auto error =
-      GRBaddconstrs(gurobi_model_, start_indices.size(), values.size(),
-                    start_indices.data(), col_indices.data(), values.data(),
-                    ord_grb.data(), rhs.data(), nullptr);
+  auto error = GRBaddconstrs(
+      gurobi_model_, start_indices.size(), values.size(), start_indices.data(),
+      col_indices.data(), values.data(), ord_grb.data(), rhs.data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }
@@ -236,8 +234,7 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-char GurobiSolver::convert_ordering(
-  const Ordering ord) {
+char GurobiSolver::convert_ordering(const Ordering ord) {
   switch (ord) {
     case Ordering::LEQ:
       return GRB_LESS_EQUAL;

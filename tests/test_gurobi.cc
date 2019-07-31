@@ -51,7 +51,7 @@ TEST(Gurobi, FullProblem) {
 }
 
 TEST(Gurobi, FullProblemRawData) {
-  // Create the Gurobi solver 
+  // Create the Gurobi solver
   GurobiSolver grb(OptimizationType::Maximize);
 
   {
@@ -65,10 +65,11 @@ TEST(Gurobi, FullProblemRawData) {
                                      VarType::Binary};
 
     grb.add_variables(std::move(objective), std::move(var_type));
-    grb.add_rows(std::move(values), std::move(start_indices), std::move(col_indices), std::move(ord), std::move(rhs));
+    grb.add_rows(std::move(values), std::move(start_indices),
+                 std::move(col_indices), std::move(ord), std::move(rhs));
   }
 
-  //Solve the primal LP problem
+  // Solve the primal LP problem
   auto status = grb.solve_primal();
   ASSERT_EQ(status, Status::Optimal);
 

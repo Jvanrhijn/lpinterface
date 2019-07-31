@@ -21,44 +21,43 @@ class LpException : public std::exception {
 };
 
 class MatrixTypeException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Wrong matrix type assumed";
   }
 };
 
 class NotImplementedError : public LpException {
-   public:
-  virtual const char *what() const throw() {
-    return "Feature not implemented";
-  }
+ public:
+  virtual const char *what() const throw() { return "Feature not implemented"; }
 };
 
 class ModelNotSolvedException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Model has not yet been solved";
   }
 };
 
 class UnsupportedParameterException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Invalid parameter was supplied";
   }
 };
 
 class UnsupportedConstraintException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Unsupported constraint type was supplied";
   }
 };
 
 class InvalidMatrixEntryException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
-    return "Invalid matrix entry; does your row/column contain duplicate indices?";
+    return "Invalid matrix entry; does your row/column contain duplicate "
+           "indices?";
   }
 };
 
@@ -86,21 +85,21 @@ class GurobiException : public LpException {
 };
 
 class UknownStatusException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Unknown status code encountered";
   }
 };
 
 class UnsupportedFeatureException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Feature not available for this solver backend";
   }
 };
 
 class LinearProgramNotInitializedException : public LpException {
-   public:
+ public:
   virtual const char *what() const throw() {
     return "Attempt to access data of un-initialized linear program";
   }
