@@ -2,9 +2,6 @@
 
 namespace lpint {
 
-template <class T>
-void print_vector(const std::vector<T>& v);
-
 using namespace soplex;
 
 SoplexSolver::SoplexSolver(OptimizationType optim_type) {
@@ -259,19 +256,6 @@ constexpr Status SoplexSolver::translate_status(
     default:
       throw UnknownStatusException();
   }
-}
-
-template <typename T>
-void print_vector(const std::vector<T>& v) {
-  if (v.size() == 0) {
-    std::cout << "[]";
-    return;
-  }
-  std::cout << "[";
-  for (const auto& el : v) {
-    std::cout << el << ", ";
-  }
-  std::cout << "\b\b]";
 }
 
 }  // namespace lpint
