@@ -170,19 +170,19 @@ LinearProgramInterface& GurobiSolver::linear_program() {
 
 const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
 
-void GurobiSolver::add_columns(__attribute__((unused)) std::vector<double>& values,
-                               __attribute__((unused)) std::vector<int>& start_indices,
-                               __attribute__((unused)) std::vector<int>& row_indices,
-                               __attribute__((unused)) std::vector<Ordering>& ord,
-                               __attribute__((unused)) std::vector<double>& rhs) {
+void GurobiSolver::add_columns(__attribute__((unused)) std::vector<double>&& values,
+                               __attribute__((unused)) std::vector<int>&& start_indices,
+                               __attribute__((unused)) std::vector<int>&& row_indices,
+                               __attribute__((unused)) std::vector<Ordering>&& ord,
+                               __attribute__((unused)) std::vector<double>&& rhs) {
   throw UnsupportedFeatureException();
 }
 
-void GurobiSolver::add_rows(std::vector<double>& values,
-                            std::vector<int>& start_indices,
-                            std::vector<int>& col_indices,
-                            std::vector<Ordering>& ord,
-                            std::vector<double>& rhs) {
+void GurobiSolver::add_rows(std::vector<double>&& values,
+                            std::vector<int>&& start_indices,
+                            std::vector<int>&& col_indices,
+                            std::vector<Ordering>&& ord,
+                            std::vector<double>&& rhs) {
   std::vector<char> ord_grb;
   for (const auto& ordering : ord) {
     ord_grb.push_back(convert_ordering(ordering));
@@ -195,8 +195,8 @@ void GurobiSolver::add_rows(std::vector<double>& values,
     throw GurobiException(error);
   }
 }
-void GurobiSolver::add_variables(std::vector<double>& objective_values,
-                                 std::vector<VarType>& var_types) {
+void GurobiSolver::add_variables(std::vector<double>&& objective_values,
+                                 std::vector<VarType>&& var_types) {
   auto error =
       GRBaddvars(gurobi_model_, objective_values.size(), 0, nullptr, nullptr,
                  nullptr, objective_values.data(), nullptr, nullptr,

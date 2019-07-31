@@ -5,3 +5,4 @@
 #include "lpinterface/lp_impl.hpp"
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/parameter_type.hpp"
+#include "lpinterface/lp_flush_raw_data.hpp"

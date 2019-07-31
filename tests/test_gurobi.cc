@@ -64,8 +64,8 @@ TEST(Gurobi, FullProblemRawData) {
     std::vector<VarType> var_type = {VarType::Binary, VarType::Binary,
                                      VarType::Binary};
 
-    grb.add_variables(objective, var_type);
-    grb.add_rows(values, start_indices, col_indices, ord, rhs);
+    grb.add_variables(std::move(objective), std::move(var_type));
+    grb.add_rows(std::move(values), std::move(start_indices), std::move(col_indices), std::move(ord), std::move(rhs));
   }
 
   //Solve the primal LP problem

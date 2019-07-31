@@ -48,14 +48,14 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   const Solution<double>& get_solution() const override;
 
-  void add_columns(std::vector<double>& values, std::vector<int>& start_indices,
-                   std::vector<int>& row_indices, std::vector<Ordering>& ord,
-                   std::vector<double>& rhs) override;
-  void add_rows(std::vector<double>& values, std::vector<int>& start_indices,
-                std::vector<int>& col_indices, std::vector<Ordering>& ord,
-                std::vector<double>& rhs) override;
-  void add_variables(std::vector<double>& objective_values,
-                     std::vector<VarType>& var_types) override;
+  void add_columns(std::vector<double>&& values, std::vector<int>&& start_indices,
+                   std::vector<int>&& row_indices, std::vector<Ordering>&& ord,
+                   std::vector<double>&& rhs) override;
+  void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
+                std::vector<int>&& col_indices, std::vector<Ordering>&& ord,
+                std::vector<double>&& rhs) override;
+  void add_variables(std::vector<double>&& objective_values,
+                     std::vector<VarType>&& var_types) override;
 
  private:
   static std::vector<char> convert_variable_type(

@@ -79,17 +79,40 @@ int main() {
 
 
       // Create Gurobi solver object. 
-      //GurobiSolver solver(std::make_shared<LinearProgram>(lp));
-
       SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
 
+/* 
+    Alternatively, one can directly flush the data to the LP solver
+    using the FlushRawData<T> interface. In this case, you should
+    specify the optimization type when constructing the LP solver
+    object, as this is no longer specified in the LP object.
+
+      SolverWrapper wrapper(std::make_shared<GurobiSolver>(OptimizationType::Maximize));
+
+      {
+        auto flusher = std::dynamic_pointer_cast<FlushRawData<double>>(wrapper.solver());
+
+        flusher->add_variables(
+            {1.0, 1.0, 2.0}, 
+            {VarType::Binary, VarType::Binary, VarType::Binary}
+        );
+
+        flusher->add_rows(
+            {1, 2, 3, 1, 1},
+            {0, 3},
+            {0, 1, 2, 0, 1},
+            {Ordering::LEQ, Ordering::GEQ},
+            {4, 1}
+        );
+      }
+*/
       // Flush LP data to internal solver.
       // This process keeps the internal LP object intact,
       // so a copy of the coefficient matrix is kept.
       // This may become prohibitively expensive if the
       // coefficient matrix is very large. In such cases,
-      // one can use the methods LinearProgramSolver::add_rows()
-      // or LinearProgramSolver::add_columns() to directly
+      // one can use the methods FlushRawData<T>::add_rows()
+      // or FlushRawData<T>::add_columns() to directly
       // flush data to the internal solver backend.
       wrapper.solver()->update_program();
 
