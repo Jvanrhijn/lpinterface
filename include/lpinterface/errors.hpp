@@ -105,6 +105,13 @@ class LinearProgramNotInitializedException : public LpException {
   }
 };
 
+class FailedToSetParameterException : public LpException {
+ public:
+  virtual const char *what() const throw() {
+    return "Failed to set an LP solver parameter";
+  }
+};
+
 enum class Status {
   //! No solution information available.
   NoInformation,

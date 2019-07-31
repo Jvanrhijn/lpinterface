@@ -16,6 +16,10 @@ enum class Param {
   Cutoff,
   Infinity,
   TimeLimit,
+  ObjectiveLowerLimit,
+  ObjectiveUpperLimit,
+  Verbosity,
+  PrimalOrDual,
 };
 
 }  // namespace lpint

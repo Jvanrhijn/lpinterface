@@ -55,31 +55,16 @@ GurobiSolver::~GurobiSolver() {
 }
 
 void GurobiSolver::set_parameter(const Param param, const int value) {
-  switch (param) {
-    case Param::GrbOutputFlag:
-      if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_), "outputflag", value)) {
-        throw GurobiException(error);
-      }
-      break;
-    case Param::GrbThreads:
-      if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_), "threads", value)) {
-        throw GurobiException(error);
-      }
-      break;
-    default:
-      throw UnsupportedParameterException();
+  if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_),
+                                  translate_parameter(param), value)) {
+    throw GurobiException(error);
   }
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
-  switch (param) {
-    case Param::Cutoff:
-      if (auto error = GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value)) {
-        throw GurobiException(error);
-      }
-      break;
-    default:
-      throw UnsupportedParameterException();
+  if (auto error = GRBsetdblparam(GRBgetenv(gurobi_model_),
+                                  translate_parameter(param), value)) {
+    throw GurobiException(error);
   }
 }
 
@@ -290,7 +275,8 @@ constexpr Status GurobiSolver::convert_gurobi_status(int status) {
   }
 }
 
-constexpr const char *GurobiSolver::translate_parameter(const Param param) {
+// TODO: extend
+constexpr const char* GurobiSolver::translate_parameter(const Param param) {
   switch (param) {
     case (Param::GrbOutputFlag):
       return "outputflag";

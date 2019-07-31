@@ -15,8 +15,7 @@ TEST(Soplex, SetParameters) {
   auto lp = std::make_shared<MockLinearProgram>();
   EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
   SoplexSolver spl(lp);
-  spl.set_parameter(Param::GrbThreads, 1);
-  spl.set_parameter(Param::GrbOutputFlag, 0);
+  spl.set_parameter(Param::Verbosity, 0);
 }
 
 TEST(Soplex, FullProblem) {
@@ -50,7 +49,7 @@ TEST(Soplex, FullProblem) {
   ASSERT_EQ(solution.objective_value, 3.0);
 }
 
-//TEST(Soplex, FullProblemRawData) {
+// TEST(Soplex, FullProblemRawData) {
 //  // Create the Gurobi solver
 //  SoplexSolver spl(OptimizationType::Maximize);
 //

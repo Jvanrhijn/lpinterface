@@ -81,8 +81,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
     swap(first.gurobi_env_, second.gurobi_env_);
   }
 
-  constexpr static const char *translate_parameter(const Param param);
-  
+  constexpr static const char* translate_parameter(const Param param);
 };
 
 }  // namespace lpint
