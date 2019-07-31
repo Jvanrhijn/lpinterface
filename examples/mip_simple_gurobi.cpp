@@ -5,7 +5,11 @@ This example shows the setup and solution of the following linear program:
 max x + y + 2z
 x + 2y + 3z <= 4
 x + y >= 1
-x, y, z binary
+x, y, z binary,
+
+using the LinearProgramInterface. Switch out the solver
+backend to see the different solvers in action; the output
+and usage will be the same for each solver.
 
  */
 
@@ -13,6 +17,23 @@ x, y, z binary
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 
 using namespace lpint;
+
+// Wrapper class, showing the use of the common
+// LinearProgramSolver interface
+class SolverWrapper {
+
+ public:
+  SolverWrapper(std::shared_ptr<LinearProgramSolver> solver)
+    : solver_(solver) {}
+
+  std::shared_ptr<LinearProgramSolver> solver() {
+      return solver_;
+  }
+
+ private:
+  std::shared_ptr<LinearProgramSolver> solver_;
+
+};
 
 template <typename T>
 void print_vector(const std::vector<T>&);
@@ -58,7 +79,9 @@ int main() {
 
 
       // Create Gurobi solver object. 
-      GurobiSolver grb(std::make_shared<LinearProgram>(lp));
+      GurobiSolver solver(std::make_shared<LinearProgram>(lp));
+
+      SolverWrapper wrapper(std::make_shared<GurobiSolver>(solver));
 
       // Flush LP data to internal solver.
       // This process keeps the internal LP object intact,
@@ -68,17 +91,17 @@ int main() {
       // one can use the methods LinearProgramSolver::add_rows()
       // or LinearProgramSolver::add_columns() to directly
       // flush data to the internal solver backend.
-      grb.update_program();
+      wrapper.solver()->update_program();
 
       // Solve the primal LP problem:
-      Status status = grb.solve_primal();
+      Status status = wrapper.solver()->solve_primal();
     
       if (status != Status::Optimal) {
           std::cout << "Optimal solution NOT found" << std::endl;
       }
     
       // Retrieve the solution from the solver object.
-      Solution<double> solution = grb.get_solution();
+      Solution<double> solution = wrapper.solver()->get_solution();
 
       // Check solution content:
       std::cout << "Objective value: " << solution.objective_value << std::endl;
