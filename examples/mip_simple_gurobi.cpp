@@ -7,7 +7,7 @@ x + 2y + 3z <= 4
 x + y >= 1
 x, y, z binary,
 
-using the LinearProgramInterface. Switch out the solver
+using the LinearProgramSolver interface. Switch out the solver
 backend to see the different solvers in action; the output
 and usage will be the same for each solver.
 
@@ -44,13 +44,13 @@ int main() {
 
       // Create a linear program object; this will hold all
       // data defining a linear program.
-      LinearProgram lp(
+      auto lp = std::make_shared<LinearProgram>(
           OptimizationType::Maximize,
           SparseMatrixType::RowWise
       );
 
       // The constraint matrix is set up in CSR format.
-      lp.add_rows({
+      lp->add_rows({
           Row<double>({1, 2, 3}, {0, 1, 2}),
           Row<double>({1, 1}, {0, 1})
       });
@@ -58,7 +58,7 @@ int main() {
       // Add constraints to the LP; constraints consist of a pair
       // (Ordering, value), representing the RHS of the constraint equations
       // including the comparison operator.
-      lp.add_constraints(
+      lp->add_constraints(
           {
               Constraint<double>{Ordering::LEQ, 4.0},
               Constraint<double>{Ordering::GEQ, 1.0}
@@ -70,7 +70,7 @@ int main() {
       // c^T x, as well as the variable types of the elements
       // of x. These can generally be real, integer, binary, semi-real or
       // semi-integer.
-      lp.set_objective(
+      lp->set_objective(
           Objective<double>{
               {1.0, 1.0, 2.0},
               {VarType::Binary, VarType::Binary, VarType::Binary}
@@ -79,9 +79,9 @@ int main() {
 
 
       // Create Gurobi solver object. 
-      GurobiSolver solver(std::make_shared<LinearProgram>(lp));
+      //GurobiSolver solver(std::make_shared<LinearProgram>(lp));
 
-      SolverWrapper wrapper(std::make_shared<GurobiSolver>(solver));
+      SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
 
       // Flush LP data to internal solver.
       // This process keeps the internal LP object intact,
