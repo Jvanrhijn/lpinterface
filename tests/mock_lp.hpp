@@ -15,6 +15,7 @@ class MockLinearProgram : public LinearProgramInterface {
   MOCK_METHOD1(add_rows, void(std::vector<Row<double>>&&));
   MOCK_METHOD1(set_matrix, void(const SparseMatrix<double>&));
   MOCK_CONST_METHOD0(matrix, const SparseMatrix<double>&());
+  MOCK_METHOD0(matrix, SparseMatrix<double>&());
   MOCK_CONST_METHOD0(constraints, const std::vector<Constraint<double>>&());
   MOCK_METHOD1(add_constraints, void(const std::vector<Constraint<double>>&));
   MOCK_CONST_METHOD0(optimization_type, OptimizationType());

@@ -30,6 +30,8 @@ class LinearProgram : public LinearProgramInterface {
 
   const SparseMatrix<double>& matrix() const override;
 
+  SparseMatrix<double>& matrix() override;
+
   const std::vector<Constraint<double>>& constraints() const override;
 
   void add_constraints(

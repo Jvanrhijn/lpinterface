@@ -51,6 +51,11 @@ class LinearProgramInterface {
    */
   virtual const SparseMatrix<double>& matrix() const = 0;
 
+  /**
+   * @brief Get mutable access to the constraint matrix
+   */
+  virtual SparseMatrix<double>& matrix() = 0;
+
   virtual const std::vector<Constraint<double>>& constraints() const = 0;
 
   /**

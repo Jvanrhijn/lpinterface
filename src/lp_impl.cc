@@ -35,6 +35,8 @@ void LinearProgram::set_matrix(const SparseMatrix<double>& matrix) {
 
 const SparseMatrix<double>& LinearProgram::matrix() const { return matrix_; }
 
+SparseMatrix<double>& LinearProgram::matrix() { return matrix_; }
+
 const std::vector<Constraint<double>>& LinearProgram::constraints() const {
   return constraints_;
 }

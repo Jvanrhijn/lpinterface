@@ -30,23 +30,26 @@ TEST(Soplex, FullProblem) {
   lp.add_constraints(constr);
 
   Objective<double> obj{{1.0, 1.0, 2.0},
-                        {VarType::Binary, VarType::Binary, VarType::Binary}};
+                        {VarType::Real, VarType::Real, VarType::Real}};
   lp.set_objective(obj);
 
   // Create the Gurobi solver from the given LP
   auto spl = create_spl(lp);
+
+  spl.set_parameter(Param::Verbosity, 0);
+
   // Update the internal Gurobi LP
   spl.update_program();
 
-  // Solve the primal LP problem
+ // // Solve the primal LP problem
   auto status = spl.solve_primal();
   ASSERT_EQ(status, Status::Optimal);
 
-  // check solution value
+ // // check solution value
   auto solution = spl.get_solution();
 
-  ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
-  ASSERT_EQ(solution.objective_value, 3.0);
+  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
+  ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
 // TEST(Soplex, FullProblemRawData) {

@@ -39,13 +39,45 @@ void SoplexSolver::set_parameter(const Param param, const double value) {
   }
 }
 
-void SoplexSolver::update_program() { throw NotImplementedError(); }
+void SoplexSolver::update_program() { 
+    if (linear_program_->matrix().type() != SparseMatrixType::RowWise) {
+        throw NotImplementedError();
+    }
+    const auto objective = linear_program_->objective();
+    const auto constraints = linear_program_->constraints();
+
+    // add variables to LP
+    DSVector dummycol(0);
+    for (const auto& coefficient : objective.values) {
+      soplex_.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
+    }
+
+    // add constraints to LP
+    std::size_t i = 0;
+    for (const auto& row : linear_program_->matrix()) {
+        DSVector ds_row(row.num_nonzero());
+        // TODO: fix this so we don't have to copy each time
+        std::vector<int> why(row.nonzero_indices().begin(), row.nonzero_indices().end());
+        ds_row.add(row.num_nonzero(), why.data(), row.values().data());
+        // determine constraint
+        if (constraints[i].ordering == Ordering::LEQ) {
+            soplex_.addRowReal(LPRow(0, ds_row, constraints[i].value));
+        } else if (constraints[i].ordering == Ordering::GEQ) {
+            soplex_.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+        } else {
+            throw UnsupportedConstraintException();
+        }
+
+        i++;
+    }
+
+ }
 
 Status SoplexSolver::solve_primal() { 
     auto status = translate_status(soplex_.optimize());
 
-    DVector prim(soplex_.numRowsReal());
-    DVector dual(soplex_.numColsReal());
+    DVector prim(soplex_.numColsReal());
+    DVector dual(soplex_.numRowsReal());
 
     soplex_.getPrimalReal(prim);
     soplex_.getDualReal(dual);
@@ -57,9 +89,13 @@ Status SoplexSolver::solve_primal() {
     return status;
 }
 
-Status SoplexSolver::solve_dual() { return solve_primal(); }
+Status SoplexSolver::solve_dual() { 
+    return solve_primal(); 
+}
 
-Status SoplexSolver::solution_status() const { throw NotImplementedError(); }
+Status SoplexSolver::solution_status() const { 
+    return translate_status(soplex_.status());
+}
 
 const LinearProgramInterface& SoplexSolver::linear_program() const {
   return *linear_program_;
