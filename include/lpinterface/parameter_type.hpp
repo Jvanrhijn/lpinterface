@@ -12,8 +12,10 @@ namespace lpint {
 enum class Param {
   GrbOutputFlag,
   GrbThreads,
-  GrbModelSense,
-  GrbCutoff,
+  ObjectiveSense,
+  Cutoff,
+  Infinity,
+  TimeLimit,
 };
 
 }  // namespace lpint

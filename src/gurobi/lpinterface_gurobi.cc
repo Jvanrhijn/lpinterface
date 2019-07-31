@@ -57,10 +57,14 @@ GurobiSolver::~GurobiSolver() {
 void GurobiSolver::set_parameter(const Param param, const int value) {
   switch (param) {
     case Param::GrbOutputFlag:
-      GRBsetintparam(GRBgetenv(gurobi_model_), "outputflag", value);
+      if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_), "outputflag", value)) {
+        throw GurobiException(error);
+      }
       break;
     case Param::GrbThreads:
-      GRBsetintparam(GRBgetenv(gurobi_model_), "threads", value);
+      if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_), "threads", value)) {
+        throw GurobiException(error);
+      }
       break;
     default:
       throw UnsupportedParameterException();
@@ -69,8 +73,10 @@ void GurobiSolver::set_parameter(const Param param, const int value) {
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
   switch (param) {
-    case Param::GrbCutoff:
-      GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value);
+    case Param::Cutoff:
+      if (auto error = GRBsetdblparam(GRBgetenv(gurobi_model_), "Cutoff", value)) {
+        throw GurobiException(error);
+      }
       break;
     default:
       throw UnsupportedParameterException();
@@ -234,7 +240,7 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-char GurobiSolver::convert_ordering(const Ordering ord) {
+constexpr char GurobiSolver::convert_ordering(const Ordering ord) {
   switch (ord) {
     case Ordering::LEQ:
       return GRB_LESS_EQUAL;
@@ -247,7 +253,7 @@ char GurobiSolver::convert_ordering(const Ordering ord) {
   }
 }
 
-Status GurobiSolver::convert_gurobi_status(int status) {
+constexpr Status GurobiSolver::convert_gurobi_status(int status) {
   switch (status) {
     case GRB_LOADED:
       return Status::NoInformation;
@@ -281,6 +287,19 @@ Status GurobiSolver::convert_gurobi_status(int status) {
       return Status::UserObjectiveLimit;
     default:
       throw UknownStatusException();
+  }
+}
+
+constexpr const char *GurobiSolver::translate_parameter(const Param param) {
+  switch (param) {
+    case (Param::GrbOutputFlag):
+      return "outputflag";
+    case (Param::GrbThreads):
+      return "threads";
+    case (Param::Cutoff):
+      return "Cutoff";
+    default:
+      throw UnsupportedParameterException();
   }
 }
 

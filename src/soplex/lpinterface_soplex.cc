@@ -54,4 +54,22 @@ const Solution<double>& SoplexSolver::get_solution() const {
     throw NotImplementedError();
 }
 
+int SoplexSolver::translate_int_parameter(const Param param) {
+    switch (param) {
+        case (Param::ObjectiveSense):
+          return SoPlex::OBJSENSE;
+        default:
+          throw UnsupportedParameterException();
+    }
+}
+
+int SoplexSolver::translate_real_parameter(const Param param) {
+    switch (param) {
+        case (Param::Infinity):
+          return SoPlex::INFTY;
+        default:
+          throw UnsupportedParameterException();
+    }
+}
+
 }  // namespace lpint
