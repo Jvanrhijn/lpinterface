@@ -11,6 +11,7 @@ SoplexSolver::SoplexSolver(OptimizationType optim_type) {
                                : SoPlex::OBJSENSE_MINIMIZE)) {
     throw FailedToSetParameterException();
   }
+  set_parameter(Param::Verbosity, 0);
 }
 
 SoplexSolver::SoplexSolver(std::shared_ptr<LinearProgramInterface> lp)
@@ -21,6 +22,7 @@ SoplexSolver::SoplexSolver(std::shared_ptr<LinearProgramInterface> lp)
                                : SoPlex::OBJSENSE_MINIMIZE)) {
     throw FailedToSetParameterException();
   }
+  set_parameter(Param::Verbosity, 0);
   // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
   // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==
   // SparseMatrixType::RowWise?

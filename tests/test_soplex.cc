@@ -36,8 +36,6 @@ TEST(Soplex, FullProblem) {
   // Create the Gurobi solver from the given LP
   auto spl = create_spl(lp);
 
-  spl.set_parameter(Param::Verbosity, 0);
-
   // Update the internal Gurobi LP
   spl.update_program();
 
