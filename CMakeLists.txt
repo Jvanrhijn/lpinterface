@@ -17,9 +17,9 @@ set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused -Werror -Wreturn-type
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+#endif()
 
 include_directories(lib)
 include_directories(include)
@@ -29,10 +29,19 @@ include(cmake/clang-cxx-dev-tools.cmake)
 find_package(GUROBI)
 
 if (GUROBI_FOUND)
-    message(STATUS "Found Gurobi: TRUE")
-    include_directories(${GUROBI_INCLUDE_DIRS})
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
+  message(STATUS "Found Gurobi: TRUE")
+  include_directories(${GUROBI_INCLUDE_DIRS})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
+  list(APPEND LIBS gurobi81)
 endif(GUROBI_FOUND)
+
+find_package(SOPLEX)
+
+if (SOPLEX_FOUND)
+  message(STATUS "Found SoPlex: TRUE")
+  include_directories(${SOPLEX_INCLUDE_DIRS})
+  list(APPEND LIBS ${SOPLEX_LIBRARIES})
+endif(SOPLEX_FOUND)
 
 if (TESTING)
   include(cmake/gtest.cmake)
@@ -53,9 +62,7 @@ endif(GUROBI_FOUND)
 
 add_library(${TARGET} STATIC ${lpinterface_files})
 
-if (GUROBI_FOUND)
-    target_link_libraries(${TARGET} gurobi81)
-endif(GUROBI_FOUND)
+target_link_libraries(${TARGET} ${LIBS})
 
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
 

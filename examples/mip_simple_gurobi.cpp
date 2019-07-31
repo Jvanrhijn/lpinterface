@@ -69,11 +69,12 @@ int main() {
       // coefficients of the elements of x in the expression
       // c^T x, as well as the variable types of the elements
       // of x. These can generally be real, integer, binary, semi-real or
-      // semi-integer.
+      // semi-integer, depending on what solver one uses (for instance,
+      // SoPlex only supports real variables).
       lp->set_objective(
           Objective<double>{
               {1.0, 1.0, 2.0},
-              {VarType::Binary, VarType::Binary, VarType::Binary}
+              {VarType::Real, VarType::Real, VarType::Real}
           }
       );
 
