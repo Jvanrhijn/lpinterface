@@ -112,10 +112,6 @@ Status GurobiSolver::solve_primal() {
   if (error) {
     throw GurobiException(error);
   }
-  // retrieve solution information from gurobi
-  if (error) {
-    throw GurobiException(error);
-  }
   error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL,
                         &solution_.objective_value);
   if (error) {
@@ -271,7 +267,7 @@ constexpr Status GurobiSolver::convert_gurobi_status(int status) {
     case GRB_USER_OBJ_LIMIT:
       return Status::UserObjectiveLimit;
     default:
-      throw UknownStatusException();
+      throw UnknownStatusException();
   }
 }
 

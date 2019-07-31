@@ -51,6 +51,7 @@ class SoplexSolver : public LinearProgramSolver {
       const Param param);
   constexpr static soplex::SoPlex::RealParam translate_real_parameter(
       const Param param);
+  constexpr static Status translate_status(const soplex::SPxSolver::Status status);
 };
 
 }  // namespace lpint

@@ -84,7 +84,7 @@ class GurobiException : public LpException {
   int code_;
 };
 
-class UknownStatusException : public LpException {
+class UnknownStatusException : public LpException {
  public:
   virtual const char *what() const throw() {
     return "Unknown status code encountered";
@@ -112,8 +112,17 @@ class FailedToSetParameterException : public LpException {
   }
 };
 
+class SoplexException : public LpException {
+ public:
+  virtual const char *what() const throw() {
+    return "SoPlex ran into an error solving an LP";
+  }
+};
+
 enum class Status {
-  //! No solution information available.
+  //! No Linear Program has been loaded
+  NotLoaded,
+  //! Linear program loaded, but no solution information available.
   NoInformation,
   //! Model was solved to optimality, solution available.
   Optimal,
@@ -147,6 +156,28 @@ enum class Status {
   InProgress,
   //! User-specified objective limit has been reached.
   UserObjectiveLimit,
+  //! No ratiotester loaded (SoPlex).
+  NoRatioTester,
+  //! No pricer loaded (SoPlex).
+  NoPricer,
+  //! No solver loaded.
+  NoSolver,
+  //! Solving process aborted to exit decomposition simplex (SoPlex).
+  ExitDecomposition,
+  //! Solving process aborted due to commence decomposition simplex (SoPlex).
+  Decomposition,
+  //! Solving process aborted due to presence of cycling.
+  Cycling,
+  //! Problem solved to optimality, but unscaled solution contains violations.
+  OptimalUnscaledViolations,
+  //! Equivalent to SoPlex NOT_INIT status; unclear from docs what
+  //! this actually means. It might be better to just throw an exception here?
+  NotInitialized,
+  //! Solving process aborted as objective limit has been reached
+  ObjectiveLimit,
+  //! LP has a usable basis (SoPlex), unclear from soplex docs what this
+  //! means.
+  Regular,
 };
 
 }  // namespace lpint
