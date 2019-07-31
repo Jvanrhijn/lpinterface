@@ -17,14 +17,12 @@ set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused -Werror -Wreturn-type
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-#endif()
-
 include_directories(lib)
 include_directories(include)
 
 include(cmake/clang-cxx-dev-tools.cmake)
+
+list(APPEND lpinterface_files src/lp_impl.cc)
 
 find_package(GUROBI)
 
@@ -33,6 +31,7 @@ if (GUROBI_FOUND)
   include_directories(${GUROBI_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
   list(APPEND LIBS gurobi81)
+  list(APPEND lpinterface_files src/gurobi/lpinterface_gurobi.cc)
 endif(GUROBI_FOUND)
 
 find_package(SOPLEX)
@@ -41,6 +40,7 @@ if (SOPLEX_FOUND)
   message(STATUS "Found SoPlex: TRUE")
   include_directories(${SOPLEX_INCLUDE_DIRS})
   list(APPEND LIBS ${SOPLEX_LIBRARIES})
+  list(APPEND lpinterface_files src/soplex/lpinterface_soplex.cc)
 endif(SOPLEX_FOUND)
 
 if (TESTING)
@@ -51,14 +51,6 @@ if (TESTING)
   add_subdirectory(lib/rapidcheck)
   add_subdirectory(tests)
 endif()
-
-set(lpinterface_files 
-        src/lp_impl.cc)
-
-if (GUROBI_FOUND)
-    set(lpinterface_files ${lpinterface_files} 
-            src/gurobi/lpinterface_gurobi.cc)
-endif(GUROBI_FOUND)
 
 add_library(${TARGET} STATIC ${lpinterface_files})
 
