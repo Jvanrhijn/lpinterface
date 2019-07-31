@@ -35,3 +35,12 @@ after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
   - kcov --exclude-pattern=expected,gtest,gmock,rapidcheck,test,mock,/usr out tests/unit_tests
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
+
+before_script:
+  - wget https://soplex.zib.de/download/release/soplex-4.0.2.tgz
+  - tar xzf soplex-4.0.2.tgz
+  - cd soplex-4.0.2
+  - cmake -H. -Bbuild
+  - cmake --build build -- -j4
+  - cd build && make install
+  - cd ${TRAVIS_BUILD_DIR}
