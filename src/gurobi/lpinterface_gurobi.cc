@@ -7,17 +7,17 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
     : linear_program_(lp) {
   // load environment
   GRBloadenv(&gurobi_env_, "");
-  // allocate Gurobi model
+ // // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
   set_parameter(Param::GrbOutputFlag, 0);
 
-  // set optimization type
-  GRBsetintattr(
-      gurobi_model_, "modelsense",
-      linear_program_->optimization_type() == OptimizationType::Maximize
-          ? GRB_MAXIMIZE
-          : GRB_MINIMIZE);
+ // // set optimization type
+ GRBsetintattr(
+     gurobi_model_, "modelsense",
+     linear_program_->optimization_type() == OptimizationType::Maximize
+         ? GRB_MAXIMIZE
+         : GRB_MINIMIZE);
 }
 
 GurobiSolver::GurobiSolver(OptimizationType opt_type) {
