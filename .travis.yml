@@ -1,5 +1,5 @@
 dist:
-  - xenial
+  - bionic 
 
 sudo:
   require
@@ -16,7 +16,6 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-6
       - llvm
       - lcov
       - kcov
@@ -30,7 +29,7 @@ addons:
 script:
   - mkdir build && cd build
   - cmake -DTESTING=1 -DCOVERAGE=1 ..
-  - make
+  - make -j4
   - ./tests/unit_tests
 
 after_success:
