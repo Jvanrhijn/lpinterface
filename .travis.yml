@@ -34,7 +34,7 @@ script:
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
-  - kcov --exclude-pattern=expected,gtest,gmock,rapidcheck,test,mock,/usr out tests/unit_tests
+  - kcov --exclude-pattern=expected,gtest,gmock,rapidcheck,test,mock,/usr,tests/* out tests/unit_tests
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
 
 before_script:
