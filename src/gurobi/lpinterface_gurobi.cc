@@ -55,14 +55,14 @@ GurobiSolver::~GurobiSolver() {
 }
 
 void GurobiSolver::set_parameter(const Param param, const int value) {
-  if (auto error = GRBsetintparam(GRBgetenv(gurobi_model_),
+  if (const auto error = GRBsetintparam(GRBgetenv(gurobi_model_),
                                   translate_parameter(param), value)) {
     throw GurobiException(error);
   }
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
-  if (auto error = GRBsetdblparam(GRBgetenv(gurobi_model_),
+  if (const auto error = GRBsetdblparam(GRBgetenv(gurobi_model_),
                                   translate_parameter(param), value)) {
     throw GurobiException(error);
   }
@@ -74,7 +74,7 @@ void GurobiSolver::update_program() {
   }
   // first add variables to Gurobi
   auto objective = linear_program_->objective();
-  std::size_t num_vars = objective.values.size();
+  const std::size_t num_vars = objective.values.size();
   auto vt = convert_variable_type(objective.variable_types);
   auto err =
       GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
@@ -84,7 +84,7 @@ void GurobiSolver::update_program() {
   }
   // set constraints
   auto matrix = linear_program_->matrix();
-  auto constraints = linear_program_->constraints();
+  const auto constraints = linear_program_->constraints();
   std::size_t idx = 0;
   if (matrix.type() == SparseMatrixType::RowWise) {
     for (auto& row : matrix) {
@@ -93,7 +93,7 @@ void GurobiSolver::update_program() {
       // for some ungodly reason
       std::vector<int> nonzero_indices(row.nonzero_indices().begin(),
                                        row.nonzero_indices().end());
-      auto error =
+      const auto error =
           GRBaddconstr(gurobi_model_, row.num_nonzero(), nonzero_indices.data(),
                        row.values().data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
@@ -132,7 +132,7 @@ Status GurobiSolver::solve_dual() { throw UnsupportedFeatureException(); }
 
 Status GurobiSolver::solution_status() const {
   int status;
-  auto error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_STATUS, &status);
+  const auto error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_STATUS, &status);
   if (error) {
     throw GurobiException(error);
   }
@@ -173,7 +173,7 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
   for (const auto& ordering : ord) {
     ord_grb.push_back(convert_ordering(ordering));
   }
-  auto error = GRBaddconstrs(
+  const auto error = GRBaddconstrs(
       gurobi_model_, start_indices.size(), values.size(), start_indices.data(),
       col_indices.data(), values.data(), ord_grb.data(), rhs.data(), nullptr);
   if (error) {
@@ -182,7 +182,7 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
 }
 void GurobiSolver::add_variables(std::vector<double>&& objective_values,
                                  std::vector<VarType>&& var_types) {
-  auto error =
+  const auto error =
       GRBaddvars(gurobi_model_, objective_values.size(), 0, nullptr, nullptr,
                  nullptr, objective_values.data(), nullptr, nullptr,
                  convert_variable_type(var_types).data(), nullptr);
@@ -193,7 +193,7 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
 
 std::vector<char> GurobiSolver::convert_variable_type(
     const std::vector<VarType>& var_types) {
-  auto num_vars = var_types.size();
+  const auto num_vars = var_types.size();
   std::vector<char> value_type(num_vars);
   for (std::size_t i = 0; i < num_vars; i++) {
     char vtype;

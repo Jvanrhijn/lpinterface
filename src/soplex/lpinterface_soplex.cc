@@ -76,7 +76,7 @@ void SoplexSolver::update_program() {
 }
 
 Status SoplexSolver::solve_primal() {
-  auto status = translate_status(soplex_.optimize());
+  const auto status = translate_status(soplex_.optimize());
 
   DVector prim(soplex_.numColsReal());
   DVector dual(soplex_.numRowsReal());
@@ -125,7 +125,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
                             std::vector<double>&& rhs) {
   std::size_t nrows = start_indices.size();
   for (std::size_t i = 0; i < nrows - 1; i++) {
-    int nnz = start_indices[i + 1] - start_indices[i];
+    const int nnz = start_indices[i + 1] - start_indices[i];
 
     std::vector<double> row(values.begin() + start_indices[i],
                             values.begin() + start_indices[i + 1]);
@@ -144,7 +144,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
     }
   }
   // have to do the last one manually since the logic differs slightly
-  int last_start_idx = start_indices[start_indices.size() - 1];
+  const int last_start_idx = start_indices[start_indices.size() - 1];
   std::vector<double> row(values.begin() + last_start_idx, values.end());
   std::vector<int> nonzero_indices(col_indices.begin() + last_start_idx,
                                    col_indices.end());
@@ -170,7 +170,7 @@ void SoplexSolver::add_variables(std::vector<double>&& objective_values,
   }
   // TODO: add columns all in one go with SoPlex::addColsReal()
   DSVector dummycol(0);
-  std::size_t nvars = objective_values.size();
+  const std::size_t nvars = objective_values.size();
   for (std::size_t i = 0; i < nvars; i++) {
     soplex_.addColReal(LPCol(objective_values[i], dummycol, infinity, 0.0));
   }
