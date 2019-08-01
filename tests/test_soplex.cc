@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
+#include <rapidcheck/gtest.h>
+
 #include <iostream>
+
 #include "lpinterface.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 #include "mock_lp.hpp"
+#include "generators.hpp"
 
 using namespace lpint;
 
@@ -16,6 +20,49 @@ TEST(Soplex, SetParameters) {
   EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
   SoplexSolver spl(lp);
   spl.set_parameter(Param::Verbosity, 0);
+}
+
+// property: any feasible LP should result in the same
+// answer as SoPlex gives us
+RC_GTEST_PROP(Soplex, TestGen, ()) {
+  // construct an LP
+  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
+
+  // TODO: generalize
+  const std::size_t nrows = *rc::gen::inRange(1ul, 10ul).as("Number of LP constraints/rows");
+  const std::size_t ncols = *rc::gen::inRange(1ul, 10ul).as("Number of LP variables/columns");
+
+  std::vector<Row<double>> rows;
+
+  for (std::size_t i = 0; i < nrows; i++) {
+    auto values_ = *rc::gen::nonEmpty<std::vector<double>>().as("Row values");
+    std::vector<double> values;
+    if (values_.size() <= ncols) {
+      values = values_;
+    } else {
+      values = std::vector<double>(values_.begin(), values_.begin() + static_cast<long int>(ncols));
+    }
+    auto indices = *rc::genUniqueVector<std::size_t>(2, rc::gen::arbitrary<std::size_t>()).as("Index values");
+    rows.emplace_back(values, indices);
+  }
+
+  lp.add_rows(std::move(rows));
+
+  // generate constraints
+  const auto constraints = *rc::genVectorSized(ncols, ncols, rc::gen::arbitrary<std::vector<Constraint<double>>>()).as("Constraint values");
+  lp.add_constraints(std::move(constraints));
+
+  // generate objective
+  const auto objective = *rc::gen::arbitrary<Objective<double>>().as("Objective");
+  lp.set_objective(objective);
+
+  SoplexSolver solver(std::make_shared<LinearProgram>(lp));
+
+  solver.update_program();
+
+  Status status = solver.solve_primal();
+
+  RC_ASSERT(status == Status::Optimal);
 }
 
 TEST(Soplex, FullProblem) {

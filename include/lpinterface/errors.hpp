@@ -119,7 +119,7 @@ class SoplexException : public LpException {
   }
 };
 
-enum class Status {
+enum class Status : int {
   //! No Linear Program has been loaded
   NotLoaded,
   //! Linear program loaded, but no solution information available.
@@ -179,6 +179,11 @@ enum class Status {
   //! means.
   Regular,
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Status& status) {
+  os << static_cast<int>(status);
+  return os;
+}
 
 }  // namespace lpint
 

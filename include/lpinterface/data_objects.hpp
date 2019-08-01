@@ -80,7 +80,7 @@ class MatrixEntry {
     return nonzero_indices_;
   }
 
- private:
+ protected:
   std::vector<T> values_;
   std::vector<std::size_t> nonzero_indices_;  // indices of nonzero entries
 };
@@ -102,6 +102,8 @@ class Row : public MatrixEntry<T> {
 
   Row(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
   Row() = default;
+
+  friend class rc::Arbitrary<Row<T>>;
 };
 
 /**
