@@ -35,21 +35,21 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
   std::vector<Row<double>> rows;
 
   for (std::size_t i = 0; i < nrows; i++) {
-    auto values_ = *rc::gen::nonEmpty<std::vector<double>>().as("Row values");
-    std::vector<double> values;
-    if (values_.size() <= ncols) {
-      values = values_;
-    } else {
-      values = std::vector<double>(values_.begin(), values_.begin() + static_cast<long int>(ncols));
-    }
-    auto indices = *rc::genUniqueVector<std::size_t>(2, rc::gen::arbitrary<std::size_t>()).as("Index values");
+    auto values = *rc::gen::suchThat(rc::gen::arbitrary<std::vector<double>>(), [&](std::vector<double> v) {
+        return v.size() == ncols;
+    });
+    auto indices = *rc::gen::suchThat(rc::gen::arbitrary<std::vector<std::size_t>>(), [&](std::vector<std::size_t> v) {
+        return v.size() == ncols;
+    });
+    //auto values = *rc::genVectorSized<double>(ncols, rc::gen::arbitrary<std::vector<double>>()).as("Row values");
+    //auto indices = *rc::genUniqueVector<std::size_t>(ncols, rc::gen::arbitrary<std::size_t>()).as("Index values");
     rows.emplace_back(values, indices);
   }
 
   lp.add_rows(std::move(rows));
 
   // generate constraints
-  const auto constraints = *rc::genVectorSized(ncols, ncols, rc::gen::arbitrary<std::vector<Constraint<double>>>()).as("Constraint values");
+  const auto constraints = *rc::genVectorSized(ncols, rc::gen::arbitrary<std::vector<Constraint<double>>>()).as("Constraint values");
   lp.add_constraints(std::move(constraints));
 
   // generate objective
