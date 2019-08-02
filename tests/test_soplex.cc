@@ -6,6 +6,7 @@
 #include "lpinterface.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 #include "mock_lp.hpp"
+
 #include "generators.hpp"
 
 using namespace lpint;
@@ -29,31 +30,30 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
   LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
 
   // TODO: generalize
-  const std::size_t nrows = *rc::gen::inRange(1ul, 10ul).as("Number of LP constraints/rows");
-  const std::size_t ncols = *rc::gen::inRange(1ul, 10ul).as("Number of LP variables/columns");
+  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 10);
+  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 10);
 
   std::vector<Row<double>> rows;
 
   for (std::size_t i = 0; i < nrows; i++) {
-    auto values = *rc::gen::suchThat(rc::gen::arbitrary<std::vector<double>>(), [&](std::vector<double> v) {
-        return v.size() == ncols;
-    });
-    auto indices = *rc::gen::suchThat(rc::gen::arbitrary<std::vector<std::size_t>>(), [&](std::vector<std::size_t> v) {
-        return v.size() == ncols;
-    });
-    //auto values = *rc::genVectorSized<double>(ncols, rc::gen::arbitrary<std::vector<double>>()).as("Row values");
-    //auto indices = *rc::genUniqueVector<std::size_t>(ncols, rc::gen::arbitrary<std::size_t>()).as("Index values");
+    auto values = *rc::gen::container<std::vector<double>>(
+                       ncols, rc::gen::arbitrary<double>())
+                       .as("Row values");
+    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(ncols, rc::gen::inRange(0ul, values.size()));
     rows.emplace_back(values, indices);
   }
 
   lp.add_rows(std::move(rows));
 
   // generate constraints
-  const auto constraints = *rc::genVectorSized(ncols, rc::gen::arbitrary<std::vector<Constraint<double>>>()).as("Constraint values");
+  auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
+      nrows, rc::genConstraintWithOrdering(
+                 rc::gen::arbitrary<double>(),
+                 rc::gen::element(Ordering::LEQ, Ordering::GEQ)));
   lp.add_constraints(std::move(constraints));
 
   // generate objective
-  const auto objective = *rc::gen::arbitrary<Objective<double>>().as("Objective");
+  const auto objective = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
   lp.set_objective(objective);
 
   SoplexSolver solver(std::make_shared<LinearProgram>(lp));
@@ -62,7 +62,9 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
 
   Status status = solver.solve_primal();
 
-  RC_ASSERT(status == Status::Optimal);
+  // now we should repeat the computation using SoPlex itsel
+
+  RC_ASSERT(false);
 }
 
 TEST(Soplex, FullProblem) {

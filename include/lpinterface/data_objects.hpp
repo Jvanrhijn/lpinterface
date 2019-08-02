@@ -6,6 +6,11 @@
 #include <type_traits>
 #include <vector>
 
+// TODO: find a more elegant way to do this
+#ifdef TESTING
+#include <rapidcheck.h>
+#endif
+
 #include "common.hpp"
 #include "errors.hpp"
 
@@ -102,8 +107,10 @@ class Row : public MatrixEntry<T> {
 
   Row(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
   Row() = default;
-
+// TODO: find a more elegant way to do this
+#if TESTING
   friend class rc::Arbitrary<Row<T>>;
+#endif
 };
 
 /**
@@ -287,6 +294,73 @@ struct Solution {
   //! Value of the objective \f$c^T x\f$.
   T objective_value;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
+  switch (ord) {
+    case Ordering::EQ:
+      os << "EQ";
+      break;
+    case Ordering::GEQ:
+      os << "GEQ";
+      break;
+    case Ordering::GT:
+      os << "GT";
+      break;
+    case Ordering::LEQ:
+      os << "LEQ";
+      break;
+    case Ordering::LT:
+      os << "LT";
+      break;
+    default:
+      throw UnsupportedConstraintException();
+  }
+  return os;
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Constraint<T>& constraint) {
+  os << constraint.ordering << " " << constraint.value;
+  return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const VarType& vtype) {
+  switch (vtype) {
+    case VarType::Binary:
+      os << "Binary";
+      break;
+    case VarType::Integer:
+      os << "Integer";
+      break;
+    case VarType::Real:
+      os << "Real";
+      break;
+    case VarType::SemiInteger:
+      os << "Semi-integer";
+      break;
+    case VarType::SemiReal:
+      os << "Semi-real";
+      break;
+    default:
+      throw UnsupportedVariableTypeException();
+  }
+  return os;
+}
+
+template <typename T>
+inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
+  if (obj.values.size() == 0) {
+    os << "Objective {}";
+    return os;
+  }
+  os << "Objective {";
+  std::size_t n = obj.values.size();
+  for (std::size_t i = 0; i < n; i++) {
+    os << obj.variable_types[i] << " " << obj.values[i] << ", ";
+  } 
+  os << "\b\b}";
+  return os;
+}
 
 }  // namespace lpint
 

@@ -56,14 +56,14 @@ GurobiSolver::~GurobiSolver() {
 
 void GurobiSolver::set_parameter(const Param param, const int value) {
   if (const auto error = GRBsetintparam(GRBgetenv(gurobi_model_),
-                                  translate_parameter(param), value)) {
+                                        translate_parameter(param), value)) {
     throw GurobiException(error);
   }
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
   if (const auto error = GRBsetdblparam(GRBgetenv(gurobi_model_),
-                                  translate_parameter(param), value)) {
+                                        translate_parameter(param), value)) {
     throw GurobiException(error);
   }
 }

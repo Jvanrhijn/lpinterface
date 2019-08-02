@@ -180,7 +180,7 @@ enum class Status : int {
   Regular,
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Status& status) {
+inline std::ostream &operator<<(std::ostream &os, const Status &status) {
   os << static_cast<int>(status);
   return os;
 }

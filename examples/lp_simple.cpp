@@ -62,7 +62,7 @@ int main() {
         {1.0, 1.0, 2.0}, {VarType::Real, VarType::Real, VarType::Real}});
 
     // Create solver object.
-    //SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
+    // SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
     SolverWrapper wrapper(std::make_shared<SoplexSolver>(lp));
 
     /*
