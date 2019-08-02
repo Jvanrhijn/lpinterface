@@ -69,7 +69,9 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
 
     // soplex
     DSVector ds_row(values.size());
-    ds_row.add(values.size(), std::vector<int>(indices.begin(), indices.end()).data(), values.data());
+    ds_row.add(values.size(),
+               std::vector<int>(indices.begin(), indices.end()).data(),
+               values.data());
     if (constraints[i].ordering == Ordering::LEQ) {
       soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
     } else {

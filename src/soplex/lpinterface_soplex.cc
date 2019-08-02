@@ -208,5 +208,4 @@ constexpr SoPlex::RealParam SoplexSolver::translate_real_parameter(
   }
 }
 
-
 }  // namespace lpint
