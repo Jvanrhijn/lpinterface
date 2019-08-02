@@ -208,54 +208,5 @@ constexpr SoPlex::RealParam SoplexSolver::translate_real_parameter(
   }
 }
 
-constexpr Status SoplexSolver::translate_status(
-    const SPxSolver::Status status) {
-  switch (status) {
-    case SPxSolver::Status::ERROR:
-      throw SoplexException();
-    case SPxSolver::Status::NO_RATIOTESTER:
-      return Status::NoRatioTester;
-    case SPxSolver::Status::NO_PRICER:
-      return Status::NoPricer;
-    case SPxSolver::Status::NO_SOLVER:
-      return Status::NoSolver;
-    case SPxSolver::Status::NOT_INIT:
-      return Status::NotInitialized;
-    case SPxSolver::Status::ABORT_EXDECOMP:
-      return Status::ExitDecomposition;
-    case SPxSolver::Status::ABORT_DECOMP:
-      return Status::Decomposition;
-    case SPxSolver::Status::ABORT_CYCLING:
-      return Status::Cycling;
-    case SPxSolver::Status::ABORT_TIME:
-      return Status::TimeOut;
-    case SPxSolver::Status::ABORT_ITER:
-      return Status::IterationLimit;
-    case SPxSolver::Status::ABORT_VALUE:
-      return Status::ObjectiveLimit;
-    case SPxSolver::Status::SINGULAR:
-      return Status::NumericFailure;
-    case SPxSolver::Status::NO_PROBLEM:
-      return Status::NotLoaded;
-    case SPxSolver::Status::REGULAR:
-      return Status::Regular;
-    case SPxSolver::Status::RUNNING:
-      return Status::InProgress;
-    case SPxSolver::Status::UNKNOWN:
-      return Status::NotLoaded;
-    case SPxSolver::Status::OPTIMAL:
-      return Status::Optimal;
-    case SPxSolver::Status::UNBOUNDED:
-      return Status::Unbounded;
-    case SPxSolver::Status::INFEASIBLE:
-      return Status::Infeasible;
-    case SPxSolver::Status::INForUNBD:
-      return Status::InfeasibleOrUnbounded;
-    case SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS:
-      return Status::OptimalUnscaledViolations;
-    default:
-      throw UnknownStatusException();
-  }
-}
 
 }  // namespace lpint

@@ -319,7 +319,8 @@ inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
 }
 
 template <typename T>
-inline std::ostream& operator<<(std::ostream& os, const Constraint<T>& constraint) {
+inline std::ostream& operator<<(std::ostream& os,
+                                const Constraint<T>& constraint) {
   os << constraint.ordering << " " << constraint.value;
   return os;
 }
@@ -357,7 +358,7 @@ inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
   std::size_t n = obj.values.size();
   for (std::size_t i = 0; i < n; i++) {
     os << obj.variable_types[i] << " " << obj.values[i] << ", ";
-  } 
+  }
   os << "\b\b}";
   return os;
 }

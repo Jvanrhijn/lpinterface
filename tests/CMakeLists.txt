@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 set(UNIT_TESTS unit_tests)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wpedantic -Wall -Wextra -Wcast-align -Wcast-qual) 

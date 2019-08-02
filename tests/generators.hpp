@@ -62,11 +62,14 @@ inline Gen<lpint::Constraint<T>> genConstraintWithOrdering(
 }
 
 template <typename T>
-inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size, Gen<lpint::VarType> vtgen, Gen<T> valgen) {
-    return gen::build<lpint::Objective<T>>(
-        gen::set(&lpint::Objective<T>::values, gen::container<std::vector<T>>(size, valgen)),
-        gen::set(&lpint::Objective<T>::variable_types, gen::container<std::vector<lpint::VarType>>(size, vtgen))
-    );
+inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
+                                                  Gen<lpint::VarType> vtgen,
+                                                  Gen<T> valgen) {
+  return gen::build<lpint::Objective<T>>(
+      gen::set(&lpint::Objective<T>::values,
+               gen::container<std::vector<T>>(size, valgen)),
+      gen::set(&lpint::Objective<T>::variable_types,
+               gen::container<std::vector<lpint::VarType>>(size, vtgen)));
 }
 
 }  // namespace rc
@@ -94,9 +97,8 @@ Gen<Container> uniqueCount(std::size_t count, Gen<T> gen) {
                                   [](const T &x) -> const T & { return x; });
 }
 
+}  // namespace gen
 
-}
-
-}
+}  // namespace rc
 
 #endif  // LPINTERFACE_GENERATORS_H

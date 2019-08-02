@@ -23,38 +23,62 @@ TEST(Soplex, SetParameters) {
   spl.set_parameter(Param::Verbosity, 0);
 }
 
-// property: any feasible LP should result in the same
+// property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, TestGen, ()) {
+  using namespace soplex;
+  // intialize soplex
+  SoPlex soplex;
+  soplex.setIntParam(SoPlex::OBJSENSE, SoPlex::OBJSENSE_MAXIMIZE);
+  soplex.setIntParam(SoPlex::VERBOSITY, 0);
+
   // construct an LP
   LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
 
   // TODO: generalize
-  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 10);
-  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 10);
+  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 100);
+  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 100);
 
-  std::vector<Row<double>> rows;
+  // generate objective
+  const auto objective = *rc::genSizedObjective(
+      ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
+  lp.set_objective(objective);
 
-  for (std::size_t i = 0; i < nrows; i++) {
-    auto values = *rc::gen::container<std::vector<double>>(
-                       ncols, rc::gen::arbitrary<double>())
-                       .as("Row values");
-    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(ncols, rc::gen::inRange(0ul, values.size()));
-    rows.emplace_back(values, indices);
+  // soplex: add vars
+  DSVector dummycol(0);
+  for (const auto& coefficient : objective.values) {
+    soplex.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
   }
-
-  lp.add_rows(std::move(rows));
 
   // generate constraints
   auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
       nrows, rc::genConstraintWithOrdering(
                  rc::gen::arbitrary<double>(),
                  rc::gen::element(Ordering::LEQ, Ordering::GEQ)));
-  lp.add_constraints(std::move(constraints));
 
-  // generate objective
-  const auto objective = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
-  lp.set_objective(objective);
+  // generate constraint matrix
+  std::vector<Row<double>> rows;
+  for (std::size_t i = 0; i < nrows; i++) {
+    auto values = *rc::gen::container<std::vector<double>>(
+                       ncols, rc::gen::arbitrary<double>())
+                       .as("Row values");
+    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(
+                        ncols, rc::gen::inRange(0ul, values.size()))
+                        .as("Row indices");
+    rows.emplace_back(values, indices);
+
+    // soplex
+    DSVector ds_row(values.size());
+    ds_row.add(values.size(), std::vector<int>(indices.begin(), indices.end()).data(), values.data());
+    if (constraints[i].ordering == Ordering::LEQ) {
+      soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
+    } else {
+      soplex.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+    }
+  }
+
+  lp.add_rows(std::move(rows));
+  lp.add_constraints(std::move(constraints));
 
   SoplexSolver solver(std::make_shared<LinearProgram>(lp));
 
@@ -62,9 +86,24 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
 
   Status status = solver.solve_primal();
 
-  // now we should repeat the computation using SoPlex itsel
+  // now we repeat the computation using SoPlex itsel
+  const auto status_soplex = SoplexSolver::translate_status(soplex.optimize());
 
-  RC_ASSERT(false);
+  // check whether bare soplex has the same result as our solver
+  RC_ASSERT(status_soplex == status);
+
+  // if the optimization was a success, check for equality of solutions
+  if (status == Status::Optimal) {
+    DVector prim(soplex.numColsReal());
+    soplex.getPrimalReal(prim);
+    std::vector<double> primal(prim.get_ptr(), prim.get_ptr() + prim.dim());
+
+    DVector dual(soplex.numRowsReal());
+    soplex.getDualReal(dual);
+    std::vector<double> d(dual.get_ptr(), dual.get_ptr() + dual.dim());
+
+    RC_ASSERT(d == solver.get_solution().dual);
+  }
 }
 
 TEST(Soplex, FullProblem) {
