@@ -58,6 +58,8 @@ class LinearProgramInterface {
 
   virtual const std::vector<Constraint<double>>& constraints() const = 0;
 
+  virtual std::vector<Constraint<double>>& constraints() = 0;
+
   /**
    * @brief Add a set of constraints to the LP formulation.
    */

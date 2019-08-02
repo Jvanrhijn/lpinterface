@@ -124,6 +124,7 @@ template <typename T>
 class SparseMatrix {
  private:
   using iterator = typename std::vector<MatrixEntry<T>>::iterator;
+  using const_iterator = typename std::vector<MatrixEntry<T>>::const_iterator;
 
  public:
   using iterator_category = std::forward_iterator_tag;
@@ -149,6 +150,11 @@ class SparseMatrix {
 
   iterator begin() { return entries_.begin(); }
   iterator end() { return entries_.end(); }
+
+  const_iterator begin() const { return entries_.begin(); }
+  const_iterator end() const { return entries_.end(); }
+
+  std::size_t num_entries() const { return entries_.size(); }
 
   /**
    * @brief Add columns to the sparse matrix.

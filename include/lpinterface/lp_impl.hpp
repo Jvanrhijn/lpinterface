@@ -34,6 +34,8 @@ class LinearProgram : public LinearProgramInterface {
 
   const std::vector<Constraint<double>>& constraints() const override;
 
+  std::vector<Constraint<double>>& constraints() override;
+
   void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
 

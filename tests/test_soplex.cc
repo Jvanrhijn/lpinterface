@@ -11,6 +11,33 @@
 
 using namespace lpint;
 
+inline void configure_soplex(soplex::SoPlex& soplex, const LinearProgram& lp) {
+  using namespace soplex;
+  // soplex: add vars
+  DSVector dummycol(0);
+  for (const auto& coefficient : lp.objective().values) {
+    soplex.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
+  }
+
+  const auto constraints = lp.constraints();
+
+  std::size_t i = 0;
+  for (const auto& row : lp.matrix()) {  // soplex
+    DSVector ds_row(row.values().size());
+    ds_row.add(row.values().size(),
+               std::vector<int>(row.nonzero_indices().begin(),
+                                row.nonzero_indices().end())
+                   .data(),
+               row.values().data());
+    if (lp.constraints()[i].ordering == Ordering::LEQ) {
+      soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
+    } else {
+      soplex.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+    }
+    i++;
+  }
+}
+
 inline SoplexSolver create_spl(const LinearProgram& lp) {
   SoplexSolver spl(std::make_shared<LinearProgram>(lp));
   return spl;
@@ -27,60 +54,22 @@ TEST(Soplex, SetParameters) {
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, TestGen, ()) {
   using namespace soplex;
+  // generate optimization sense
+  const int objsense = *rc::gen::element(0, 1).as("Objective sense");
+
   // intialize soplex
   SoPlex soplex;
-  soplex.setIntParam(SoPlex::OBJSENSE, SoPlex::OBJSENSE_MAXIMIZE);
+  soplex.setIntParam(SoPlex::OBJSENSE, objsense);
   soplex.setIntParam(SoPlex::VERBOSITY, 0);
 
-  // construct an LP
-  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
-
   // TODO: generalize
-  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 100);
-  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 100);
+  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 100).as("Rows in LP");
+  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 100).as("Columns in LP");
 
-  // generate objective
-  const auto objective = *rc::genSizedObjective(
-      ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
-  lp.set_objective(objective);
+  const OptimizationType opt_type = objsense == SoPlex::OBJSENSE_MAXIMIZE? OptimizationType::Maximize : OptimizationType::Minimize;
+  auto lp = rc::generateLinearProgram(nrows, ncols, opt_type);
 
-  // soplex: add vars
-  DSVector dummycol(0);
-  for (const auto& coefficient : objective.values) {
-    soplex.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
-  }
-
-  // generate constraints
-  auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
-      nrows, rc::genConstraintWithOrdering(
-                 rc::gen::arbitrary<double>(),
-                 rc::gen::element(Ordering::LEQ, Ordering::GEQ)));
-
-  // generate constraint matrix
-  std::vector<Row<double>> rows;
-  for (std::size_t i = 0; i < nrows; i++) {
-    auto values = *rc::gen::container<std::vector<double>>(
-                       ncols, rc::gen::arbitrary<double>())
-                       .as("Row values");
-    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(
-                        ncols, rc::gen::inRange(0ul, values.size()))
-                        .as("Row indices");
-    rows.emplace_back(values, indices);
-
-    // soplex
-    DSVector ds_row(values.size());
-    ds_row.add(values.size(),
-               std::vector<int>(indices.begin(), indices.end()).data(),
-               values.data());
-    if (constraints[i].ordering == Ordering::LEQ) {
-      soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
-    } else {
-      soplex.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
-    }
-  }
-
-  lp.add_rows(std::move(rows));
-  lp.add_constraints(std::move(constraints));
+  configure_soplex(soplex, lp);
 
   SoplexSolver solver(std::make_shared<LinearProgram>(lp));
 
@@ -103,6 +92,8 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
     DVector dual(soplex.numRowsReal());
     soplex.getDualReal(dual);
     std::vector<double> d(dual.get_ptr(), dual.get_ptr() + dual.dim());
+
+    RC_ASSERT(soplex.objValueReal() == solver.get_solution().objective_value);
 
     RC_ASSERT(d == solver.get_solution().dual);
   }

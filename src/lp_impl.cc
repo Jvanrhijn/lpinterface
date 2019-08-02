@@ -41,6 +41,10 @@ const std::vector<Constraint<double>>& LinearProgram::constraints() const {
   return constraints_;
 }
 
+std::vector<Constraint<double>>& LinearProgram::constraints() {
+  return constraints_;
+}
+
 void LinearProgram::add_constraints(
     const std::vector<Constraint<double>>& constraints) {
   constraints_ = constraints;

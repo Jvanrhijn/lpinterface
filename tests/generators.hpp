@@ -4,6 +4,32 @@
 #include <iostream>
 #include "rapidcheck.h"
 
+// hack unique container generators with count parameter into rapidcheck
+namespace rc {
+
+namespace gen {
+
+template <typename Container, typename T, typename F>
+Gen<Container> uniqueByCount(std::size_t count, Gen<T> gen, F &&f) {
+  using Strategy = detail::UniqueContainerStrategy<Decay<F>>;
+  detail::ContainerHelper<Container, Strategy> helper(
+      Strategy(std::forward<F>(f)));
+
+  return [=](const Random &random, int size) {
+    return helper.generate(count, random, size, gen);
+  };
+}
+
+template <typename Container, typename T>
+Gen<Container> uniqueCount(std::size_t count, Gen<T> gen) {
+  return uniqueByCount<Container>(count, std::move(gen),
+                                  [](const T &x) -> const T & { return x; });
+}
+
+}  // namespace gen
+
+}  // namespace rc
+
 namespace rc {
 
 template <typename T>
@@ -72,32 +98,42 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
                gen::container<std::vector<lpint::VarType>>(size, vtgen)));
 }
 
-}  // namespace rc
+// TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
+inline lpint::LinearProgram generateLinearProgram(const std::size_t nrows,
+                                                  const std::size_t ncols,
+                                                  lpint::OptimizationType opt_type) {
+  using namespace lpint;
+  // construct an LP
+  LinearProgram lp(opt_type, SparseMatrixType::RowWise);
 
-// hack unique container generators with count parameter into rapidcheck
+  // generate objective
+  const auto objective = *rc::genSizedObjective(
+      ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>()).as("Objective");
+  lp.set_objective(objective);
 
-namespace rc {
+  // generate constraints
+  auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
+      nrows, rc::genConstraintWithOrdering(
+                 rc::gen::arbitrary<double>(),
+                 rc::gen::element(Ordering::LEQ, Ordering::GEQ))).as("Constraints");
 
-namespace gen {
+  // generate constraint matrix
+  std::vector<Row<double>> rows;
+  for (std::size_t i = 0; i < nrows; i++) {
+    auto values = *rc::gen::container<std::vector<double>>(
+                       ncols, rc::gen::arbitrary<double>())
+                       .as("Row values");
+    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(
+                        ncols, rc::gen::inRange(0ul, values.size()))
+                        .as("Row indices");
+    rows.emplace_back(values, indices);
+  }
 
-template <typename Container, typename T, typename F>
-Gen<Container> uniqueByCount(std::size_t count, Gen<T> gen, F &&f) {
-  using Strategy = detail::UniqueContainerStrategy<Decay<F>>;
-  detail::ContainerHelper<Container, Strategy> helper(
-      Strategy(std::forward<F>(f)));
+  lp.add_rows(std::move(rows));
+  lp.add_constraints(std::move(constraints));
 
-  return [=](const Random &random, int size) {
-    return helper.generate(count, random, size, gen);
-  };
+  return lp;
 }
-
-template <typename Container, typename T>
-Gen<Container> uniqueCount(std::size_t count, Gen<T> gen) {
-  return uniqueByCount<Container>(count, std::move(gen),
-                                  [](const T &x) -> const T & { return x; });
-}
-
-}  // namespace gen
 
 }  // namespace rc
 
