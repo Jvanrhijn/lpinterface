@@ -52,54 +52,7 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
                      std::vector<VarType>&& var_types) override;
 
   constexpr static Status translate_status(
-      const soplex::SPxSolver::Status status) {
-    switch (status) {
-      case soplex::SPxSolver::Status::ERROR:
-        throw SoplexException();
-      case soplex::SPxSolver::Status::NO_RATIOTESTER:
-        return Status::NoRatioTester;
-      case soplex::SPxSolver::Status::NO_PRICER:
-        return Status::NoPricer;
-      case soplex::SPxSolver::Status::NO_SOLVER:
-        return Status::NoSolver;
-      case soplex::SPxSolver::Status::NOT_INIT:
-        return Status::NotInitialized;
-      case soplex::SPxSolver::Status::ABORT_EXDECOMP:
-        return Status::ExitDecomposition;
-      case soplex::SPxSolver::Status::ABORT_DECOMP:
-        return Status::Decomposition;
-      case soplex::SPxSolver::Status::ABORT_CYCLING:
-        return Status::Cycling;
-      case soplex::SPxSolver::Status::ABORT_TIME:
-        return Status::TimeOut;
-      case soplex::SPxSolver::Status::ABORT_ITER:
-        return Status::IterationLimit;
-      case soplex::SPxSolver::Status::ABORT_VALUE:
-        return Status::ObjectiveLimit;
-      case soplex::SPxSolver::Status::SINGULAR:
-        return Status::NumericFailure;
-      case soplex::SPxSolver::Status::NO_PROBLEM:
-        return Status::NotLoaded;
-      case soplex::SPxSolver::Status::REGULAR:
-        return Status::Regular;
-      case soplex::SPxSolver::Status::RUNNING:
-        return Status::InProgress;
-      case soplex::SPxSolver::Status::UNKNOWN:
-        return Status::NotLoaded;
-      case soplex::SPxSolver::Status::OPTIMAL:
-        return Status::Optimal;
-      case soplex::SPxSolver::Status::UNBOUNDED:
-        return Status::Unbounded;
-      case soplex::SPxSolver::Status::INFEASIBLE:
-        return Status::Infeasible;
-      case soplex::SPxSolver::Status::INForUNBD:
-        return Status::InfeasibleOrUnbounded;
-      case soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS:
-        return Status::OptimalUnscaledViolations;
-      default:
-        throw UnknownStatusException();
-    }
-  }
+      const soplex::SPxSolver::Status status);
 
  private:
   soplex::SoPlex soplex_;
@@ -113,6 +66,56 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   constexpr static soplex::SoPlex::RealParam translate_real_parameter(
       const Param param);
 };
+
+constexpr Status SoplexSolver::translate_status(
+    const soplex::SPxSolver::Status status) {
+  switch (status) {
+    case soplex::SPxSolver::Status::ERROR:
+      throw SoplexException();
+    case soplex::SPxSolver::Status::NO_RATIOTESTER:
+      return Status::NoRatioTester;
+    case soplex::SPxSolver::Status::NO_PRICER:
+      return Status::NoPricer;
+    case soplex::SPxSolver::Status::NO_SOLVER:
+      return Status::NoSolver;
+    case soplex::SPxSolver::Status::NOT_INIT:
+      return Status::NotInitialized;
+    case soplex::SPxSolver::Status::ABORT_EXDECOMP:
+      return Status::ExitDecomposition;
+    case soplex::SPxSolver::Status::ABORT_DECOMP:
+      return Status::Decomposition;
+    case soplex::SPxSolver::Status::ABORT_CYCLING:
+      return Status::Cycling;
+    case soplex::SPxSolver::Status::ABORT_TIME:
+      return Status::TimeOut;
+    case soplex::SPxSolver::Status::ABORT_ITER:
+      return Status::IterationLimit;
+    case soplex::SPxSolver::Status::ABORT_VALUE:
+      return Status::ObjectiveLimit;
+    case soplex::SPxSolver::Status::SINGULAR:
+      return Status::NumericFailure;
+    case soplex::SPxSolver::Status::NO_PROBLEM:
+      return Status::NotLoaded;
+    case soplex::SPxSolver::Status::REGULAR:
+      return Status::Regular;
+    case soplex::SPxSolver::Status::RUNNING:
+      return Status::InProgress;
+    case soplex::SPxSolver::Status::UNKNOWN:
+      return Status::NotLoaded;
+    case soplex::SPxSolver::Status::OPTIMAL:
+      return Status::Optimal;
+    case soplex::SPxSolver::Status::UNBOUNDED:
+      return Status::Unbounded;
+    case soplex::SPxSolver::Status::INFEASIBLE:
+      return Status::Infeasible;
+    case soplex::SPxSolver::Status::INForUNBD:
+      return Status::InfeasibleOrUnbounded;
+    case soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS:
+      return Status::OptimalUnscaledViolations;
+    default:
+      throw UnknownStatusException();
+  }
+}
 
 }  // namespace lpint
 
