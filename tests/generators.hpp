@@ -99,23 +99,27 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
 }
 
 // TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
-inline lpint::LinearProgram generateLinearProgram(const std::size_t nrows,
-                                                  const std::size_t ncols,
-                                                  lpint::OptimizationType opt_type) {
+inline lpint::LinearProgram generateLinearProgram(
+    const std::size_t nrows, const std::size_t ncols,
+    lpint::OptimizationType opt_type) {
   using namespace lpint;
   // construct an LP
   LinearProgram lp(opt_type, SparseMatrixType::RowWise);
 
   // generate objective
-  const auto objective = *rc::genSizedObjective(
-      ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>()).as("Objective");
+  const auto objective =
+      *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real),
+                             rc::gen::arbitrary<double>())
+           .as("Objective");
   lp.set_objective(objective);
 
   // generate constraints
-  auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
-      nrows, rc::genConstraintWithOrdering(
-                 rc::gen::arbitrary<double>(),
-                 rc::gen::element(Ordering::LEQ, Ordering::GEQ))).as("Constraints");
+  auto constraints =
+      *rc::gen::container<std::vector<Constraint<double>>>(
+           nrows, rc::genConstraintWithOrdering(
+                      rc::gen::arbitrary<double>(),
+                      rc::gen::element(Ordering::LEQ, Ordering::GEQ)))
+           .as("Constraints");
 
   // generate constraint matrix
   std::vector<Row<double>> rows;

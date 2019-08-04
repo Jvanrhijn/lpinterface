@@ -63,10 +63,14 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
   soplex.setIntParam(SoPlex::VERBOSITY, 0);
 
   // TODO: generalize
-  const std::size_t nrows = *rc::gen::inRange<std::size_t>(1, 100).as("Rows in LP");
-  const std::size_t ncols = *rc::gen::inRange<std::size_t>(1, 100).as("Columns in LP");
+  const std::size_t nrows =
+      *rc::gen::inRange<std::size_t>(1, 100).as("Rows in LP");
+  const std::size_t ncols =
+      *rc::gen::inRange<std::size_t>(1, 100).as("Columns in LP");
 
-  const OptimizationType opt_type = objsense == SoPlex::OBJSENSE_MAXIMIZE? OptimizationType::Maximize : OptimizationType::Minimize;
+  const OptimizationType opt_type = objsense == SoPlex::OBJSENSE_MAXIMIZE
+                                        ? OptimizationType::Maximize
+                                        : OptimizationType::Minimize;
   auto lp = rc::generateLinearProgram(nrows, ncols, opt_type);
 
   configure_soplex(soplex, lp);
