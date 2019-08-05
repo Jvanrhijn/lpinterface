@@ -16,7 +16,10 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
 
   // intialize soplex
   SoPlex soplex;
-  soplex.setIntParam(SoPlex::OBJSENSE, lp.optimization_type() == OptimizationType::Maximize? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE);
+  soplex.setIntParam(SoPlex::OBJSENSE,
+                     lp.optimization_type() == OptimizationType::Maximize
+                         ? SoPlex::OBJSENSE_MAXIMIZE
+                         : SoPlex::OBJSENSE_MINIMIZE);
   soplex.setIntParam(SoPlex::VERBOSITY, 0);
 
   // soplex: add vars
@@ -59,11 +62,18 @@ TEST(Soplex, SetParameters) {
   spl.set_parameter(Param::Verbosity, 0);
 }
 
+// TEST(Soplex, UpdateProgram) {
+//  auto lp = std::make_shared<MockLinearProgram>();
+//  EXPECT_CALL(*lp.get(), matrix()).Times(testing::AtLeast(1));
+//  EXPECT_CALL(*lp.get(), optimization_type()).Times(testing::AtLeast(1));
+//  SoplexSolver spl(lp);
+//  spl.update_program();
+//}
+
 // property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
-  // generate optimization sense
 
   auto lp = rc::generateLinearProgram(100, 100);
 

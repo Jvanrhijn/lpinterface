@@ -8,19 +8,6 @@ LinearProgram::LinearProgram(const OptimizationType opt_type,
                              const SparseMatrixType sptype)
     : matrix_(sptype), opt_type_(opt_type), initialized_(true) {}
 
-LinearProgram::LinearProgram(const OptimizationType opt_type,
-                             const std::initializer_list<Row<double>>&& rows)
-    : matrix_(std::forward<decltype(rows)>(rows)),
-      opt_type_(opt_type),
-      initialized_(true) {}
-
-LinearProgram::LinearProgram(
-    const OptimizationType opt_type,
-    const std::initializer_list<Column<double>>&& columns)
-    : matrix_(std::forward<decltype(columns)>(columns)),
-      opt_type_(opt_type),
-      initialized_(true) {}
-
 void LinearProgram::add_columns(std::vector<Column<double>>&& columns) {
   return matrix_.add_columns(std::move(columns));
 }

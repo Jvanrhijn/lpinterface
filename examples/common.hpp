@@ -43,4 +43,4 @@ void print_vector(const std::vector<T>& v) {
   std::cout << "\b\b]";
 }
 
-#endif // LPINTERFACE_COMMON_H
+#endif  // LPINTERFACE_COMMON_H

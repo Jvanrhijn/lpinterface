@@ -99,8 +99,8 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
 }
 
 // TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
-inline lpint::LinearProgram generateLinearProgram(
-    const std::size_t max_nrows, const std::size_t max_ncols) {
+inline lpint::LinearProgram generateLinearProgram(const std::size_t max_nrows,
+                                                  const std::size_t max_ncols) {
   using namespace lpint;
 
   const std::size_t nrows =
@@ -108,16 +108,11 @@ inline lpint::LinearProgram generateLinearProgram(
   const std::size_t ncols =
       *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
 
-  const auto objsense = *rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize);
-  // construct an LP
-  LinearProgram lp(objsense, SparseMatrixType::RowWise);
-
   // generate objective
-  const auto objective =
-      *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real),
-                             rc::gen::arbitrary<double>())
-           .as("Objective");
-  lp.set_objective(objective);
+  auto objective = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real),
+                                          rc::gen::arbitrary<double>())
+                        .as("Objective");
+  // lp.set_objective(objective);
 
   // generate constraints
   auto constraints =
@@ -136,13 +131,13 @@ inline lpint::LinearProgram generateLinearProgram(
     auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(
                         ncols, rc::gen::inRange(0ul, values.size()))
                         .as("Row indices");
+
     rows.emplace_back(values, indices);
   }
-
-  lp.add_rows(std::move(rows));
-  lp.add_constraints(std::move(constraints));
-
-  return lp;
+  const auto objsense =
+      *rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize);
+  return LinearProgram(objsense, std::move(rows), std::move(constraints),
+                       std::move(objective));
 }
 
 }  // namespace rc

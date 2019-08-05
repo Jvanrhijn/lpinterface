@@ -12,7 +12,8 @@
  * The constraints that each queen must be safe can be formulated as constraints
  * on the chess board matrix. The four constraints are:
  *
- * - The sum of each row must be less than or equal to 1 (i.e. at most one queen per row).
+ * - The sum of each row must be less than or equal to 1 (i.e. at most one queen
+ * per row).
  * - The sum of each column must be less than or equal to 1.
  * - The sum of each diagonal must be less than or equal to 1.
  * - The sum of each anti-diagonal must be less than or equal to 1.
@@ -27,7 +28,6 @@
 #include "common.hpp"
 
 using namespace lpint;
-
 
 int main(int argc, char *argv[]) {
   // get board width
@@ -109,7 +109,8 @@ int main(int argc, char *argv[]) {
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
-  // - max one queen per anti-sub-diagonal: sum_i X{N - i, i + k + 1} <= 1, k <= N
+  // - max one queen per anti-sub-diagonal: sum_i X{N - i, i + k + 1} <= 1, k <=
+  // N
   for (std::size_t k = 0; k < BOARD_SIZE; k++) {
     std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
@@ -120,7 +121,8 @@ int main(int argc, char *argv[]) {
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
-  // - max one queen per anti-super-diagonal:, sum_i X{N - i - k, i + 1} <= 1, k <= N
+  // - max one queen per anti-super-diagonal:, sum_i X{N - i - k, i + 1} <= 1, k
+  // <= N
   for (std::size_t k = 0; k < BOARD_SIZE; k++) {
     std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
