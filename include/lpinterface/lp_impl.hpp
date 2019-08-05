@@ -17,20 +17,19 @@ class LinearProgram : public LinearProgramInterface {
   template <typename Entry>
   LinearProgram(const OptimizationType opt_type,
                 const std::initializer_list<Entry>&& entries)
-              : matrix_(std::forward<decltype(entries)>(entries)),
-                opt_type_(opt_type),
-                initialized_(true) {}
+      : matrix_(std::forward<decltype(entries)>(entries)),
+        opt_type_(opt_type),
+        initialized_(true) {}
 
   template <typename Entry>
-  LinearProgram(const OptimizationType opt_type,
-                std::vector<Entry>&& entries,
+  LinearProgram(const OptimizationType opt_type, std::vector<Entry>&& entries,
                 std::vector<Constraint<double>>&& constraints,
-                Objective<double>&& objective) 
-                : objective_(objective),
-                  matrix_(std::forward<decltype(entries)>(entries)),
-                  constraints_(constraints),
-                  opt_type_(opt_type),
-                  initialized_(true) {}
+                Objective<double>&& objective)
+      : objective_(objective),
+        matrix_(std::forward<decltype(entries)>(entries)),
+        constraints_(constraints),
+        opt_type_(opt_type),
+        initialized_(true) {}
 
   LinearProgram(const OptimizationType opt_type,
                 const std::initializer_list<Column<double>>&& columns);

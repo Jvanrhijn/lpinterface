@@ -54,6 +54,8 @@ class MatrixEntry {
                 "MatrixEntry<T> requires T to be arithmetic");
 
  public:
+  using Index = std::size_t;
+
   MatrixEntry(const std::vector<T>& values,
               const std::vector<std::size_t>& indices)
       : values_(values), nonzero_indices_(indices) {}

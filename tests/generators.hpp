@@ -98,9 +98,19 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
                gen::container<std::vector<lpint::VarType>>(size, vtgen)));
 }
 
+template <typename T>
+inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen) {
+  using namespace lpint;
+  return gen::construct<Row<T>>(
+      rc::gen::container<std::vector<T>>(count, std::move(valgen)),
+      rc::gen::uniqueCount<std::vector<std::size_t>>(
+          count, rc::gen::inRange(0ul, count)));
+}
+
 // TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
-inline lpint::LinearProgram generateLinearProgram(const std::size_t max_nrows,
-                                                  const std::size_t max_ncols) {
+inline Gen<lpint::LinearProgram> generateLinearProgram(
+    const std::size_t max_nrows, const std::size_t max_ncols,
+    Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
   using namespace lpint;
 
   const std::size_t nrows =
@@ -108,36 +118,15 @@ inline lpint::LinearProgram generateLinearProgram(const std::size_t max_nrows,
   const std::size_t ncols =
       *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
 
-  // generate objective
-  auto objective = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real),
-                                          rc::gen::arbitrary<double>())
-                        .as("Objective");
-  // lp.set_objective(objective);
-
-  // generate constraints
-  auto constraints =
-      *rc::gen::container<std::vector<Constraint<double>>>(
-           nrows, rc::genConstraintWithOrdering(
-                      rc::gen::arbitrary<double>(),
-                      rc::gen::element(Ordering::LEQ, Ordering::GEQ)))
-           .as("Constraints");
-
-  // generate constraint matrix
-  std::vector<Row<double>> rows;
-  for (std::size_t i = 0; i < nrows; i++) {
-    auto values = *rc::gen::container<std::vector<double>>(
-                       ncols, rc::gen::arbitrary<double>())
-                       .as("Row values");
-    auto indices = *rc::gen::uniqueCount<std::vector<std::size_t>>(
-                        ncols, rc::gen::inRange(0ul, values.size()))
-                        .as("Row indices");
-
-    rows.emplace_back(values, indices);
-  }
-  const auto objsense =
-      *rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize);
-  return LinearProgram(objsense, std::move(rows), std::move(constraints),
-                       std::move(objective));
+  return gen::construct<LinearProgram>(
+      rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize),
+      rc::gen::container<std::vector<Row<double>>>(
+          nrows, genRow(ncols, rc::gen::arbitrary<double>())),
+      rc::gen::container<std::vector<Constraint<double>>>(
+          nrows, rc::genConstraintWithOrdering(rc::gen::arbitrary<double>(),
+                                               std::move(genord))),
+      rc::genSizedObjective(ncols, std::move(genvt),
+                            rc::gen::arbitrary<double>()));
 }
 
 }  // namespace rc
