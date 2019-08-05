@@ -100,11 +100,17 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
 
 // TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
 inline lpint::LinearProgram generateLinearProgram(
-    const std::size_t nrows, const std::size_t ncols,
-    lpint::OptimizationType opt_type) {
+    const std::size_t max_nrows, const std::size_t max_ncols) {
   using namespace lpint;
+
+  const std::size_t nrows =
+      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
+  const std::size_t ncols =
+      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
+
+  const auto objsense = *rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize);
   // construct an LP
-  LinearProgram lp(opt_type, SparseMatrixType::RowWise);
+  LinearProgram lp(objsense, SparseMatrixType::RowWise);
 
   // generate objective
   const auto objective =

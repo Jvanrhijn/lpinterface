@@ -11,8 +11,14 @@
 
 using namespace lpint;
 
-inline void configure_soplex(soplex::SoPlex& soplex, const LinearProgram& lp) {
+inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   using namespace soplex;
+
+  // intialize soplex
+  SoPlex soplex;
+  soplex.setIntParam(SoPlex::OBJSENSE, lp.optimization_type() == OptimizationType::Maximize? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE);
+  soplex.setIntParam(SoPlex::VERBOSITY, 0);
+
   // soplex: add vars
   DSVector dummycol(0);
   for (const auto& coefficient : lp.objective().values) {
@@ -38,6 +44,7 @@ inline void configure_soplex(soplex::SoPlex& soplex, const LinearProgram& lp) {
     }
     i++;
   }
+  return soplex;
 }
 
 inline SoplexSolver create_spl(const LinearProgram& lp) {
@@ -57,25 +64,8 @@ TEST(Soplex, SetParameters) {
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
   // generate optimization sense
-  const auto objsense = *rc::gen::element(SoPlex::OBJSENSE_MAXIMIZE, SoPlex::OBJSENSE_MINIMIZE).as("Objective sense");
 
-  // intialize soplex
-  SoPlex soplex;
-  soplex.setIntParam(SoPlex::OBJSENSE, objsense);
-  soplex.setIntParam(SoPlex::VERBOSITY, 0);
-
-  // TODO: generalize
-  const std::size_t nrows =
-      *rc::gen::inRange<std::size_t>(1, 100).as("Rows in LP");
-  const std::size_t ncols =
-      *rc::gen::inRange<std::size_t>(1, 100).as("Columns in LP");
-
-  const OptimizationType opt_type = objsense == SoPlex::OBJSENSE_MAXIMIZE
-                                        ? OptimizationType::Maximize
-                                        : OptimizationType::Minimize;
-  auto lp = rc::generateLinearProgram(nrows, ncols, opt_type);
-
-  configure_soplex(soplex, lp);
+  auto lp = rc::generateLinearProgram(100, 100);
 
   SoplexSolver solver(std::make_shared<LinearProgram>(lp));
 
@@ -84,6 +74,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   Status status = solver.solve_primal();
 
   // now we repeat the computation using SoPlex itself
+  auto soplex = configure_soplex(lp);
   const auto status_soplex = SoplexSolver::translate_status(soplex.optimize());
 
   // check whether bare soplex has the same result as our solver
