@@ -31,8 +31,10 @@ inline void configure_soplex(soplex::SoPlex& soplex, const LinearProgram& lp) {
                row.values().data());
     if (lp.constraints()[i].ordering == Ordering::LEQ) {
       soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
-    } else {
+    } else if (lp.constraints()[i].ordering == Ordering::GEQ) {
       soplex.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+    } else {
+      throw UnsupportedConstraintException();
     }
     i++;
   }
@@ -52,10 +54,10 @@ TEST(Soplex, SetParameters) {
 
 // property: any LP should result in the same
 // answer as SoPlex gives us
-RC_GTEST_PROP(Soplex, TestGen, ()) {
+RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
   // generate optimization sense
-  const int objsense = *rc::gen::element(0, 1).as("Objective sense");
+  const auto objsense = *rc::gen::element(SoPlex::OBJSENSE_MAXIMIZE, SoPlex::OBJSENSE_MINIMIZE).as("Objective sense");
 
   // intialize soplex
   SoPlex soplex;
@@ -81,7 +83,7 @@ RC_GTEST_PROP(Soplex, TestGen, ()) {
 
   Status status = solver.solve_primal();
 
-  // now we repeat the computation using SoPlex itsel
+  // now we repeat the computation using SoPlex itself
   const auto status_soplex = SoplexSolver::translate_status(soplex.optimize());
 
   // check whether bare soplex has the same result as our solver
@@ -118,7 +120,7 @@ TEST(Soplex, FullProblem) {
                         {VarType::Real, VarType::Real, VarType::Real}};
   lp.set_objective(obj);
 
-  // Create the Gurobi solver from the given LP
+  // Create the solver from the given LP
   auto spl = create_spl(lp);
 
   // Update the internal Gurobi LP
