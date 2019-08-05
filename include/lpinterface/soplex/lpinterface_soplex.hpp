@@ -113,7 +113,7 @@ constexpr Status SoplexSolver::translate_status(
     case soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS:
       return Status::OptimalUnscaledViolations;
     default:
-      throw UnknownStatusException();
+      throw UnknownStatusException(status);
   }
 }
 

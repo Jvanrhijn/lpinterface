@@ -13,12 +13,7 @@ namespace lpint {
  * subclassed for each error cause, allowing fine-grained
  * control over various error paths.
  */
-class LpException : public std::exception {
- public:
-  virtual const char *what() const throw() { return msg; }
-
-  const char *msg;
-};
+class LpException : public std::exception {};
 
 class MatrixTypeException : public LpException {
  public:
@@ -73,22 +68,38 @@ class GurobiException : public LpException {
   virtual const char *what() const throw() {
     // TODO find better way to do this
     char *message = new char[100];
-    snprintf(message, 99, "Error occured in Gurobi, code %d", code_);
+    if (!msg_.empty()) {
+      snprintf(message, 99, "Error occured in Gurobi, code %d - %s", code_, msg_.c_str());
+    } else {
+      snprintf(message, 99, "Error occured in Gurobi, code %d", code_);
+    }
     return message;
   }
 
  public:
   GurobiException(int code) : code_(code) {}
+  GurobiException(int code, const char *msg) : code_(code), msg_(msg) {}
+
+  int code() const { return code_; }
 
  private:
   int code_;
+  std::string msg_;
 };
 
 class UnknownStatusException : public LpException {
  public:
   virtual const char *what() const throw() {
-    return "Unknown status code encountered";
+    char *message = new char[100];
+    snprintf(message, 99, "Unknown status code encountered: %d", code_);
+    return message;
   }
+
+ public:
+  UnknownStatusException(int code) : code_(code) {}
+
+ private:
+  int code_;
 };
 
 class UnsupportedFeatureException : public LpException {

@@ -75,7 +75,7 @@ TEST(Soplex, SetParameters) {
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
-  auto lp = *rc::generateLinearProgram(
+  auto lp = *rc::genLinearProgram(
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 

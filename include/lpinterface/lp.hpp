@@ -2,6 +2,7 @@
 #define LPINTERFACE_LP_H
 
 #include <vector>
+#include <iostream>
 
 #include "data_objects.hpp"
 #include "errors.hpp"
@@ -14,6 +15,22 @@ enum class OptimizationType {
   Minimize,
   Maximize,
 };
+
+inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
+  switch (ot) {
+    case (OptimizationType::Maximize):
+      os << "Maximize";
+      break;
+    case (OptimizationType::Minimize):
+      os << "Minimize";
+      break;
+    default:
+      // TODO: make a more descriptive exception
+      // for this case
+      throw UnsupportedFeatureException();
+  }
+  return os;
+}
 
 /**
  * @brief Interface representing linear program formulation.
@@ -55,6 +72,8 @@ class LinearProgramInterface {
    * @brief Get mutable access to the constraint matrix
    */
   virtual SparseMatrix<double>& matrix() = 0;
+
+  virtual std::size_t num_vars() const = 0;
 
   virtual const std::vector<Constraint<double>>& constraints() const = 0;
 

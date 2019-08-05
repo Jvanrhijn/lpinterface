@@ -46,6 +46,8 @@ class LinearProgram : public LinearProgramInterface {
 
   SparseMatrix<double>& matrix() override;
 
+  std::size_t num_vars() const override;
+
   const std::vector<Constraint<double>>& constraints() const override;
 
   std::vector<Constraint<double>>& constraints() override;
@@ -63,6 +65,8 @@ class LinearProgram : public LinearProgramInterface {
 
   bool is_initialized() const override;
 
+  friend std::ostream& operator<<(std::ostream&, const LinearProgram&);
+
  private:
   Objective<double> objective_;
   SparseMatrix<double> matrix_;
@@ -70,6 +74,18 @@ class LinearProgram : public LinearProgramInterface {
   OptimizationType opt_type_;
   bool initialized_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const LinearProgram& lp) {
+  if (lp.matrix_.type() != SparseMatrixType::RowWise) {
+    throw NotImplementedError();
+  }
+  os << lp.opt_type_ << " " << lp.objective_ << std::endl;
+  const auto n = lp.matrix_.num_entries();
+  for (std::size_t i = 0; i < n; i++) {
+    os << lp.matrix_.entries()[i] << " " << lp.constraints_[i] << std::endl;
+  }
+  return os;
+}
 
 }  // namespace lpint
 

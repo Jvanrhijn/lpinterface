@@ -4,6 +4,8 @@
 #include <iostream>
 #include "rapidcheck.h"
 
+#include "lpinterface.hpp"
+
 // hack unique container generators with count parameter into rapidcheck
 namespace rc {
 
@@ -108,9 +110,10 @@ inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen) {
 }
 
 // TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
-inline Gen<lpint::LinearProgram> generateLinearProgram(
-    const std::size_t max_nrows, const std::size_t max_ncols,
-    Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
+inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
+                                                  const std::size_t max_ncols,
+                                                  Gen<lpint::Ordering> genord,
+                                                  Gen<lpint::VarType> genvt) {
   using namespace lpint;
 
   const std::size_t nrows =

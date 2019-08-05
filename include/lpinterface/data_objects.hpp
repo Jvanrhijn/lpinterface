@@ -167,6 +167,10 @@ class SparseMatrix {
 
   std::size_t num_entries() const { return entries_.size(); }
 
+  const std::vector<MatrixEntry<T>>& entries() const {
+    return entries_;
+  }
+
   /**
    * @brief Add columns to the sparse matrix.
    *
@@ -377,6 +381,24 @@ inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
     os << obj.variable_types[i] << " " << obj.values[i] << ", ";
   }
   os << "\b\b}";
+  return os;
+}
+
+template <typename T> 
+inline std::ostream& operator<<(std::ostream& os, const MatrixEntry<T>& row) {
+  if (row.num_nonzero() == 0) {
+    os << "Hello";
+    return os;
+  }
+  os << "Entry {[";
+  for (const auto& val : row.values()) {
+    os << val << " ";
+  }
+  os << "\b] [";
+  for (const auto& val : row.nonzero_indices()) {
+    os << val << " ";
+  }
+  os << "\b]}";
   return os;
 }
 

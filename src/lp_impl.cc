@@ -24,6 +24,8 @@ const SparseMatrix<double>& LinearProgram::matrix() const { return matrix_; }
 
 SparseMatrix<double>& LinearProgram::matrix() { return matrix_; }
 
+std::size_t LinearProgram::num_vars() const { return objective_.values.size(); }
+
 const std::vector<Constraint<double>>& LinearProgram::constraints() const {
   return constraints_;
 }

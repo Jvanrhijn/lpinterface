@@ -1,12 +1,18 @@
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include <iostream>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 
 namespace lpint {
 
 GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
     : linear_program_(lp) {
   // load environment
+  redirect_stdout();
   GRBloadenv(&gurobi_env_, "");
+  restore_stdout();
   // // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
@@ -21,7 +27,9 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
 }
 
 GurobiSolver::GurobiSolver(OptimizationType opt_type) {
+  redirect_stdout();
   GRBloadenv(&gurobi_env_, "");
+  restore_stdout();
   // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
@@ -35,8 +43,10 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type) {
 
 GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
     : linear_program_(other.linear_program_) {
+  redirect_stdout();
   gurobi_model_ = GRBcopymodel(other.gurobi_model_);
   gurobi_env_ = GRBgetenv(gurobi_model_);
+  restore_stdout();
 }
 
 GurobiSolver& GurobiSolver::operator=(GurobiSolver other) noexcept {
@@ -74,13 +84,13 @@ void GurobiSolver::update_program() {
   }
   // first add variables to Gurobi
   auto objective = linear_program_->objective();
-  const std::size_t num_vars = objective.values.size();
+  const std::size_t num_vars = linear_program_->num_vars();
   auto vt = convert_variable_type(objective.variable_types);
   auto err =
       GRBaddvars(gurobi_model_, num_vars, 0, nullptr, nullptr, nullptr,
                  objective.values.data(), nullptr, nullptr, vt.data(), nullptr);
   if (err != 0) {
-    throw GurobiException(err);
+    throw GurobiException(err, GRBgeterrormsg(gurobi_env_));
   }
   // set constraints
   auto matrix = linear_program_->matrix();
@@ -98,7 +108,7 @@ void GurobiSolver::update_program() {
                        row.values().data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
-        throw GurobiException(error);
+        throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
       }
       idx++;
     }
@@ -110,12 +120,21 @@ void GurobiSolver::update_program() {
 Status GurobiSolver::solve_primal() {
   auto error = GRBoptimize(gurobi_model_);
   if (error) {
-    throw GurobiException(error);
+    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
   }
+  Status status;
+  do {
+    status = solution_status();
+  } while (status == Status::InProgress);
+
+  if (status != Status::Optimal) {
+    return status;
+  }
+
   error = GRBgetdblattr(gurobi_model_, GRB_DBL_ATTR_OBJVAL,
                         &solution_.objective_value);
   if (error) {
-    throw GurobiException(error);
+    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
   }
   int num_vars;
   error == GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
@@ -123,9 +142,9 @@ Status GurobiSolver::solve_primal() {
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
                              solution_.primal.data());
   if (error) {
-    throw GurobiException(error);
+    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
   }
-  return solution_status();
+  return status;
 }
 
 Status GurobiSolver::solve_dual() { throw UnsupportedFeatureException(); }
@@ -134,7 +153,7 @@ Status GurobiSolver::solution_status() const {
   int status;
   const auto error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_STATUS, &status);
   if (error) {
-    throw GurobiException(error);
+    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
   }
   return convert_gurobi_status(status);
 }
@@ -191,6 +210,25 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
   }
 }
 
+void GurobiSolver::redirect_stdout() {
+  // TODO: find better way to disable the license thingy
+  saved_stdout_ = dup(1);
+  close(1);
+  new_stdout_ = open("/dev/null", O_WRONLY);
+  if (new_stdout_ != 1) {
+    throw std::runtime_error("Failed to redirect stdout");
+  }
+}
+
+void GurobiSolver::restore_stdout() {
+  close(new_stdout_);
+  new_stdout_ = dup(saved_stdout_);
+  if (new_stdout_ != 1) {
+    throw std::runtime_error("Failed to redirect stdout");
+  }
+  close(saved_stdout_);
+}
+
 std::vector<char> GurobiSolver::convert_variable_type(
     const std::vector<VarType>& var_types) {
   const auto num_vars = var_types.size();
@@ -221,56 +259,6 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-constexpr char GurobiSolver::convert_ordering(const Ordering ord) {
-  switch (ord) {
-    case Ordering::LEQ:
-      return GRB_LESS_EQUAL;
-    case Ordering::GEQ:
-      return GRB_GREATER_EQUAL;
-    case Ordering::EQ:
-      return GRB_EQUAL;
-    default:
-      throw UnsupportedConstraintException();
-  }
-}
-
-constexpr Status GurobiSolver::convert_gurobi_status(int status) {
-  switch (status) {
-    case GRB_LOADED:
-      return Status::NoInformation;
-    case GRB_OPTIMAL:
-      return Status::Optimal;
-    case GRB_INFEASIBLE:
-      return Status::Infeasible;
-    case GRB_INF_OR_UNBD:
-      return Status::InfeasibleOrUnbounded;
-    case GRB_UNBOUNDED:
-      return Status::Unbounded;
-    case GRB_CUTOFF:
-      return Status::Cutoff;
-    case GRB_ITERATION_LIMIT:
-      return Status::IterationLimit;
-    case GRB_NODE_LIMIT:
-      return Status::NodeLimit;
-    case GRB_TIME_LIMIT:
-      return Status::TimeOut;
-    case GRB_SOLUTION_LIMIT:
-      return Status::SolutionLimit;
-    case GRB_INTERRUPTED:
-      return Status::Interrupted;
-    case GRB_NUMERIC:
-      return Status::NumericFailure;
-    case GRB_SUBOPTIMAL:
-      return Status::SuboptimalSolution;
-    case GRB_INPROGRESS:
-      return Status::InProgress;
-    case GRB_USER_OBJ_LIMIT:
-      return Status::UserObjectiveLimit;
-    default:
-      throw UnknownStatusException();
-  }
-}
-
 // TODO: extend
 constexpr const char* GurobiSolver::translate_parameter(const Param param) {
   switch (param) {
@@ -280,6 +268,8 @@ constexpr const char* GurobiSolver::translate_parameter(const Param param) {
       return "threads";
     case (Param::Cutoff):
       return "Cutoff";
+    case (Param::TimeLimit):
+      return GRB_DBL_PAR_TIMELIMIT;
     default:
       throw UnsupportedParameterException();
   }

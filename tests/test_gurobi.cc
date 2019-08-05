@@ -1,5 +1,12 @@
 #include <gtest/gtest.h>
+#include <rapidcheck/gtest.h>
+
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <iostream>
+
+#include "generators.hpp"
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "mock_lp.hpp"
@@ -11,12 +18,135 @@ inline GurobiSolver create_grb(const LinearProgram& lp) {
   return grb;
 }
 
+inline int configure_gurobi(LinearProgram& lp, GRBenv* env, GRBmodel* model) {
+  int saved_stdout = dup(1);
+  close(1);
+  int new_stdout = open("/dev/null", O_WRONLY);
+
+  int error = GRBloadenv(&env, "");
+
+  close(new_stdout);
+  new_stdout = dup(saved_stdout);
+  close(saved_stdout);
+
+  if (error) {
+    return error;
+  }
+  error = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
+                      nullptr);
+  if (error) {
+    return error;
+  }
+
+  GRBsetintattr(model, "outputflag", 0);
+
+  // set objective sense
+  error = GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE,
+                        lp.optimization_type() == OptimizationType::Maximize
+                            ? GRB_MAXIMIZE
+                            : GRB_MINIMIZE);
+  if (error) {
+    return error;
+  }
+  // add variables
+  error = GRBaddvars(
+      model, lp.num_vars(), 0, nullptr, nullptr, nullptr,
+      lp.objective().values.data(), nullptr, nullptr,
+      GurobiSolver::convert_variable_type(lp.objective().variable_types).data(),
+      nullptr);
+
+  if (error) {
+    return error;
+  }
+
+  const auto constraints = lp.constraints();
+
+  // add constraints
+  std::size_t idx = 0;
+  for (auto& row : lp.matrix()) {
+    std::vector<int> indices(row.nonzero_indices().begin(),
+                             row.nonzero_indices().end());
+    error = GRBaddconstr(
+        model, row.num_nonzero(), indices.data(), row.values().data(),
+        GurobiSolver::convert_ordering(constraints[idx].ordering),
+        constraints[idx].value, ("constr" + std::to_string(idx)).c_str());
+    if (error) {
+      return error;
+    }
+    idx++;
+  }
+  return 0;
+}
+
 TEST(Gurobi, SetParameters) {
   auto lp = std::make_shared<MockLinearProgram>();
   EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
   GurobiSolver grb(lp);
   grb.set_parameter(Param::GrbThreads, 1);
   grb.set_parameter(Param::GrbOutputFlag, 0);
+}
+
+RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
+  constexpr double TIME_LIMIT = 10.0;
+
+  auto lp = *rc::genLinearProgram(
+      100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
+      rc::gen::arbitrary<VarType>());
+
+  GRBenv* env = nullptr;
+  GRBmodel* model = nullptr;
+
+  auto grb = create_grb(lp);
+
+  grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
+
+  int error;
+  try {
+    error = configure_gurobi(lp, env, model);
+    GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
+    grb.update_program();
+  } catch (const GurobiException& e) {
+    RC_ASSERT(e.code() == error);
+    return;
+  }
+
+  // solve the lp
+  Status status;
+  try {
+    error = GRBoptimize(model);
+    status = grb.solve_primal();
+  } catch (const GurobiException& e) {
+    std::cout << e.what() << std::endl;
+    RC_ASSERT(e.code() == error);
+    return; 
+  }
+
+  // retrieve solution info from gurobi
+  int gurobi_status;
+  do {
+    error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &gurobi_status);
+  } while (gurobi_status == GRB_INPROGRESS);
+
+  if (error) {
+    throw GurobiException(error, GRBgeterrormsg(env));
+  }
+
+  // gurobi and interface should return same status
+  RC_ASSERT(GurobiSolver::convert_gurobi_status(gurobi_status) == status);
+
+  if (status == Status::Optimal) {
+    std::vector<double> solution(lp.num_vars());
+    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, lp.num_vars(),
+                               solution.data());
+    RC_ASSERT(solution == grb.get_solution().primal);
+
+    double objval;
+    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+    RC_ASSERT(std::abs(objval - grb.get_solution().objective_value) < 1e-15);
+  }
+
+  GRBfreemodel(model);
+  GRBfreeenv(env);
 }
 
 TEST(Gurobi, FullProblem) {
