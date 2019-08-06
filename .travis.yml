@@ -11,6 +11,8 @@ compiler:
   - clang
   - gcc
 
+cache: ccache
+
 addons:
   apt:
     sources:
@@ -25,11 +27,31 @@ addons:
       - cmake
       - libc++-dev
       - libgmp3-dev
+      - ccache
+
+matrix:
+  include:
+   # gcc 
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Release
+
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Debug
+
+    # clang
+    - os: linux
+      compiler: clang
+      env: BUILD_TYPE=Release
+
+    - os: linux
+      compiler: clang
+      env: BUILD_TYPE=Debug 
 
 script:
-  - mkdir build && cd build
-  - cmake -DTESTING=1 -DCOVERAGE=1 ..
-  - make -j4
+  - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - cmake --build build -- -j4
   - ./tests/unit_tests
 
 after_success:
