@@ -128,7 +128,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   } while (gurobi_status == GRB_INPROGRESS);
 
   if (error) {
-    //throw GurobiException(error, GRBgeterrormsg(env));
+    throw GurobiException(error, GRBgeterrormsg(env));
   }
 
   // gurobi and interface should return same status
