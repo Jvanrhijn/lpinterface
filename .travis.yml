@@ -59,6 +59,7 @@ matrix:
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
     - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -118,7 +119,7 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
 
 before_script:
-  - eval "${MATRIX_EVAL}""
+  - eval "${MATRIX_EVAL}"
   - wget https://soplex.zib.de/download/release/soplex-4.0.2.tgz
   - tar xzf soplex-4.0.2.tgz
   - cd soplex-4.0.2
