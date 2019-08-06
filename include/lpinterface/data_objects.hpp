@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <vector>
+#include <set>
 
 // TODO: find a more elegant way to do this
 #ifdef TESTING
@@ -61,7 +62,7 @@ class MatrixEntry {
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
 
-  T operator[](const std::size_t index) const {
+  T operator[](const Index index) const {
     auto index_in_data =
         std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
     if (index_in_data == nonzero_indices_.end()) {
@@ -83,19 +84,22 @@ class MatrixEntry {
 
   const std::vector<T>& values() const { return values_; }
   std::vector<T>& values() { return values_; }
-  const std::vector<std::size_t>& nonzero_indices() const {
+  const std::vector<Index>& nonzero_indices() const {
     return nonzero_indices_;
   }
 
  protected:
   std::vector<T> values_;
-  std::vector<std::size_t> nonzero_indices_;  // indices of nonzero entries
+  std::vector<Index> nonzero_indices_;  // indices of nonzero entries
 };
 
 template <typename T>
 class Column : public MatrixEntry<T> {
  public:
-  Column(const std::vector<T>& values, const std::vector<std::size_t>& indices)
+  using Index = typename MatrixEntry<T>::Index;
+
+ public:
+  Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   Column(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
   Column() = default;
@@ -104,7 +108,10 @@ class Column : public MatrixEntry<T> {
 template <typename T>
 class Row : public MatrixEntry<T> {
  public:
-  Row(const std::vector<T>& values, const std::vector<std::size_t>& indices)
+  using Index = typename MatrixEntry<T>::Index;
+
+ public:
+  Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
 
   Row(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
@@ -134,6 +141,8 @@ class SparseMatrix {
   using difference_type = int;
   using pointer = value_type*;
   using reference = value_type&;
+
+  using Index = typename MatrixEntry<T>::Index;
 
  public:
   SparseMatrix() : type_(SparseMatrixType::RowWise) {}
@@ -214,7 +223,7 @@ class SparseMatrix {
    * @param j Column index of element to access.
    * @return T Element at matrix position A_{ij}.
    */
-  T operator()(const std::size_t i, const std::size_t j) const {
+  T operator()(const Index i, const Index j) const {
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
     } else {
@@ -227,33 +236,17 @@ class SparseMatrix {
  private:
   void add_entries(const std::vector<MatrixEntry<T>>& entries) {
     for (const auto& entry : entries) {
-      // entries are invalid if there are two duplicate
-      // nonzero indices present
-      auto nonzero_ind = entry.nonzero_indices();
-      const std::size_t nnz = entry.num_nonzero();
-      // remove sequential duplicates from sorted nonzero-indices
-      std::sort(nonzero_ind.begin(), nonzero_ind.end());
-      auto last = std::unique(nonzero_ind.begin(), nonzero_ind.end());
-      nonzero_ind.erase(last, nonzero_ind.end());
-      // if unduplicated nonzero-indices is not equal to nnz,
-      // there were duplicate nonzero-indices -> entry invalid
-      if (nonzero_ind.size() != nnz) {
-        throw InvalidMatrixEntryException();
-      }
+      check_entry_valid(entry);
       entries_.emplace_back(entry);
     }
   }
 
   void check_entry_valid(const MatrixEntry<T> entry) {
-    auto nonzero_ind = entry.nonzero_indices();
-    const std::size_t nnz = entry.num_nonzero();
-    // remove sequential duplicates from sorted nonzero-indices
-    std::sort(nonzero_ind.begin(), nonzero_ind.end());
-    auto last = std::unique(nonzero_ind.begin(), nonzero_ind.end());
-    nonzero_ind.erase(last, nonzero_ind.end());
-    // if unduplicated nonzero-indices is not equal to nnz,
-    // there were duplicate nonzero-indices -> entry invalid
-    if (nonzero_ind.size() != nnz) {
+    // matrix entries are invalid if there are
+    // duplicate nonzero indices present
+    const auto nonzero_indices = entry.nonzero_indices();
+    std::set<Index> index_set(nonzero_indices.begin(), nonzero_indices.end());
+    if (nonzero_indices.size() != index_set.size()) {
       throw InvalidMatrixEntryException();
     }
   }
