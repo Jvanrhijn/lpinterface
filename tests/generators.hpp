@@ -105,7 +105,7 @@ inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen) {
   using namespace lpint;
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
-      rc::gen::uniqueCount<std::vector<std::size_t>>(
+      rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
           count, rc::gen::inRange(0ul, count)));
 }
 

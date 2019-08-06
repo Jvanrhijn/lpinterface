@@ -55,14 +55,15 @@ class MatrixEntry {
                 "MatrixEntry<T> requires T to be arithmetic");
 
  public:
-  using Index = std::size_t;
+  using Index = int;//std::size_t;
+  using SizeType = std::size_t; 
 
   MatrixEntry(const std::vector<T>& values,
-              const std::vector<std::size_t>& indices)
+              const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
 
-  T operator[](const Index index) const {
+  T operator[](const SizeType index) const {
     auto index_in_data =
         std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
     if (index_in_data == nonzero_indices_.end()) {
@@ -77,14 +78,19 @@ class MatrixEntry {
   T lower_bound() const {
     return std::min_element(values_.begin(), values_.end());
   }
+
   T upper_bound() const {
     return std::max_element(values_.begin(), values_.end());
   }
+
   std::size_t num_nonzero() const { return values_.size(); }
 
   const std::vector<T>& values() const { return values_; }
   std::vector<T>& values() { return values_; }
   const std::vector<Index>& nonzero_indices() const {
+    return nonzero_indices_;
+  }
+  std::vector<Index>& nonzero_indices() {
     return nonzero_indices_;
   }
 
@@ -97,6 +103,7 @@ template <typename T>
 class Column : public MatrixEntry<T> {
  public:
   using Index = typename MatrixEntry<T>::Index;
+  using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
@@ -109,6 +116,7 @@ template <typename T>
 class Row : public MatrixEntry<T> {
  public:
   using Index = typename MatrixEntry<T>::Index;
+  using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
@@ -143,6 +151,7 @@ class SparseMatrix {
   using reference = value_type&;
 
   using Index = typename MatrixEntry<T>::Index;
+  using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
   SparseMatrix() : type_(SparseMatrixType::RowWise) {}
@@ -223,7 +232,7 @@ class SparseMatrix {
    * @param j Column index of element to access.
    * @return T Element at matrix position A_{ij}.
    */
-  T operator()(const Index i, const Index j) const {
+  T operator()(const SizeType i, const SizeType j) const {
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
     } else {

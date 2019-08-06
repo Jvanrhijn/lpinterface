@@ -64,10 +64,8 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv **env, GRBmodel **model) {
   // add constraints
   std::size_t idx = 0;
   for (auto& row : lp.matrix()) {
-    std::vector<int> indices(row.nonzero_indices().begin(),
-                             row.nonzero_indices().end());
     error = GRBaddconstr(
-        *model, row.num_nonzero(), indices.data(), row.values().data(),
+        *model, row.num_nonzero(), row.nonzero_indices().data(), row.values().data(),
         GurobiSolver::convert_ordering(constraints[idx].ordering),
         constraints[idx].value, ("constr" + std::to_string(idx)).c_str());
     if (error) {

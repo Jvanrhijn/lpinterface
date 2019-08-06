@@ -99,12 +99,8 @@ void GurobiSolver::update_program() {
   if (matrix.type() == SparseMatrixType::RowWise) {
     for (auto& row : matrix) {
       char ord = convert_ordering(constraints[idx].ordering);
-      // need to do this since gurobi wants int* for indices
-      // for some ungodly reason
-      std::vector<int> nonzero_indices(row.nonzero_indices().begin(),
-                                       row.nonzero_indices().end());
       const auto error =
-          GRBaddconstr(gurobi_model_, row.num_nonzero(), nonzero_indices.data(),
+          GRBaddconstr(gurobi_model_, row.num_nonzero(), row.nonzero_indices().data(),
                        row.values().data(), ord, constraints[idx].value,
                        ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {

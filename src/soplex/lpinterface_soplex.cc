@@ -59,9 +59,7 @@ void SoplexSolver::update_program() {
   for (const auto& row : linear_program_->matrix()) {
     DSVector ds_row(row.num_nonzero());
     // TODO: fix this so we don't have to copy each time
-    std::vector<int> why(row.nonzero_indices().begin(),
-                         row.nonzero_indices().end());
-    ds_row.add(row.num_nonzero(), why.data(), row.values().data());
+    ds_row.add(row.num_nonzero(), row.nonzero_indices().data(), row.values().data());
     // determine constraint
     if (constraints[i].ordering == Ordering::LEQ) {
       soplex_.addRowReal(LPRow(0, ds_row, constraints[i].value));

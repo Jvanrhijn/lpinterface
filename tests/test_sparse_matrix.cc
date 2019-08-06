@@ -5,13 +5,16 @@
 
 using namespace lpint;
 
-constexpr std::size_t M = 10;
-constexpr std::size_t N = 10;
+using Index = typename MatrixEntry<double>::Index;
+using SizeType = typename MatrixEntry<double>::SizeType;
+
+constexpr Index M = 10;
+constexpr Index N = 10;
 
 template <typename T>
-std::vector<std::size_t> get_nonzero_indices(const std::vector<T>& v) {
-  std::vector<std::size_t> nz;
-  for (std::size_t i = 0; i < v.size(); i++) {
+std::vector<Index> get_nonzero_indices(const std::vector<T>& v) {
+  std::vector<Index> nz;
+  for (SizeType i = 0; i < v.size(); i++) {
     if (v[i] != T()) {
       nz.push_back(i);
     }
@@ -71,8 +74,8 @@ SparseMatrix<T> build_sparse_matrix_row(std::array<std::array<T, N>, M> mat) {
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
               (const std::array<std::array<double, N>, M> mat)) {
   auto sp = build_sparse_matrix_row(mat);
-  for (std::size_t i = 0; i < M; i++) {
-    for (std::size_t j = 0; j < N; j++) {
+  for (SizeType i = 0; i < M; i++) {
+    for (SizeType j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }
@@ -81,8 +84,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
               (const std::array<std::array<double, N>, M> mat)) {
   auto sp = build_sparse_matrix_col(mat);
-  for (std::size_t i = 0; i < M; i++) {
-    for (std::size_t j = 0; j < N; j++) {
+  for (SizeType i = 0; i < M; i++) {
+    for (SizeType j = 0; j < N; j++) {
       RC_ASSERT(sp(i, j) == mat[i][j]);
     }
   }
@@ -97,11 +100,12 @@ TEST(SparseMatrix, ErrorIfDuplicateNonzeroIndices) {
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
               (const std::array<std::array<double, N>, M> mat)) {
   auto sp = build_sparse_matrix_row(mat);
-  std::size_t i = 0;
+  SizeType i = 0;
   for (const auto& row : sp) {
     std::vector<double> vec(mat[i].begin(), mat[i].end());
-    for (std::size_t j : row.nonzero_indices()) {
-      RC_ASSERT(row[j] == vec[j]);
+    for (Index j : row.nonzero_indices()) {
+      auto jj = static_cast<SizeType>(j);
+      RC_ASSERT(row[jj] == vec[jj]);
     }
     i++;
   }
@@ -111,8 +115,9 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
   i = 0;
   for (const auto& col : spc) {
     std::vector<double> vec(matc[i].begin(), matc[i].end());
-    for (std::size_t j : col.nonzero_indices()) {
-      RC_ASSERT(col[j] == vec[j]);
+    for (Index j : col.nonzero_indices()) {
+      auto jj = static_cast<SizeType>(j);
+      RC_ASSERT(col[jj] == vec[jj]);
     }
     i++;
   }
