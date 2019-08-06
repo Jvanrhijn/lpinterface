@@ -7,10 +7,6 @@ sudo:
 language: 
   - cpp
 
-compiler:
-  - clang
-  - gcc
-
 cache: ccache
 
 addons:
@@ -28,28 +24,52 @@ addons:
       - libc++-dev
       - libgmp3-dev
       - ccache
+      - g++-5
+      - gcc-5
+      - g++-6
+      - gcc-6
+      - g++-7
+      - gcc-7
 
 matrix:
   include:
    # gcc 
     - os: linux
       compiler: gcc
-      env: BUILD_TYPE=Release
+      env: BUILD_TYPE=Release COMPILER_VERSION=5.0
 
     - os: linux
       compiler: gcc
-      env: BUILD_TYPE=Debug
+      env: BUILD_TYPE=Debug COMPILER_VERSION=5
+
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Release COMPILER_VERSION=6
+
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Debug COMPILER_VERSION=6
+
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Release COMPILER_VERSION=7
+
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE=Debug COMPILER_VERSION=7
 
     # clang
     - os: linux
       compiler: clang
-      env: BUILD_TYPE=Release
+      env: BUILD_TYPE=Release 
 
     - os: linux
       compiler: clang
       env: BUILD_TYPE=Debug 
 
 script:
+  - export CC="${CC}-${COMPILER_VERSION}"
+  - export CXX="${CXX}-${COMPILER_VERSION}"
   - ls -l /usr/lib/ccache
   # trick for using ccache, stolen from rapidcheck
   - mkdir -p ${HOME}/bin
@@ -61,7 +81,7 @@ script:
   # collect ccache stats
   - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
-  - ccache --show-status > ccache_after
+  - ccache --show-stats > ccache_after
   - diff -U100 ccache_before ccache_after || true
 
 after_success:
