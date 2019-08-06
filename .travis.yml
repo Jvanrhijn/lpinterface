@@ -50,9 +50,19 @@ matrix:
       env: BUILD_TYPE=Debug 
 
 script:
+  - ls -l /usr/lib/ccache
+  # trick for using ccache, stolen from rapidcheck
+  - mkdir -p ${HOME}/bin
+  - export PATH="${HOME}/bin:${PATH}"
+  - ln -sf /usr/bin/ccache ${HOME}/bin/"${CXX}"
+  - which ${CXX}
+  # generate build files
   - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  # collect ccache stats
+  - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
-  - ./tests/unit_tests
+  - ccache --show-status > ccache_after
+  - diff -U100 ccache_before ccache_after || true
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
