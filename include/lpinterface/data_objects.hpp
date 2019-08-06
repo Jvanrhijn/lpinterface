@@ -55,7 +55,7 @@ class MatrixEntry {
                 "MatrixEntry<T> requires T to be arithmetic");
 
  public:
-  using Index = int;//std::size_t;
+  using Index = int;
   using SizeType = std::size_t; 
 
   MatrixEntry(const std::vector<T>& values,
@@ -69,9 +69,13 @@ class MatrixEntry {
     if (index_in_data == nonzero_indices_.end()) {
       return T();
     } else {
-      // TODO replace with safe indexing in debug case
-      return values_[static_cast<std::size_t>(index_in_data -
+      #if NDEBUG
+      return values_[static_cast<SizeType>(index_in_data -
                                               nonzero_indices_.begin())];
+      #else
+      return values_.at(static_cast<SizeType>(index_in_data -
+                                              nonzero_indices_.begin()));
+      #endif
     }
   }
 
@@ -233,11 +237,19 @@ class SparseMatrix {
    * @return T Element at matrix position A_{ij}.
    */
   T operator()(const SizeType i, const SizeType j) const {
+    #ifdef NDEBUG
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
     } else {
       return entries_[i][j];
     }
+    #else
+    if (type_ == SparseMatrixType::ColumnWise) {
+      return entries_.at(j)[i];
+    } else {
+      return entries_.at(i)[j];
+    }
+    #endif
   }
 
   SparseMatrixType type() const { return type_; }
