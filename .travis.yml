@@ -76,6 +76,7 @@ script:
   - export PATH="${HOME}/bin:${PATH}"
   - ln -sf /usr/bin/ccache ${HOME}/bin/"${CXX}"
   - which ${CXX}
+  - which ${CC}
   # generate build files
   - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
   # collect ccache stats
