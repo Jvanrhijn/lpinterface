@@ -38,7 +38,7 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv **env, GRBmodel **model) {
     return error;
   }
 
-  GRBsetintattr(*model, "outputflag", 0);
+  GRBsetintparam(GRBgetenv(*model), "outputflag", 0);
 
   // set objective sense
   error = GRBsetintattr(*model, GRB_INT_ATTR_MODELSENSE,
