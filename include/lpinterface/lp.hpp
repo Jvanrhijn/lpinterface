@@ -1,8 +1,8 @@
 #ifndef LPINTERFACE_LP_H
 #define LPINTERFACE_LP_H
 
-#include <vector>
 #include <iostream>
+#include <vector>
 
 #include "data_objects.hpp"
 #include "errors.hpp"

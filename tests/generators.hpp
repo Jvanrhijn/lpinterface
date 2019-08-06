@@ -77,11 +77,6 @@ struct Arbitrary<lpint::Objective<T>> {
 };
 
 template <typename T>
-struct Arbitrary<lpint::Row<T>> {
-  static Gen<lpint::Row<T>> arbitrary() {}
-};
-
-template <typename T>
 inline Gen<lpint::Constraint<T>> genConstraintWithOrdering(
     Gen<T> vgen, Gen<lpint::Ordering> ogen) {
   return gen::build<lpint::Constraint<T>>(
@@ -109,7 +104,59 @@ inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen) {
           count, rc::gen::inRange(0ul, count)));
 }
 
-// TODO: refactor into an Arbitrary instance or a true Gen<LinearProgram>
+template <typename T>
+inline Gen<lpint::Row<T>> genRow(Gen<T> valgen) {
+  using namespace lpint;
+  const auto count = *rc::gen::arbitrary<std::size_t>();
+  return gen::construct<Row<T>>(
+      rc::gen::container<std::vector<T>>(count, std::move(valgen)),
+      rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
+          count, rc::gen::inRange(0ul, count)));
+}
+
+template <typename T>
+struct Arbitrary<lpint::Row<T>> {
+  static Gen<lpint::Row<T>> arbitrary() {
+    using namespace lpint;
+    return genRow(rc::gen::arbitrary<T>());
+  }
+};
+
+template <typename T>
+inline Gen<lpint::Column<T>> genColumn(const std::size_t count, Gen<T> valgen) {
+  using namespace lpint;
+  return gen::construct<Column<T>>(
+      rc::gen::container<std::vector<T>>(count, std::move(valgen)),
+      rc::gen::uniqueCount<std::vector<typename Column<T>::Index>>(
+          count, rc::gen::inRange(0ul, count)));
+}
+
+template <typename T>
+inline Gen<lpint::Column<T>> genColumn(Gen<T> valgen) {
+  using namespace lpint;
+  const auto count = *rc::gen::arbitrary<std::size_t>();
+  return gen::construct<Column<T>>(
+      rc::gen::container<std::vector<T>>(count, std::move(valgen)),
+      rc::gen::uniqueCount<std::vector<typename Column<T>::Index>>(
+          count, rc::gen::inRange(0ul, count)));
+}
+
+template <typename T>
+struct Arbitrary<lpint::Column<T>> {
+  static Gen<lpint::Column<T>> arbitrary() {
+    using namespace lpint;
+    return genColumn(rc::gen::arbitrary<T>());
+  }
+};
+
+template <>
+struct Arbitrary<lpint::SparseMatrixType> {
+  static Gen<lpint::SparseMatrixType> arbitrary() {
+    using namespace lpint;
+    return gen::element(SparseMatrixType::RowWise, SparseMatrixType::ColumnWise);
+  }
+};
+
 inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
                                                   const std::size_t max_ncols,
                                                   Gen<lpint::Ordering> genord,

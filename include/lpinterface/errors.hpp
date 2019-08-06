@@ -69,7 +69,8 @@ class GurobiException : public LpException {
     // TODO find better way to do this
     char *message = new char[100];
     if (!msg_.empty()) {
-      snprintf(message, 99, "Error occured in Gurobi, code %d - %s", code_, msg_.c_str());
+      snprintf(message, 99, "Error occured in Gurobi, code %d - %s", code_,
+               msg_.c_str());
     } else {
       snprintf(message, 99, "Error occured in Gurobi, code %d", code_);
     }

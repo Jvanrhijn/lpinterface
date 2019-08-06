@@ -3,9 +3,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <set>
 #include <type_traits>
 #include <vector>
-#include <set>
 
 // TODO: find a more elegant way to do this
 #ifdef TESTING
@@ -54,12 +54,21 @@ class MatrixEntry {
   static_assert(std::is_arithmetic<T>::value,
                 "MatrixEntry<T> requires T to be arithmetic");
 
+ private:
+  using iterator = typename std::vector<T>::iterator;
+  using const_iterator = typename std::vector<T>::const_iterator;
+
  public:
   using Index = int;
-  using SizeType = std::size_t; 
+  using SizeType = std::size_t;
 
-  MatrixEntry(const std::vector<T>& values,
-              const std::vector<Index>& indices)
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = T;
+  using difference_type = int;
+  using pointer = value_type*;
+  using reference = value_type&;
+
+  MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
 
@@ -69,13 +78,13 @@ class MatrixEntry {
     if (index_in_data == nonzero_indices_.end()) {
       return T();
     } else {
-      #if NDEBUG
+#if NDEBUG
       return values_[static_cast<SizeType>(index_in_data -
-                                              nonzero_indices_.begin())];
-      #else
-      return values_.at(static_cast<SizeType>(index_in_data -
-                                              nonzero_indices_.begin()));
-      #endif
+                                           nonzero_indices_.begin())];
+#else
+      return values_.at(
+          static_cast<SizeType>(index_in_data - nonzero_indices_.begin()));
+#endif
     }
   }
 
@@ -91,12 +100,14 @@ class MatrixEntry {
 
   const std::vector<T>& values() const { return values_; }
   std::vector<T>& values() { return values_; }
-  const std::vector<Index>& nonzero_indices() const {
-    return nonzero_indices_;
-  }
-  std::vector<Index>& nonzero_indices() {
-    return nonzero_indices_;
-  }
+  const std::vector<Index>& nonzero_indices() const { return nonzero_indices_; }
+  std::vector<Index>& nonzero_indices() { return nonzero_indices_; }
+
+  iterator begin() { return values_.begin(); }
+  const_iterator begin() const { return values_.begin(); }
+
+  iterator end() { return values_.end(); }
+  const_iterator end() const { return values_.end(); }
 
  protected:
   std::vector<T> values_;
@@ -189,9 +200,7 @@ class SparseMatrix {
 
   std::size_t num_entries() const { return entries_.size(); }
 
-  const std::vector<MatrixEntry<T>>& entries() const {
-    return entries_;
-  }
+  const std::vector<MatrixEntry<T>>& entries() const { return entries_; }
 
   /**
    * @brief Add columns to the sparse matrix.
@@ -237,19 +246,19 @@ class SparseMatrix {
    * @return T Element at matrix position A_{ij}.
    */
   T operator()(const SizeType i, const SizeType j) const {
-    #ifdef NDEBUG
+#ifdef NDEBUG
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_[j][i];
     } else {
       return entries_[i][j];
     }
-    #else
+#else
     if (type_ == SparseMatrixType::ColumnWise) {
       return entries_.at(j)[i];
     } else {
       return entries_.at(i)[j];
     }
-    #endif
+#endif
   }
 
   SparseMatrixType type() const { return type_; }
@@ -398,7 +407,7 @@ inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
   return os;
 }
 
-template <typename T> 
+template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const MatrixEntry<T>& row) {
   if (row.num_nonzero() == 0) {
     os << "Hello";

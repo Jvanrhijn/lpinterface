@@ -33,8 +33,7 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   std::size_t i = 0;
   for (const auto& row : lp.matrix()) {  // soplex
     DSVector ds_row(row.values().size());
-    ds_row.add(row.values().size(),
-               row.nonzero_indices().data(),
+    ds_row.add(row.values().size(), row.nonzero_indices().data(),
                row.values().data());
     if (lp.constraints()[i].ordering == Ordering::LEQ) {
       soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));

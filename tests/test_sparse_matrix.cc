@@ -2,6 +2,7 @@
 #include <rapidcheck/gtest.h>
 
 #include "lpinterface.hpp"
+#include "generators.hpp"
 
 using namespace lpint;
 
@@ -72,53 +73,70 @@ SparseMatrix<T> build_sparse_matrix_row(std::array<std::array<T, N>, M> mat) {
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
-              (const std::array<std::array<double, N>, M> mat)) {
-  auto sp = build_sparse_matrix_row(mat);
-  for (SizeType i = 0; i < M; i++) {
-    for (SizeType j = 0; j < N; j++) {
-      RC_ASSERT(sp(i, j) == mat[i][j]);
+              (const uint8_t nrows, const uint8_t ncols)) {
+  SparseMatrix<double> sp(SparseMatrixType::RowWise);
+  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
+  for (SizeType i = 0; i < nrows; i++) {
+    for (SizeType j = 0; j < ncols; j++) {
+      const auto nz = sp.entries()[i].nonzero_indices();
+      if (std::find(nz.begin(), nz.end(), j) != nz.end()) {
+        RC_ASSERT(sp(i, j) != 0);
+      } else {
+        RC_ASSERT(sp(i, j) == 0);
+      }
     }
   }
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
-              (const std::array<std::array<double, N>, M> mat)) {
-  auto sp = build_sparse_matrix_col(mat);
-  for (SizeType i = 0; i < M; i++) {
-    for (SizeType j = 0; j < N; j++) {
-      RC_ASSERT(sp(i, j) == mat[i][j]);
+              (const uint8_t nrows, const uint8_t ncols)) {
+  SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
+  sp.add_columns(*rc::gen::container<std::vector<Column<double>>>(ncols, rc::genRow(ncols, rc::gen::nonZero<double>())));
+  for (SizeType i = 0; i < nrows; i++) {
+    for (SizeType j = 0; j < ncols; j++) {
+      const auto nz = sp.entries()[j].nonzero_indices();
+      if (std::find(nz.begin(), nz.end(), i) != nz.end()) {
+        RC_ASSERT(sp(i, j) != 0);
+      } else {
+        RC_ASSERT(sp(i, j) == 0);
+      }
     }
   }
 }
 
-TEST(SparseMatrix, ErrorIfDuplicateNonzeroIndices) {
+RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices,
+              ()) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  ASSERT_THROW(sp.add_rows({Row<double>({1, 2, 3}, {0, 0, 1})}),
-               InvalidMatrixEntryException);
+
+  const auto values = *rc::gen::container<std::vector<double>>(*rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()), rc::gen::arbitrary<double>());
+  auto indices = *rc::gen::uniqueCount<std::vector<Index>>(values.size(), rc::gen::inRange(0ul, values.size()));
+
+  const auto from = *rc::gen::inRange(0ul, values.size()/2);
+  const auto to = *rc::gen::inRange(from+1, values.size());
+  indices[to] = indices[from]; // make a duplicate index
+  try {
+    sp.add_rows({Row<double>(values, indices)});
+    RC_ASSERT(false);
+  } catch (const InvalidMatrixEntryException& e) {
+    RC_ASSERT(true);
+  }
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
-              (const std::array<std::array<double, N>, M> mat)) {
-  auto sp = build_sparse_matrix_row(mat);
-  SizeType i = 0;
+              (const uint8_t nrows, const uint8_t ncols)) {
+  SparseMatrix<double> sp(SparseMatrixType::RowWise);
+  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
   for (const auto& row : sp) {
-    std::vector<double> vec(mat[i].begin(), mat[i].end());
-    for (Index j : row.nonzero_indices()) {
-      auto jj = static_cast<SizeType>(j);
-      RC_ASSERT(row[jj] == vec[jj]);
+    for (const auto& val : row) {      
+      RC_ASSERT(val != 0);
     }
-    i++;
   }
 
-  auto spc = build_sparse_matrix_col(mat);
-  auto matc = transpose(mat);
-  i = 0;
+  SparseMatrix<double> spc(SparseMatrixType::ColumnWise);
+  spc.add_columns(*rc::gen::container<std::vector<Column<double>>>(nrows, rc::genColumn(ncols, rc::gen::nonZero<double>())));
   for (const auto& col : spc) {
-    std::vector<double> vec(matc[i].begin(), matc[i].end());
-    for (Index j : col.nonzero_indices()) {
-      auto jj = static_cast<SizeType>(j);
-      RC_ASSERT(col[jj] == vec[jj]);
+    for (const auto& val : col) {
+      RC_ASSERT(val != 0);
     }
-    i++;
   }
 }

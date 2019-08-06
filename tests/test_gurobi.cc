@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <iostream>
 
 #include "generators.hpp"
@@ -18,7 +18,7 @@ inline GurobiSolver create_grb(const LinearProgram& lp) {
   return grb;
 }
 
-inline int configure_gurobi(LinearProgram& lp, GRBenv **env, GRBmodel **model) {
+inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
@@ -32,8 +32,8 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv **env, GRBmodel **model) {
   if (error) {
     return error;
   }
-  error = GRBnewmodel(*env, model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
-                      nullptr);
+  error = GRBnewmodel(*env, model, nullptr, 0, nullptr, nullptr, nullptr,
+                      nullptr, nullptr);
   if (error) {
     return error;
   }
@@ -65,7 +65,8 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv **env, GRBmodel **model) {
   std::size_t idx = 0;
   for (auto& row : lp.matrix()) {
     error = GRBaddconstr(
-        *model, row.num_nonzero(), row.nonzero_indices().data(), row.values().data(),
+        *model, row.num_nonzero(), row.nonzero_indices().data(),
+        row.values().data(),
         GurobiSolver::convert_ordering(constraints[idx].ordering),
         constraints[idx].value, ("constr" + std::to_string(idx)).c_str());
     if (error) {
@@ -116,7 +117,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   } catch (const GurobiException& e) {
     std::cout << e.what() << std::endl;
     RC_ASSERT(e.code() == error);
-    return; 
+    return;
   }
 
   // retrieve solution info from gurobi

@@ -1,9 +1,8 @@
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
-#include <iostream>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
-
+#include <iostream>
 
 namespace lpint {
 
@@ -99,10 +98,10 @@ void GurobiSolver::update_program() {
   if (matrix.type() == SparseMatrixType::RowWise) {
     for (auto& row : matrix) {
       char ord = convert_ordering(constraints[idx].ordering);
-      const auto error =
-          GRBaddconstr(gurobi_model_, row.num_nonzero(), row.nonzero_indices().data(),
-                       row.values().data(), ord, constraints[idx].value,
-                       ("constr" + std::to_string(idx)).c_str());
+      const auto error = GRBaddconstr(
+          gurobi_model_, row.num_nonzero(), row.nonzero_indices().data(),
+          row.values().data(), ord, constraints[idx].value,
+          ("constr" + std::to_string(idx)).c_str());
       if (error != 0) {
         throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
       }
