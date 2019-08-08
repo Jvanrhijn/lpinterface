@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
-#include "lpinterface.hpp"
 #include "generators.hpp"
+#include "lpinterface.hpp"
 
 using namespace lpint;
 
@@ -75,7 +75,8 @@ SparseMatrix<T> build_sparse_matrix_row(std::array<std::array<T, N>, M> mat) {
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
               (const uint8_t nrows, const uint8_t ncols)) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
+  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(
+      nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
   for (SizeType i = 0; i < nrows; i++) {
     for (SizeType j = 0; j < ncols; j++) {
       const auto nz = sp.entries()[i].nonzero_indices();
@@ -91,7 +92,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
               (const uint8_t nrows, const uint8_t ncols)) {
   SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
-  sp.add_columns(*rc::gen::container<std::vector<Column<double>>>(ncols, rc::genRow(ncols, rc::gen::nonZero<double>())));
+  sp.add_columns(*rc::gen::container<std::vector<Column<double>>>(
+      ncols, rc::genRow(ncols, rc::gen::nonZero<double>())));
   for (SizeType i = 0; i < nrows; i++) {
     for (SizeType j = 0; j < ncols; j++) {
       const auto nz = sp.entries()[j].nonzero_indices();
@@ -104,16 +106,18 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
   }
 }
 
-RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices,
-              ()) {
+RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices, ()) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
 
-  const auto values = *rc::gen::container<std::vector<double>>(*rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()), rc::gen::arbitrary<double>());
-  auto indices = *rc::gen::uniqueCount<std::vector<Index>>(values.size(), rc::gen::inRange(0ul, values.size()));
+  const auto values = *rc::gen::container<std::vector<double>>(
+      *rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()),
+      rc::gen::arbitrary<double>());
+  auto indices = *rc::gen::uniqueCount<std::vector<Index>>(
+      values.size(), rc::gen::inRange(0ul, values.size()));
 
-  const auto from = *rc::gen::inRange(0ul, values.size()/2);
-  const auto to = *rc::gen::inRange(from+1, values.size());
-  indices[to] = indices[from]; // make a duplicate index
+  const auto from = *rc::gen::inRange(0ul, values.size() / 2);
+  const auto to = *rc::gen::inRange(from + 1, values.size());
+  indices[to] = indices[from];  // make a duplicate index
   try {
     sp.add_rows({Row<double>(values, indices)});
     RC_ASSERT(false);
@@ -125,15 +129,17 @@ RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices,
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
               (const uint8_t nrows, const uint8_t ncols)) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
-  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
+  sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(
+      nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
   for (const auto& row : sp) {
-    for (const auto& val : row) {      
+    for (const auto& val : row) {
       RC_ASSERT(val != 0);
     }
   }
 
   SparseMatrix<double> spc(SparseMatrixType::ColumnWise);
-  spc.add_columns(*rc::gen::container<std::vector<Column<double>>>(nrows, rc::genColumn(ncols, rc::gen::nonZero<double>())));
+  spc.add_columns(*rc::gen::container<std::vector<Column<double>>>(
+      nrows, rc::genColumn(ncols, rc::gen::nonZero<double>())));
   for (const auto& col : spc) {
     for (const auto& val : col) {
       RC_ASSERT(val != 0);

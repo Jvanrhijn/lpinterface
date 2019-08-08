@@ -10,4 +10,4 @@
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/parameter_type.hpp"
 
-#endif // LPINTERFACE_H
+#endif  // LPINTERFACE_H

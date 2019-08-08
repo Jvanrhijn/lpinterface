@@ -9,7 +9,7 @@ namespace lpint {
  * @brief Interface useful for flushing data directly to an LP solver backend.
  * This class provides methods to flush data directly to an LP solver. The
  * given data is moved from, to minimize unnecessary copying.
- * 
+ *
  * @tparam T Type of data in LP matrix.
  */
 template <typename T>
@@ -17,7 +17,7 @@ class FlushRawData {
  public:
   /**
    * @brief Add columns to the LP in CSC format.
-   * 
+   *
    * @param values Column values.
    * @param start_indices Starting indices columns in values.
    * @param row_indices Row indices of values in columns
@@ -32,7 +32,7 @@ class FlushRawData {
 
   /**
    * @brief Add rows to the LP in CSR format.
-   * 
+   *
    * @param values Row values.
    * @param start_indices Starting indices rows in values.
    * @param row_indices Column indices of values in rows
@@ -46,7 +46,7 @@ class FlushRawData {
 
   /**
    * @brief Add variables to the LP.
-   * 
+   *
    * @param objective_values values of objective function vector.
    * @param var_types Type of each variable (real, integer, binary, etc.)
    */

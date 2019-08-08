@@ -45,7 +45,8 @@ class UnsupportedParameterException : public LpException {
   }
 };
 
-//! Attempt to set a constaint Ordering that is not supported by the current backend.
+//! Attempt to set a constaint Ordering that is not supported by the current
+//! backend.
 class UnsupportedConstraintException : public LpException {
  public:
   virtual const char *what() const throw() {

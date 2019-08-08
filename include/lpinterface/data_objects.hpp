@@ -96,7 +96,7 @@ class MatrixEntry {
   /**
    * @brief Indexing operator; can be used identically to a dense vector.
    * Will perform bounds checking ifndef NDEBUG.
-   * 
+   *
    * @param index Index of element to retrieve.
    * @return T Element at index.
    */
@@ -127,7 +127,9 @@ class MatrixEntry {
   }
 
   //! Return the number of nonzero entries in the matrix entry.
-  typename std::vector<T>::size_type num_nonzero() const { return values_.size(); }
+  typename std::vector<T>::size_type num_nonzero() const {
+    return values_.size();
+  }
 
   //! Get a const reference to the underlying value array.
   const std::vector<T>& values() const { return values_; }
@@ -252,10 +254,12 @@ class SparseMatrix {
    * @brief Return the number of matrix entries.
    * If type() == SparseMatrixType::RowWise, returns the number of rows.
    * If type() == SparseMatrixType::ColumnWise, returns the number of columns.
-   * 
+   *
    * @return std::size_t Number of matrix entries.
    */
-  typename std::vector<MatrixEntry<T>>::size_type num_entries() const { return entries_.size(); }
+  typename std::vector<MatrixEntry<T>>::size_type num_entries() const {
+    return entries_.size();
+  }
 
   const std::vector<MatrixEntry<T>>& entries() const { return entries_; }
 

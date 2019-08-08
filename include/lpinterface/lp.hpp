@@ -122,7 +122,7 @@ class LinearProgramInterface {
 
   /**
    * @brief Check whether the LP is initialized.
-   * 
+   *
    * @return true The LP data is ready to be flushed to a solver backend.
    * @return false The LP data cannot be safely flushed to a backend.
    */

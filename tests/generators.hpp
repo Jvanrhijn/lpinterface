@@ -153,7 +153,8 @@ template <>
 struct Arbitrary<lpint::SparseMatrixType> {
   static Gen<lpint::SparseMatrixType> arbitrary() {
     using namespace lpint;
-    return gen::element(SparseMatrixType::RowWise, SparseMatrixType::ColumnWise);
+    return gen::element(SparseMatrixType::RowWise,
+                        SparseMatrixType::ColumnWise);
   }
 };
 
