@@ -17,24 +17,45 @@
 
 namespace lpint {
 
+/**
+ * @brief Type of sparse matrices supported.
+ */
 enum class SparseMatrixType {
+  //! CSR encoding.
   RowWise,
+  //! CSC encoding.
   ColumnWise,
 };
 
+/**
+ * @brief Enum representing orderings of values.
+ */
 enum class Ordering {
+  //! Supported by:
   LT,
+  //! Supported by:
   GT,
+  //! Supported by: Gurobi.
   EQ,
+  //! Supported by: Gurobi, SoPlex.
   LEQ,
+  //! Supported by: Gurobi, SoPlex.
   GEQ,
 };
 
+/**
+ * @brief Enum representing possible variable types for an LP.
+ */
 enum class VarType {
+  //! Supported by: Gurobi.
   Binary,
+  //! Supported by: Gurobi.
   Integer,
+  //! Supported by: Gurobi, SoPlex.
   Real,
+  //! Supported by: Gurobi.
   SemiReal,
+  //! Supported by: Gurobi.
   SemiInteger,
 };
 
@@ -72,6 +93,13 @@ class MatrixEntry {
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
 
+  /**
+   * @brief Indexing operator; can be used identically to a dense vector.
+   * Will perform bounds checking ifndef NDEBUG.
+   * 
+   * @param index Index of element to retrieve.
+   * @return T Element at index.
+   */
   T operator[](const SizeType index) const {
     auto index_in_data =
         std::find(nonzero_indices_.begin(), nonzero_indices_.end(), index);
@@ -88,25 +116,41 @@ class MatrixEntry {
     }
   }
 
+  //! Returns the smallest entry of this matrix element.
   T lower_bound() const {
     return std::min_element(values_.begin(), values_.end());
   }
 
+  //! Returns the largest entry of this matrix element.
   T upper_bound() const {
     return std::max_element(values_.begin(), values_.end());
   }
 
-  std::size_t num_nonzero() const { return values_.size(); }
+  //! Return the number of nonzero entries in the matrix entry.
+  typename std::vector<T>::size_type num_nonzero() const { return values_.size(); }
 
+  //! Get a const reference to the underlying value array.
   const std::vector<T>& values() const { return values_; }
+
+  //! Get a reference to the underlying value array.
   std::vector<T>& values() { return values_; }
+
+  //! Get a const reference to the underlying nonzero indices.
   const std::vector<Index>& nonzero_indices() const { return nonzero_indices_; }
+
+  //! Get a reference to the underlying nonzero indices.
   std::vector<Index>& nonzero_indices() { return nonzero_indices_; }
 
+  //! Obtain an iterator to the begin of the underlying value array.
   iterator begin() { return values_.begin(); }
+
+  //! Obtain a const  iterator to the begin of the underlying value array.
   const_iterator begin() const { return values_.begin(); }
 
+  //! Obtain an iterator to the end of the underlying value array.
   iterator end() { return values_.end(); }
+
+  //! Obtain a const  iterator to the end of the underlying value array.
   const_iterator end() const { return values_.end(); }
 
  protected:
@@ -165,7 +209,9 @@ class SparseMatrix {
   using pointer = value_type*;
   using reference = value_type&;
 
+  //! Type of the nonzero matrix entry indices.
   using Index = typename MatrixEntry<T>::Index;
+  //! Size type used to index into the sparse matrix.
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
@@ -192,13 +238,24 @@ class SparseMatrix {
     add_rows(std::forward<decltype(rows)>(rows));
   }
 
+  //! Return an iterator to the begin of the underlying vector of entries
   iterator begin() { return entries_.begin(); }
+  //! Return an iterator to the end of the underlying vector of entries
   iterator end() { return entries_.end(); }
 
+  //! Return a const iterator to the begin of the underlying vector of entries
   const_iterator begin() const { return entries_.begin(); }
+  //! Return a const iterator to the end of the underlying vector of entries
   const_iterator end() const { return entries_.end(); }
 
-  std::size_t num_entries() const { return entries_.size(); }
+  /**
+   * @brief Return the number of matrix entries.
+   * If type() == SparseMatrixType::RowWise, returns the number of rows.
+   * If type() == SparseMatrixType::ColumnWise, returns the number of columns.
+   * 
+   * @return std::size_t Number of matrix entries.
+   */
+  typename std::vector<MatrixEntry<T>>::size_type num_entries() const { return entries_.size(); }
 
   const std::vector<MatrixEntry<T>>& entries() const { return entries_; }
 
@@ -239,7 +296,7 @@ class SparseMatrix {
   }
 
   /**
-   * @brief Matrix indexing operator.
+   * @brief Matrix indexing operator. Performs bounds checking ifndef NDEBUG.
    *
    * @param i Row index of element to access.
    * @param j Column index of element to access.

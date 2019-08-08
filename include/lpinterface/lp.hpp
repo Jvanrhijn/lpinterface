@@ -11,8 +11,13 @@
 
 namespace lpint {
 
+/**
+ * @brief Objective sense for an LP.
+ */
 enum class OptimizationType {
+  //! Maximize the objective function value.
   Minimize,
+  //! Minimize the objective function value.
   Maximize,
 };
 
@@ -71,10 +76,19 @@ class LinearProgramInterface {
    */
   virtual SparseMatrix<double>& matrix() = 0;
 
+  /**
+   * @brief Get the number of variables in the LP.
+   */
   virtual std::size_t num_vars() const = 0;
 
+  /**
+   * @brief Get a const reference to the vector of constraints.
+   */
   virtual const std::vector<Constraint<double>>& constraints() const = 0;
 
+  /**
+   * @brief Get a reference to the vector of constraints.
+   */
   virtual std::vector<Constraint<double>>& constraints() = 0;
 
   /**
@@ -96,10 +110,22 @@ class LinearProgramInterface {
    */
   virtual void set_objective(const Objective<double>& objective) = 0;
 
+  /**
+   * @brief Get a const reference to the objective function.
+   */
   virtual const Objective<double>& objective() const = 0;
 
+  /**
+   * @brief Get a reference to the objective function.
+   */
   virtual Objective<double>& objective() = 0;
 
+  /**
+   * @brief Check whether the LP is initialized.
+   * 
+   * @return true The LP data is ready to be flushed to a solver backend.
+   * @return false The LP data cannot be safely flushed to a backend.
+   */
   virtual bool is_initialized() const = 0;
 };
 

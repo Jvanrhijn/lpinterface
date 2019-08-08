@@ -81,8 +81,8 @@ TEST(Gurobi, SetParameters) {
   auto lp = std::make_shared<MockLinearProgram>();
   EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
   GurobiSolver grb(lp);
-  grb.set_parameter(Param::GrbThreads, 1);
-  grb.set_parameter(Param::GrbOutputFlag, 0);
+  grb.set_parameter(Param::Threads, 1);
+  grb.set_parameter(Param::Verbosity, 0);
 }
 
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {

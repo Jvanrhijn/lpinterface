@@ -15,6 +15,7 @@ namespace lpint {
  */
 class LpException : public std::exception {};
 
+//! Attempt to add rows to a CSC or columns to a CSR matrix.
 class MatrixTypeException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -22,11 +23,13 @@ class MatrixTypeException : public LpException {
   }
 };
 
+//! Attempt to use a feature that is not yet implemented.
 class NotImplementedError : public LpException {
  public:
   virtual const char *what() const throw() { return "Feature not implemented"; }
 };
 
+//! Attempt to access solution of an unsolved model.
 class ModelNotSolvedException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -34,6 +37,7 @@ class ModelNotSolvedException : public LpException {
   }
 };
 
+//! Attempt set a parameter that is not supported by the current backend.
 class UnsupportedParameterException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -41,6 +45,7 @@ class UnsupportedParameterException : public LpException {
   }
 };
 
+//! Attempt to set a constaint Ordering that is not supported by the current backend.
 class UnsupportedConstraintException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -48,6 +53,7 @@ class UnsupportedConstraintException : public LpException {
   }
 };
 
+//! Attempt to add a matrix entry containing duplicate indices.
 class InvalidMatrixEntryException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -56,6 +62,7 @@ class InvalidMatrixEntryException : public LpException {
   }
 };
 
+//! Attempt to use a variable type that is not supported by the current backend.
 class UnsupportedVariableTypeException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -63,6 +70,7 @@ class UnsupportedVariableTypeException : public LpException {
   }
 };
 
+//! Internal error occured in Gurobi.
 class GurobiException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -88,6 +96,7 @@ class GurobiException : public LpException {
   std::string msg_;
 };
 
+//! Attempt to use a status code that is not supported.
 class UnknownStatusException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -103,6 +112,7 @@ class UnknownStatusException : public LpException {
   int code_;
 };
 
+//! Attempt to use a feature that is not supported by the current backend.
 class UnsupportedFeatureException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -110,6 +120,7 @@ class UnsupportedFeatureException : public LpException {
   }
 };
 
+//! Attempt to use an uninitialized LinearProgram object.
 class LinearProgramNotInitializedException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -117,6 +128,7 @@ class LinearProgramNotInitializedException : public LpException {
   }
 };
 
+//! Failed to set a parameter value.
 class FailedToSetParameterException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -124,6 +136,7 @@ class FailedToSetParameterException : public LpException {
   }
 };
 
+//! Internal error occured in SoPlex.
 class SoplexException : public LpException {
  public:
   virtual const char *what() const throw() {
@@ -131,6 +144,11 @@ class SoplexException : public LpException {
   }
 };
 
+/**
+ * @brief Enum class representing LP solution status.
+ * If the LP could not be solved to optimality, one can check
+ * for any of the status code variants found here.
+ */
 enum class Status : int {
   //! No Linear Program has been loaded
   NotLoaded,

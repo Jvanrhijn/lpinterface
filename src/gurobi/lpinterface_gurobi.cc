@@ -15,7 +15,7 @@ GurobiSolver::GurobiSolver(std::shared_ptr<LinearProgramInterface> lp)
   // // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
-  set_parameter(Param::GrbOutputFlag, 0);
+  set_parameter(Param::Verbosity, 0);
 
   // // set optimization type
   GRBsetintattr(
@@ -32,7 +32,7 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type) {
   // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
-  set_parameter(Param::GrbOutputFlag, 0);
+  set_parameter(Param::Verbosity, 0);
 
   // set optimization type
   GRBsetintattr(
@@ -257,9 +257,9 @@ std::vector<char> GurobiSolver::convert_variable_type(
 // TODO: extend
 constexpr const char* GurobiSolver::translate_parameter(const Param param) {
   switch (param) {
-    case (Param::GrbOutputFlag):
+    case (Param::Verbosity):
       return "outputflag";
-    case (Param::GrbThreads):
+    case (Param::Threads):
       return "threads";
     case (Param::Cutoff):
       return "Cutoff";
