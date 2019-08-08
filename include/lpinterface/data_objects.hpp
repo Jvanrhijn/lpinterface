@@ -410,7 +410,7 @@ inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const MatrixEntry<T>& row) {
   if (row.num_nonzero() == 0) {
-    os << "Hello";
+    os << "Entry {[] []}";
     return os;
   }
   os << "Entry {[";
