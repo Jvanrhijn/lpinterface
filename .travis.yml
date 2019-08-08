@@ -11,6 +11,7 @@ cache: ccache
 
 addons:
   apt:
+    update: true
     sources:
       - ubuntu-toolchain-r-test
     packages:
@@ -24,7 +25,6 @@ addons:
       - libc++-dev
       - libgmp3-dev
       - ccache
-      - doxygen
 
 matrix:
   include:
@@ -173,6 +173,9 @@ matrix:
           packages:
             - clang-5.0
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+before_install:
+  - sudo apt-get install doxygen
 
 script:
   - ls -l /usr/lib/ccache
