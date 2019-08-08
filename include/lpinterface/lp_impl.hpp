@@ -34,8 +34,12 @@ class LinearProgram : public LinearProgramInterface {
         opt_type_(opt_type),
         initialized_(true) {}
 
+  template <typename Entry>
   LinearProgram(const OptimizationType opt_type,
-                const std::initializer_list<Column<double>>&& columns);
+                std::vector<Entry>&& entries) 
+      : matrix_(std::forward<decltype(entries)>(entries)),
+        opt_type_(opt_type),
+        initialized_(true) {}
 
   ~LinearProgram() = default;
 

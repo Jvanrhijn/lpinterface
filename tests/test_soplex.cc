@@ -47,8 +47,8 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   return soplex;
 }
 
-inline SoplexSolver create_spl(const LinearProgram& lp) {
-  SoplexSolver spl(std::make_shared<LinearProgram>(lp));
+inline SoplexSolver create_spl(LinearProgram&& lp) {
+  SoplexSolver spl(std::make_shared<LinearProgram>(std::move(lp)));
   return spl;
 }
 
@@ -76,7 +76,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
-  SoplexSolver solver(std::make_shared<LinearProgram>(lp));
+  SoplexSolver solver(std::make_shared<LinearProgram>(std::move(lp)));
 
   solver.update_program();
 
@@ -106,9 +106,13 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
+  std::vector<Row<double>> rows;
+  rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
+  rows.emplace_back(Row<double>({1, 1}, {0, 1}));
   LinearProgram lp(
       OptimizationType::Maximize,
-      {Row<double>({1, 2, 3}, {0, 1, 2}), Row<double>({1, 1}, {0, 1})});
+      std::move(rows)
+  );
 
   std::vector<Constraint<double>> constr = {
       Constraint<double>{Ordering::LEQ, 4.0},
@@ -121,7 +125,7 @@ TEST(Soplex, FullProblem) {
   lp.set_objective(obj);
 
   // Create the solver from the given LP
-  auto spl = create_spl(lp);
+  auto spl = create_spl(std::move(lp));
 
   // Update the internal Gurobi LP
   spl.update_program();

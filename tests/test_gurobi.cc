@@ -13,8 +13,8 @@
 
 using namespace lpint;
 
-inline GurobiSolver create_grb(const LinearProgram& lp) {
-  GurobiSolver grb(std::make_shared<LinearProgram>(lp));
+inline GurobiSolver create_grb(LinearProgram&& lp) {
+  GurobiSolver grb(std::make_shared<LinearProgram>(std::move(lp)));
   return grb;
 }
 
@@ -95,7 +95,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  auto grb = create_grb(lp);
+  auto grb = create_grb(std::move(lp));
 
   grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
 
@@ -149,9 +149,13 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
 }
 
 TEST(Gurobi, FullProblem) {
+  std::vector<Row<double>> rows;
+  rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
+  rows.emplace_back(Row<double>({1, 1}, {0, 1}));
   LinearProgram lp(
       OptimizationType::Maximize,
-      {Row<double>({1, 2, 3}, {0, 1, 2}), Row<double>({1, 1}, {0, 1})});
+      std::move(rows)
+  );
 
   std::vector<Constraint<double>> constr = {
       Constraint<double>{Ordering::LEQ, 4.0},
@@ -164,7 +168,7 @@ TEST(Gurobi, FullProblem) {
   lp.set_objective(obj);
 
   // Create the Gurobi solver from the given LP
-  auto grb = create_grb(lp);
+  auto grb = create_grb(std::move(lp));
   // Update the internal Gurobi LP
   grb.update_program();
 
