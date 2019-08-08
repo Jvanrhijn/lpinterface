@@ -37,7 +37,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: BUILD_TYPE=Release MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+      env: BUILD_TYPE=Release MATRIX_EVAL="CC=gcc-6 && CXX=g++-6" PAGES=YES
 
     - os: linux
       compiler: gcc
@@ -217,3 +217,4 @@ deploy:
   github_token: $GH_REPO_TOKEN
   on:
     branch: master
+    condition: $PAGES = YES
