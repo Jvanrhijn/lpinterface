@@ -4,12 +4,8 @@
 
 Follow the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md).
 Use clang-tidy to lint your code, and clang-format for formatting. Code formatting rules follow
-the Google style guide.
+the Google style guide, with the following exceptions: functions are snake_case, enum variants
+are CamelCase, and exceptions are allowed.
 
-### Error handling
-
-Don't use exceptions, since most solver backends also don't. To avoid making too much of a 
-C-like API, we will use [tl::expected](https://github.com/TartanLlama/expected) to return error
-values. tl::expected is essentially the same as std::experimental::expected, but with some
-functional extensions similar to Rust's Result<T, E>.
-
+Write documentation using doxygen. It will be automatically deployed when the code is merged
+into the master branch.
