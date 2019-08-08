@@ -12,6 +12,9 @@ class LinearProgram : public LinearProgramInterface {
  public:
   LinearProgram();
 
+  LinearProgram(LinearProgram&&) = default;
+  LinearProgram& operator=(LinearProgram&&) = default;
+
   LinearProgram(const OptimizationType opt_type, const SparseMatrixType sptype);
 
   template <typename Entry>
@@ -40,7 +43,7 @@ class LinearProgram : public LinearProgramInterface {
 
   void add_rows(std::vector<Row<double>>&& rows) override;
 
-  void set_matrix(const SparseMatrix<double>& matrix) override;
+  void set_matrix(SparseMatrix<double>&& matrix) override;
 
   const SparseMatrix<double>& matrix() const override;
 
@@ -81,8 +84,9 @@ inline std::ostream& operator<<(std::ostream& os, const LinearProgram& lp) {
   }
   os << lp.opt_type_ << " " << lp.objective_ << std::endl;
   const auto n = lp.matrix_.num_entries();
+  const auto& entries = lp.matrix_.entries();
   for (std::size_t i = 0; i < n; i++) {
-    os << lp.matrix_.entries()[i] << " " << lp.constraints_[i] << std::endl;
+    os << entries[i] << " " << lp.constraints_[i] << std::endl;
   }
   return os;
 }

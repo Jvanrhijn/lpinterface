@@ -89,9 +89,14 @@ class MatrixEntry {
   using pointer = value_type*;
   using reference = value_type&;
 
+  MatrixEntry(MatrixEntry<T>&&) = default;
+  MatrixEntry(const MatrixEntry<T>&) = delete;
+
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
+
+  MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
   /**
    * @brief Indexing operator; can be used identically to a dense vector.
@@ -167,6 +172,7 @@ class Column : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Column(Column<T>&&) = default;
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   Column(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
@@ -180,6 +186,7 @@ class Row : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Row(Row<T>&&) = default;
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
 
@@ -217,6 +224,9 @@ class SparseMatrix {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  SparseMatrix(SparseMatrix<T>&&) = default;
+  SparseMatrix(const SparseMatrix<T>&) = delete;
+
   SparseMatrix() : type_(SparseMatrixType::RowWise) {}
 
   SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
@@ -239,6 +249,8 @@ class SparseMatrix {
       : type_(SparseMatrixType::RowWise) {
     add_rows(std::forward<decltype(rows)>(rows));
   }
+
+  SparseMatrix<T>& operator=(SparseMatrix<T>&&) = default;
 
   //! Return an iterator to the begin of the underlying vector of entries
   iterator begin() { return entries_.begin(); }
@@ -332,10 +344,10 @@ class SparseMatrix {
     }
   }
 
-  void check_entry_valid(const MatrixEntry<T> entry) {
+  void check_entry_valid(const MatrixEntry<T>& entry) {
     // matrix entries are invalid if there are
     // duplicate nonzero indices present
-    const auto nonzero_indices = entry.nonzero_indices();
+    const auto& nonzero_indices = entry.nonzero_indices();
     std::set<Index> index_set(nonzero_indices.begin(), nonzero_indices.end());
     if (nonzero_indices.size() != index_set.size()) {
       throw InvalidMatrixEntryException();

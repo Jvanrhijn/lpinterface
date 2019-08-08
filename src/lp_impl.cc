@@ -9,15 +9,15 @@ LinearProgram::LinearProgram(const OptimizationType opt_type,
     : matrix_(sptype), opt_type_(opt_type), initialized_(true) {}
 
 void LinearProgram::add_columns(std::vector<Column<double>>&& columns) {
-  return matrix_.add_columns(std::move(columns));
+  matrix_.add_columns(std::move(columns));
 }
 
 void LinearProgram::add_rows(std::vector<Row<double>>&& rows) {
-  return matrix_.add_rows(std::move(rows));
+  matrix_.add_rows(std::move(rows));
 }
 
-void LinearProgram::set_matrix(const SparseMatrix<double>& matrix) {
-  matrix_ = matrix;
+void LinearProgram::set_matrix(SparseMatrix<double>&& matrix) {
+  matrix_ = std::move(matrix);
 }
 
 const SparseMatrix<double>& LinearProgram::matrix() const { return matrix_; }

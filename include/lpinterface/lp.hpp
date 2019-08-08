@@ -64,7 +64,7 @@ class LinearProgramInterface {
   /**
    * @brief Set the linear program matrix.
    */
-  virtual void set_matrix(const SparseMatrix<double>& matrix) = 0;
+  virtual void set_matrix(SparseMatrix<double>&& matrix) = 0;
 
   /**
    * @brief Get immutable access to the constraint matrix

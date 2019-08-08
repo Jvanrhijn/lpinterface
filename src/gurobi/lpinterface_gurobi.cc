@@ -92,7 +92,7 @@ void GurobiSolver::update_program() {
     throw GurobiException(err, GRBgeterrormsg(gurobi_env_));
   }
   // set constraints
-  auto matrix = linear_program_->matrix();
+  auto& matrix = linear_program_->matrix();
   const auto constraints = linear_program_->constraints();
   std::size_t idx = 0;
   if (matrix.type() == SparseMatrixType::RowWise) {

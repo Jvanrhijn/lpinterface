@@ -43,8 +43,10 @@ int main() {
                                               SparseMatrixType::RowWise);
 
     // The constraint matrix is set up in CSR format.
-    lp->add_rows(
-        {Row<double>({1, 2, 3}, {0, 1, 2}), Row<double>({1, 1}, {0, 1})});
+    std::vector<Row<double>> rows;
+    rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
+    rows.emplace_back(Row<double>({1, 1}, {0, 1}));
+    lp->add_rows(std::move(rows));
 
     // Add constraints to the LP; constraints consist of a pair
     // (Ordering, value), representing the RHS of the constraint equations
@@ -107,6 +109,12 @@ int main() {
 
     if (status != Status::Optimal) {
       std::cout << "Optimal solution NOT found" << std::endl;
+    } 
+    
+    if (status == Status::SuboptimalSolution) {
+      std::cout << "Suboptimal solution found" << std::endl;
+    } else {
+      exit(1);
     }
 
     // Retrieve the solution from the solver object.

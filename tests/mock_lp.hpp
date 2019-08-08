@@ -13,7 +13,7 @@ class MockLinearProgram : public LinearProgramInterface {
  public:
   MOCK_METHOD1(add_columns, void(std::vector<Column<double>>&&));
   MOCK_METHOD1(add_rows, void(std::vector<Row<double>>&&));
-  MOCK_METHOD1(set_matrix, void(const SparseMatrix<double>&));
+  MOCK_METHOD1(set_matrix, void(SparseMatrix<double>&&));
   MOCK_CONST_METHOD0(matrix, const SparseMatrix<double>&());
   MOCK_METHOD0(matrix, SparseMatrix<double>&());
   MOCK_CONST_METHOD0(num_vars, std::size_t());

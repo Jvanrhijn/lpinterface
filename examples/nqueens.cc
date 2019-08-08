@@ -29,6 +29,8 @@
 
 using namespace lpint;
 
+using Index = Row<double>::Index;
+
 int main(int argc, char *argv[]) {
   // get board width
   std::size_t BOARD_SIZE;
@@ -70,66 +72,66 @@ int main(int argc, char *argv[]) {
 
   // - max one queen in each row: sum_j X_{ij} <= 1, forall i
   for (std::size_t i = 0; i < BOARD_SIZE; i++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE);
+    std::vector<Index> nonzeros(BOARD_SIZE);
     std::iota(nonzeros.begin(), nonzeros.end(), i * BOARD_SIZE);
-    rows.push_back(Row<double>(std::vector<double>(BOARD_SIZE, 1.0), nonzeros));
+    rows.emplace_back(std::vector<double>(BOARD_SIZE, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
   // - max one queen in each column: sum_i X_{ij} <= 1, forall j
   for (std::size_t j = 0; j < BOARD_SIZE; j++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE);
+    std::vector<Index> nonzeros(BOARD_SIZE);
     for (std::size_t jj = 0; jj < BOARD_SIZE; jj++) {
       nonzeros[jj] = vectorize_indices(jj, j, BOARD_SIZE);
     }
-    rows.push_back(Row<double>(std::vector<double>(BOARD_SIZE, 1.0), nonzeros));
+    rows.emplace_back(std::vector<double>(BOARD_SIZE, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
   //// - max one queen per sub-diagonal: sum_i X_{i + k, i} <= 1 for k < N
   for (std::size_t k = 0; k < BOARD_SIZE; k++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
+    std::vector<Index> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(i + k, i, BOARD_SIZE);
     }
-    rows.push_back(
-        Row<double>(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros));
+    rows.emplace_back(
+        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
   // - max one queen per super-diagonal: sum_i X{i, i + k} <= 1 for k < N
   // skip the actual diagonal for this set of constraints
   for (std::size_t k = 1; k < BOARD_SIZE; k++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
+    std::vector<Index> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(i, i + k, BOARD_SIZE);
     }
-    rows.push_back(
-        Row<double>(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros));
+    rows.emplace_back(
+        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
   // - max one queen per anti-sub-diagonal: sum_i X{N - i, i + k + 1} <= 1, k <=
   // N
   for (std::size_t k = 0; k < BOARD_SIZE; k++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
+    std::vector<Index> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(BOARD_SIZE - i - 1, i + k, BOARD_SIZE);
     }
-    rows.push_back(
-        Row<double>(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros));
+    rows.emplace_back(
+        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
   // - max one queen per anti-super-diagonal:, sum_i X{N - i - k, i + 1} <= 1, k
   // <= N
   for (std::size_t k = 0; k < BOARD_SIZE; k++) {
-    std::vector<std::size_t> nonzeros(BOARD_SIZE - k);
+    std::vector<Index> nonzeros(BOARD_SIZE - k);
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(BOARD_SIZE - i - 1 - k, i, BOARD_SIZE);
     }
-    rows.push_back(
-        Row<double>(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros));
+    rows.emplace_back(
+        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
