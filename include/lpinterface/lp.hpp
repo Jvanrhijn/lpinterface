@@ -35,13 +35,11 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
 /**
  * @brief Interface representing linear program formulation.
  * This interface represents linear programs of the form
- * \f[
-      \{\min, \max\} c^T x, \\
-      Ax \leq b,\\
-      x \geq 0,
- * \f]
- * where \f$c \in \mathbb{R}^{n}\f$, \f$x \in \mathbb{R}^n\f$,
- * \f$b \in \mathbb{R}^{m}\f$, and \f$A \in \mathbb{R}^{m \times n}\f$.
+      {min, max} c^T x,
+      Ax <= b,
+      x >= 0,
+ * where c, x, and b are real-valued vectors, and
+ * A is a real-valued matrix.
  * The interface provides methods to modify the LP internally, as well
  * access the LP structure.
  */
