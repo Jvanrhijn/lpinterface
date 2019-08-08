@@ -36,12 +36,11 @@ int main() {
   // represent the constraint matrix in CSR format
   auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize, 
                                             SparseMatrixType::RowWise);
-  lp->add_rows(
-    {
-      Row<double>({1, 2, 3}, {0, 1, 2}),
-      Row<double>({4, 5, 6}, {1, 2, 3})
-    }
-  );
+
+  std::vector<Row<double>> rows;
+  rows.emplace_back({1, 2, 3}, {0, 1, 2});
+  rows.emplace_back({4, 5, 6}, {1, 2, 3});
+  lp->add_rows(std::move(rows));
 
   // add constraints; these represent the right-hand side of the
   // constraint equations, together with the upper/lower bounds of each constraint
