@@ -24,6 +24,7 @@ addons:
       - libc++-dev
       - libgmp3-dev
       - ccache
+      - doxygen
 
 matrix:
   include:
@@ -119,13 +120,13 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
           packages:
-            - clang-3.7
-      env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
+            8ac9cfc66bd0d253002
+      env: B8ac9cfc66bd0d253002L="CC=clang-3.7 && CXX=clang++-3.7"
 
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
+    - os: li8ac9cfc66bd0d253002
+      compil8ac9cfc66bd0d253002
+      addons8ac9cfc66bd0d253002
+        apt:8ac9cfc66bd0d253002
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
@@ -202,6 +203,16 @@ after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
   - kcov --exclude-pattern=expected,gtest,gmock,rapidcheck,test,mock,/usr,tests/* out tests/unit_tests
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
+  - cd ${TRAVIS_BUILD_DIR}
+  - doxygen Doxyfile
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: docs/html
+  github_token: $GH_REPO_TOKEN
+  on:
+    branch: master
 
 before_script:
   - eval "${MATRIX_EVAL}"
