@@ -141,6 +141,16 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
+      env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
