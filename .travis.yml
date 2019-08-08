@@ -178,15 +178,6 @@ script:
   - ls -l /usr/lib/ccache
   # trick for using ccache, stolen from rapidcheck
   - mkdir -p ${HOME}/bin
-script:
-  - ls -l /usr/lib/ccache
-  # trick for using ccache, stolen from rapidcheck
-  - mkdir -p ${HOME}/bin
-
-script:
-  - ls -l /usr/lib/ccache
-  # trick for using ccache, stolen from rapidcheck
-  - mkdir -p ${HOME}/bin
   - export PATH="${HOME}/bin:${PATH}"
   - ln -sf /usr/bin/ccache ${HOME}/bin/"${CXX}"
   - which ${CXX}
@@ -211,6 +202,8 @@ deploy:
   skip_cleanup: true
   local_dir: docs/html
   github_token: $GH_REPO_TOKEN
+  on:
+    branch: master
 
 before_script:
   - eval "${MATRIX_EVAL}"
