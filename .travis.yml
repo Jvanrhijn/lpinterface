@@ -120,13 +120,13 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
           packages:
-            8ac9cfc66bd0d253002
-      env: B8ac9cfc66bd0d253002L="CC=clang-3.7 && CXX=clang++-3.7"
+            - clang-3.7
+      env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
-    - os: li8ac9cfc66bd0d253002
-      compil8ac9cfc66bd0d253002
-      addons8ac9cfc66bd0d253002
-        apt:8ac9cfc66bd0d253002
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
@@ -197,14 +197,6 @@ after_success:
   - cd ${TRAVIS_BUILD_DIR}
   - doxygen Doxyfile
 
-deploy:
-  provider: pages
-  skip_cleanup: true
-  local_dir: docs/html
-  github_token: $GH_REPO_TOKEN
-  on:
-    branch: master
-
 before_script:
   - eval "${MATRIX_EVAL}"
   - wget https://soplex.zib.de/download/release/soplex-4.0.2.tgz
@@ -214,3 +206,11 @@ before_script:
   - cmake --build build -- -j4
   - cd build && sudo make install
   - cd ${TRAVIS_BUILD_DIR}
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: docs/html
+  github_token: $GH_REPO_TOKEN
+  on:
+    branch: master
