@@ -13,6 +13,8 @@ and usage will be the same for each solver.
 
  */
 
+#include <iostream>
+
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
@@ -25,8 +27,14 @@ using namespace lpint;
 // LinearProgramSolver interface
 class SolverWrapper {
  public:
+  SolverWrapper() = default;
+
   SolverWrapper(std::shared_ptr<LinearProgramSolver> solver)
       : solver_(solver) {}
+
+  void insert_solver(std::shared_ptr<LinearProgramSolver> solver) {
+    solver_ = solver;
+  }
 
   std::shared_ptr<LinearProgramSolver> solver() { return solver_; }
 
@@ -34,7 +42,14 @@ class SolverWrapper {
   std::shared_ptr<LinearProgramSolver> solver_;
 };
 
-int main() {
+int main(int argc, char* argv[]) {
+  if (argc < 2) {
+    std::cerr << "Please provide a solver backend as argument. Supported: "
+                 "gurobi, soplex."
+              << std::endl;
+    exit(1);
+  }
+
   try {
     // Create a linear program object; this will hold all
     // data defining a linear program.
@@ -63,8 +78,16 @@ int main() {
         {1.0, 1.0, 2.0}, {VarType::Real, VarType::Real, VarType::Real}});
 
     // Create solver object.
-    // SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
-    SolverWrapper wrapper(std::make_shared<SoplexSolver>(std::move(lp)));
+    SolverWrapper wrapper;
+
+    if (argv[1] == std::string("gurobi")) {
+      wrapper.insert_solver(std::make_shared<GurobiSolver>(lp));
+    } else if (argv[1] == std::string("soplex")) {
+      wrapper.insert_solver(std::make_shared<SoplexSolver>(lp));
+    } else {
+      std::cerr << "Unsupported solver backend." << std::endl;
+      exit(1);
+    }
 
     /*
         Alternatively, one can directly flush the data to the LP solver
