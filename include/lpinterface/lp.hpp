@@ -9,7 +9,12 @@
 
 #include "common.hpp"
 
+#include "badge.hpp"
+
 namespace lpint {
+
+class SoplexSolver;
+class GurobiSolver;
 
 /**
  * @brief Objective sense for an LP.
@@ -127,6 +132,9 @@ class LinearProgramInterface {
    * @return false The LP data cannot be safely flushed to a backend.
    */
   virtual bool is_initialized() const = 0;
+
+  virtual void set_initialization(Badge<SoplexSolver>, bool init) = 0;
+  virtual void set_initialization(Badge<GurobiSolver>, bool init) = 0;
 };
 
 }  // namespace lpint

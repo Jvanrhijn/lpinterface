@@ -154,16 +154,10 @@ Status GurobiSolver::solution_status() const {
 }
 
 const LinearProgramInterface& GurobiSolver::linear_program() const {
-  if (!linear_program_->is_initialized()) {
-    throw LinearProgramNotInitializedException();
-  }
   return *linear_program_;
 }
 
 LinearProgramInterface& GurobiSolver::linear_program() {
-  if (!linear_program_->is_initialized()) {
-    throw LinearProgramNotInitializedException();
-  }
   return *linear_program_;
 }
 

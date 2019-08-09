@@ -42,11 +42,16 @@ void SoplexSolver::set_parameter(const Param param, const double value) {
 }
 
 void SoplexSolver::update_program() {
+  // can't push data to LP if data does not exist
+  if (!linear_program_->is_initialized()) {
+    throw LinearProgramNotInitializedException();
+  }
+  // Only support CSR matrices for now
   if (linear_program_->matrix().type() != SparseMatrixType::RowWise) {
     throw NotImplementedError();
   }
-  const auto objective = linear_program_->objective();
-  const auto constraints = linear_program_->constraints();
+  const auto& objective = linear_program_->objective();
+  const auto& constraints = linear_program_->constraints();
 
   // add variables to LP
   DSVector dummycol(0);

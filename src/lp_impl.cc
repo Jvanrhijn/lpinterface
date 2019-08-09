@@ -10,14 +10,17 @@ LinearProgram::LinearProgram(const OptimizationType opt_type,
 
 void LinearProgram::add_columns(std::vector<Column<double>>&& columns) {
   matrix_.add_columns(std::move(columns));
+  initialized_ = true;
 }
 
 void LinearProgram::add_rows(std::vector<Row<double>>&& rows) {
   matrix_.add_rows(std::move(rows));
+  initialized_ = true;
 }
 
 void LinearProgram::set_matrix(SparseMatrix<double>&& matrix) {
   matrix_ = std::move(matrix);
+  initialized_ = true;
 }
 
 const SparseMatrix<double>& LinearProgram::matrix() const { return matrix_; }
@@ -50,5 +53,13 @@ const Objective<double>& LinearProgram::objective() const { return objective_; }
 Objective<double>& LinearProgram::objective() { return objective_; }
 
 bool LinearProgram::is_initialized() const { return initialized_; }
+
+void LinearProgram::set_initialization(Badge<GurobiSolver>, bool init) {
+  initialized_ = init;
+}
+
+void LinearProgram::set_initialization(Badge<SoplexSolver>, bool init) {
+  initialized_ = init;
+}
 
 }  // namespace lpint

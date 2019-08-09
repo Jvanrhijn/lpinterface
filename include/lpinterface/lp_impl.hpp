@@ -2,7 +2,10 @@
 #define LPINTERFACE_LP_IMPL_H
 
 #include "common.hpp"
+#include "lpinterface.hpp"
 #include "lp.hpp"
+
+#include "badge.hpp"
 
 #include <vector>
 
@@ -70,6 +73,9 @@ class LinearProgram : public LinearProgramInterface {
   Objective<double>& objective() override;
 
   bool is_initialized() const override;
+
+  void set_initialization(Badge<SoplexSolver>, bool init) override;
+  void set_initialization(Badge<GurobiSolver>, bool init) override;
 
   friend std::ostream& operator<<(std::ostream&, const LinearProgram&);
 

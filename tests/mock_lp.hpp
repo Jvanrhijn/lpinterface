@@ -25,6 +25,8 @@ class MockLinearProgram : public LinearProgramInterface {
   MOCK_CONST_METHOD0(objective, const Objective<double>&());
   MOCK_METHOD0(objective, Objective<double>&());
   MOCK_CONST_METHOD0(is_initialized, bool());
+  MOCK_METHOD2(set_initialization, void(Badge<GurobiSolver>, bool));
+  MOCK_METHOD2(set_initialization, void(Badge<SoplexSolver>, bool));
 };
 
 }  // namespace lpint
