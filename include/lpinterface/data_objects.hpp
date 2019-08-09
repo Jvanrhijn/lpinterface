@@ -148,7 +148,7 @@ class MatrixEntry {
   //! Get a reference to the underlying nonzero indices.
   std::vector<Index>& nonzero_indices() { return nonzero_indices_; }
 
-  //! Obtain an iterator to the begin of the underlying value array.
+  //! Obtain an iterator to the begin of the ests/CMakeFiles/unit_tests.dir/all] Error 2
   iterator begin() { return values_.begin(); }
 
   //! Obtain a const  iterator to the begin of the underlying value array.
@@ -175,7 +175,7 @@ class Column : public MatrixEntry<T> {
   Column(Column<T>&&) = default;
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
-  Column(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
+  Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
   Column() = default;
 };
 
@@ -190,7 +190,7 @@ class Row : public MatrixEntry<T> {
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
 
-  Row(const MatrixEntry<T> m) : MatrixEntry<T>(m) {}
+  Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
   Row() = default;
 // TODO: find a more elegant way to do this
 #if TESTING

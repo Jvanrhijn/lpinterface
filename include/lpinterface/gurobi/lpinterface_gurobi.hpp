@@ -25,8 +25,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   // rule of five: should implement/delete these
   GurobiSolver(const GurobiSolver&) noexcept;
   GurobiSolver(GurobiSolver&&) noexcept;
-  GurobiSolver& operator=(GurobiSolver) noexcept;
-  GurobiSolver& operator=(GurobiSolver&&) noexcept = delete;
+  GurobiSolver& operator=(GurobiSolver other) noexcept;
 
   void set_parameter(const Param param, const int value) override;
 
@@ -86,6 +85,8 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
     using std::swap;
     swap(first.linear_program_, second.linear_program_);
     swap(first.gurobi_env_, second.gurobi_env_);
+    swap(first.gurobi_model_, second.gurobi_model_);
+    swap(first.solution_, second.solution_);
   }
 };
 

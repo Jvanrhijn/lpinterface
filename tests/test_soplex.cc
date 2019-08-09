@@ -76,6 +76,8 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
+  auto soplex = configure_soplex(lp);
+
   SoplexSolver solver(std::make_shared<LinearProgram>(std::move(lp)));
 
   solver.update_program();
@@ -83,7 +85,6 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   Status status = solver.solve_primal();
 
   // now we repeat the computation using SoPlex itself
-  auto soplex = configure_soplex(lp);
   const auto status_soplex = SoplexSolver::translate_status(soplex.optimize());
 
   // check whether bare soplex has the same result as our solver

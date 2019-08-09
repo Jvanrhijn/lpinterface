@@ -95,14 +95,15 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  auto grb = create_grb(std::move(lp));
-
-  grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
+  //auto grb = create_grb(std::move(lp));
+  GurobiSolver grb;
 
   int error;
   try {
     error = configure_gurobi(lp, &env, &model);
     GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
+    grb = create_grb(std::move(lp));
+    grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
     grb.update_program();
   } catch (const GurobiException& e) {
     RC_ASSERT(e.code() == error);
@@ -134,8 +135,9 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   RC_ASSERT(GurobiSolver::convert_gurobi_status(gurobi_status) == status);
 
   if (status == Status::Optimal) {
-    std::vector<double> solution(lp.num_vars());
-    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, lp.num_vars(),
+    const auto nvars = grb.linear_program().num_vars();
+    std::vector<double> solution(nvars);
+    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, solution.size(),
                                solution.data());
     RC_ASSERT(solution == grb.get_solution().primal);
 
