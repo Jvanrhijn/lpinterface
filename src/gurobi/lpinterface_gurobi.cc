@@ -92,23 +92,16 @@ void GurobiSolver::update_program() {
     throw GurobiException(err, GRBgeterrormsg(gurobi_env_));
   }
   // set constraints
-  auto& matrix = linear_program_->matrix();
-  const auto constraints = linear_program_->constraints();
-  std::size_t idx = 0;
-  if (matrix.type() == SparseMatrixType::RowWise) {
-    for (auto& row : matrix) {
-      char ord = convert_ordering(constraints[idx].ordering);
-      const auto error = GRBaddconstr(
-          gurobi_model_, row.num_nonzero(), row.nonzero_indices().data(),
-          row.values().data(), ord, constraints[idx].value,
-          ("constr" + std::to_string(idx)).c_str());
-      if (error != 0) {
-        throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
-      }
-      idx++;
+  auto& constraints = linear_program_->constraints();
+  for (auto& constraint : constraints) {
+    char ord = convert_ordering(constraint.ordering);
+    const auto error = GRBaddconstr(
+        gurobi_model_, constraint.row.num_nonzero(),
+        constraint.row.nonzero_indices().data(), constraint.row.values().data(),
+        ord, constraint.value, nullptr);
+    if (error != 0) {
+      throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
     }
-  } else {
-    throw MatrixTypeException();
   }
 }
 

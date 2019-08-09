@@ -28,21 +28,19 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
     soplex.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
   }
 
-  const auto constraints = lp.constraints();
+  const auto& constraints = lp.constraints();
 
-  std::size_t i = 0;
-  for (const auto& row : lp.matrix()) {  // soplex
-    DSVector ds_row(row.values().size());
-    ds_row.add(row.values().size(), row.nonzero_indices().data(),
-               row.values().data());
-    if (lp.constraints()[i].ordering == Ordering::LEQ) {
-      soplex.addRowReal(LPRow(0, ds_row, constraints[i].value));
-    } else if (lp.constraints()[i].ordering == Ordering::GEQ) {
-      soplex.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+  for (const auto& constraint: constraints) {  // soplex
+    DSVector ds_row(constraint.row.values().size());
+    ds_row.add(constraint.row.values().size(), constraint.row.nonzero_indices().data(),
+               constraint.row.values().data());
+    if (constraint.ordering == Ordering::LEQ) {
+      soplex.addRowReal(LPRow(0, ds_row, constraint.value));
+    } else if (constraint.ordering == Ordering::GEQ) {
+      soplex.addRowReal(LPRow(constraint.value, ds_row, infinity));
     } else {
       throw UnsupportedConstraintException();
     }
-    i++;
   }
   return soplex;
 }
@@ -58,14 +56,6 @@ TEST(Soplex, SetParameters) {
   SoplexSolver spl(lp);
   spl.set_parameter(Param::Verbosity, 0);
 }
-
-// TEST(Soplex, UpdateProgram) {
-//  auto lp = std::make_shared<MockLinearProgram>();
-//  EXPECT_CALL(*lp.get(), matrix()).Times(testing::AtLeast(1));
-//  EXPECT_CALL(*lp.get(), optimization_type()).Times(testing::AtLeast(1));
-//  SoplexSolver spl(lp);
-//  spl.update_program();
-//}
 
 // property: any LP should result in the same
 // answer as SoPlex gives us
@@ -107,16 +97,13 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
-  std::vector<Row<double>> rows;
-  rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
-  rows.emplace_back(Row<double>({1, 1}, {0, 1}));
-  LinearProgram lp(OptimizationType::Maximize, std::move(rows));
+  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
 
-  std::vector<Constraint<double>> constr = {
-      Constraint<double>{Ordering::LEQ, 4.0},
-      Constraint<double>{Ordering::GEQ, 1.0}};
+  std::vector<Constraint<double>> constr;
+  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);
+  constr.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
 
-  lp.add_constraints(constr);
+  lp.add_constraints(std::move(constr));
 
   Objective<double> obj{{1.0, 1.0, 2.0},
                         {VarType::Real, VarType::Real, VarType::Real}};

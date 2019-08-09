@@ -46,12 +46,8 @@ void SoplexSolver::update_program() {
   if (!linear_program_->is_initialized()) {
     throw LinearProgramNotInitializedException();
   }
-  // Only support CSR matrices for now
-  if (linear_program_->matrix().type() != SparseMatrixType::RowWise) {
-    throw NotImplementedError();
-  }
+
   const auto& objective = linear_program_->objective();
-  const auto& constraints = linear_program_->constraints();
 
   // add variables to LP
   DSVector dummycol(0);
@@ -61,16 +57,17 @@ void SoplexSolver::update_program() {
 
   // add constraints to LP
   std::size_t i = 0;
-  for (const auto& row : linear_program_->matrix()) {
-    DSVector ds_row(row.num_nonzero());
+  for (auto& constraint : linear_program_->constraints()) {
+    DSVector ds_row(constraint.row.num_nonzero());
     // TODO: fix this so we don't have to copy each time
-    ds_row.add(row.num_nonzero(), row.nonzero_indices().data(),
-               row.values().data());
+    ds_row.add(constraint.row.num_nonzero(),
+               constraint.row.nonzero_indices().data(),
+               constraint.row.values().data());
     // determine constraint
-    if (constraints[i].ordering == Ordering::LEQ) {
-      soplex_.addRowReal(LPRow(0, ds_row, constraints[i].value));
-    } else if (constraints[i].ordering == Ordering::GEQ) {
-      soplex_.addRowReal(LPRow(constraints[i].value, ds_row, infinity));
+    if (constraint.ordering == Ordering::LEQ) {
+      soplex_.addRowReal(LPRow(0, ds_row, constraint.value));
+    } else if (constraint.ordering == Ordering::GEQ) {
+      soplex_.addRowReal(LPRow(constraint.value, ds_row, infinity));
     } else {
       throw UnsupportedConstraintException();
     }

@@ -11,14 +11,15 @@
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "mock_lp.hpp"
 
-using namespace lpint;
+ using namespace lpint;
 
-inline GurobiSolver create_grb(LinearProgram&& lp) {
+ inline GurobiSolver create_grb(LinearProgram&& lp) {
   GurobiSolver grb(std::make_shared<LinearProgram>(std::move(lp)));
   return grb;
 }
 
-inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
+ inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel**
+ model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
@@ -59,16 +60,17 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
     return error;
   }
 
-  const auto constraints = lp.constraints();
+  auto& constraints = lp.constraints();
 
   // add constraints
   std::size_t idx = 0;
-  for (auto& row : lp.matrix()) {
+  for (auto& constraint: constraints) {
+    auto& row = constraint.row;
     error = GRBaddconstr(
         *model, row.num_nonzero(), row.nonzero_indices().data(),
         row.values().data(),
-        GurobiSolver::convert_ordering(constraints[idx].ordering),
-        constraints[idx].value, ("constr" + std::to_string(idx)).c_str());
+        GurobiSolver::convert_ordering(constraint.ordering),
+        constraint.value, ("constr" + std::to_string(idx)).c_str());
     if (error) {
       return error;
     }
@@ -77,7 +79,7 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   return 0;
 }
 
-TEST(Gurobi, SetParameters) {
+ TEST(Gurobi, SetParameters) {
   auto lp = std::make_shared<MockLinearProgram>();
   EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
   GurobiSolver grb(lp);
@@ -85,7 +87,7 @@ TEST(Gurobi, SetParameters) {
   grb.set_parameter(Param::Verbosity, 0);
 }
 
-RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
+ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 10.0;
 
   auto lp = *rc::genLinearProgram(
@@ -150,17 +152,14 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   GRBfreeenv(env);
 }
 
-TEST(Gurobi, FullProblem) {
-  std::vector<Row<double>> rows;
-  rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
-  rows.emplace_back(Row<double>({1, 1}, {0, 1}));
-  LinearProgram lp(OptimizationType::Maximize, std::move(rows));
+ TEST(Gurobi, FullProblem) {
+  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
 
-  std::vector<Constraint<double>> constr = {
-      Constraint<double>{Ordering::LEQ, 4.0},
-      Constraint<double>{Ordering::GEQ, 1.0}};
+  std::vector<Constraint<double>> constr;
+  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);
+  constr.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
 
-  lp.add_constraints(constr);
+  lp.add_constraints(std::move(constr));
 
   Objective<double> obj{{1.0, 1.0, 2.0},
                         {VarType::Binary, VarType::Binary, VarType::Binary}};
@@ -182,7 +181,7 @@ TEST(Gurobi, FullProblem) {
   ASSERT_EQ(solution.objective_value, 3.0);
 }
 
-TEST(Gurobi, FullProblemRawData) {
+ TEST(Gurobi, FullProblemRawData) {
   // Create the Gurobi solver
   GurobiSolver grb(OptimizationType::Maximize);
 

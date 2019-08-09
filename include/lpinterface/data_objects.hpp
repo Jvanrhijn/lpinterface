@@ -89,14 +89,15 @@ class MatrixEntry {
   using pointer = value_type*;
   using reference = value_type&;
 
+  MatrixEntry() = default;
   MatrixEntry(MatrixEntry<T>&&) = default;
   MatrixEntry(const MatrixEntry<T>&) = delete;
+  MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {}
   virtual ~MatrixEntry() = default;
 
-  MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
   /**
    * @brief Indexing operator; can be used identically to a dense vector.
@@ -178,6 +179,12 @@ class Column : public MatrixEntry<T> {
       : MatrixEntry<T>(values, indices) {}
   Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
   Column() = default;
+  Column<T>& operator=(Column<T>&&) = default; 
+
+// TODO: find a more elegant way to do this
+#if TESTING
+  friend class rc::Arbitrary<Row<T>>;
+#endif
 };
 
 template <typename T>
@@ -193,6 +200,8 @@ class Row : public MatrixEntry<T> {
 
   Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
   Row() = default;
+  Row<T>& operator=(Row<T>&&) = default;
+
 // TODO: find a more elegant way to do this
 #if TESTING
   friend class rc::Arbitrary<Row<T>>;
@@ -374,6 +383,12 @@ template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
+
+  Constraint() = default;
+  Constraint(Row<T>&& r, Ordering ord, T val)
+      : row(std::move(r)), ordering(ord), value(val) {}
+
+  Row<T> row;
   //! Ordering type of this constraint, see Ordering for possible variants.
   Ordering ordering;
   //! Value of right-hand-side vector of constraints.
@@ -439,7 +454,7 @@ inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Constraint<T>& constraint) {
-  os << constraint.ordering << " " << constraint.value;
+  os << constraint.row << " " << constraint.ordering << " " << constraint.value;
   return os;
 }
 

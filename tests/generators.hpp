@@ -49,15 +49,6 @@ struct Arbitrary<lpint::Ordering> {
   }
 };
 
-template <typename T>
-struct Arbitrary<lpint::Constraint<T>> {
-  static Gen<lpint::Constraint<T>> arbitrary() {
-    return gen::build<lpint::Constraint<T>>(
-        gen::set(&lpint::Constraint<T>::value),
-        gen::set(&lpint::Constraint<T>::ordering));
-  }
-};
-
 template <>
 struct Arbitrary<lpint::VarType> {
   static Gen<lpint::VarType> arbitrary() {
@@ -78,8 +69,9 @@ struct Arbitrary<lpint::Objective<T>> {
 
 template <typename T>
 inline Gen<lpint::Constraint<T>> genConstraintWithOrdering(
-    Gen<T> vgen, Gen<lpint::Ordering> ogen) {
+    Gen<lpint::Row<T>> rowgen, Gen<T> vgen, Gen<lpint::Ordering> ogen) {
   return gen::build<lpint::Constraint<T>>(
+      gen::set(&lpint::Constraint<T>::row, rowgen),
       gen::set(&lpint::Constraint<T>::ordering, ogen),
       gen::set(&lpint::Constraint<T>::value, vgen));
 }
@@ -119,6 +111,16 @@ struct Arbitrary<lpint::Row<T>> {
   static Gen<lpint::Row<T>> arbitrary() {
     using namespace lpint;
     return genRow(rc::gen::arbitrary<T>());
+  }
+};
+
+template <typename T>
+struct Arbitrary<lpint::Constraint<T>> {
+  static Gen<lpint::Constraint<T>> arbitrary() {
+    return gen::build<lpint::Constraint<T>>(
+        gen::set(&lpint::Constraint<T>::value),
+        gen::set(&lpint::Constraint<T>::row),
+        gen::set(&lpint::Constraint<T>::ordering));
   }
 };
 
@@ -171,11 +173,10 @@ inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
 
   return gen::construct<LinearProgram>(
       rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize),
-      rc::gen::container<std::vector<Row<double>>>(
-          nrows, genRow(ncols, rc::gen::arbitrary<double>())),
       rc::gen::container<std::vector<Constraint<double>>>(
-          nrows, rc::genConstraintWithOrdering(rc::gen::arbitrary<double>(),
-                                               std::move(genord))),
+          nrows, rc::genConstraintWithOrdering(
+                     genRow(ncols, rc::gen::arbitrary<double>()),
+                     rc::gen::arbitrary<double>(), std::move(genord))),
       rc::genSizedObjective(ncols, std::move(genvt),
                             rc::gen::arbitrary<double>()));
 }

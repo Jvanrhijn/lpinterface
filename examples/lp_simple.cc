@@ -57,16 +57,13 @@ int main(int argc, char* argv[]) {
                                               SparseMatrixType::RowWise);
 
     // The constraint matrix is set up in CSR format.
-    std::vector<Row<double>> rows;
-    rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
-    rows.emplace_back(Row<double>({1, 1}, {0, 1}));
-    lp->add_rows(std::move(rows));
-
-    // Add constraints to the LP; constraints consist of a pair
-    // (Ordering, value), representing the RHS of the constraint equations
-    // including the comparison operator.
-    lp->add_constraints({Constraint<double>{Ordering::LEQ, 4.0},
-                         Constraint<double>{Ordering::GEQ, 1.0}});
+    // Each Constraint consists of a matrix row, an
+    // ordering, and a bound.
+    std::vector<Constraint<double>> constraints;
+    constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ,
+                             4.0);
+    constraints.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
+    lp->add_constraints(std::move(constraints));
 
     // Set the objective vector. The objective consists of the
     // coefficients of the elements of x in the expression

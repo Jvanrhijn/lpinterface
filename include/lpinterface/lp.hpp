@@ -56,30 +56,6 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
 class LinearProgramInterface {
  public:
   virtual ~LinearProgramInterface() = default;
-  /**
-   * @brief Add columns to the LP.
-   */
-  virtual void add_columns(std::vector<Column<double>>&& columns) = 0;
-
-  /**
-   * @brief Add rows to the LP.
-   */
-  virtual void add_rows(std::vector<Row<double>>&& rows) = 0;
-
-  /**
-   * @brief Set the linear program matrix.
-   */
-  virtual void set_matrix(SparseMatrix<double>&& matrix) = 0;
-
-  /**
-   * @brief Get immutable access to the constraint matrix
-   */
-  virtual const SparseMatrix<double>& matrix() const = 0;
-
-  /**
-   * @brief Get mutable access to the constraint matrix
-   */
-  virtual SparseMatrix<double>& matrix() = 0;
 
   /**
    * @brief Get the number of variables in the LP.
@@ -100,7 +76,7 @@ class LinearProgramInterface {
    * @brief Add a set of constraints to the LP formulation.
    */
   virtual void add_constraints(
-      const std::vector<Constraint<double>>& constraints) = 0;
+      std::vector<Constraint<double>>&& constraints) = 0;
 
   /**
    * @brief Retrieve the optimization type of this LinearProgramInterface.
@@ -132,9 +108,6 @@ class LinearProgramInterface {
    * @return false The LP data cannot be safely flushed to a backend.
    */
   virtual bool is_initialized() const = 0;
-
-  virtual void set_initialization(Badge<SoplexSolver>, bool init) = 0;
-  virtual void set_initialization(Badge<GurobiSolver>, bool init) = 0;
 };
 
 }  // namespace lpint
