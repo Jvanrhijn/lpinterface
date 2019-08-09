@@ -110,10 +110,7 @@ TEST(Soplex, FullProblem) {
   std::vector<Row<double>> rows;
   rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
   rows.emplace_back(Row<double>({1, 1}, {0, 1}));
-  LinearProgram lp(
-      OptimizationType::Maximize,
-      std::move(rows)
-  );
+  LinearProgram lp(OptimizationType::Maximize, std::move(rows));
 
   std::vector<Constraint<double>> constr = {
       Constraint<double>{Ordering::LEQ, 4.0},

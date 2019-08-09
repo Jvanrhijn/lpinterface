@@ -148,7 +148,8 @@ class MatrixEntry {
   //! Get a reference to the underlying nonzero indices.
   std::vector<Index>& nonzero_indices() { return nonzero_indices_; }
 
-  //! Obtain an iterator to the begin of the ests/CMakeFiles/unit_tests.dir/all] Error 2
+  //! Obtain an iterator to the begin of the ests/CMakeFiles/unit_tests.dir/all]
+  //! Error 2
   iterator begin() { return values_.begin(); }
 
   //! Obtain a const  iterator to the begin of the underlying value array.

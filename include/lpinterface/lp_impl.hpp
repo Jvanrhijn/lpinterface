@@ -35,8 +35,7 @@ class LinearProgram : public LinearProgramInterface {
         initialized_(true) {}
 
   template <typename Entry>
-  LinearProgram(const OptimizationType opt_type,
-                std::vector<Entry>&& entries) 
+  LinearProgram(const OptimizationType opt_type, std::vector<Entry>&& entries)
       : matrix_(std::forward<decltype(entries)>(entries)),
         opt_type_(opt_type),
         initialized_(true) {}

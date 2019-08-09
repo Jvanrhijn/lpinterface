@@ -94,8 +94,7 @@ int main(int argc, char *argv[]) {
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(i + k, i, BOARD_SIZE);
     }
-    rows.emplace_back(
-        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
+    rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
@@ -106,8 +105,7 @@ int main(int argc, char *argv[]) {
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(i, i + k, BOARD_SIZE);
     }
-    rows.emplace_back(
-        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
+    rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
@@ -118,8 +116,7 @@ int main(int argc, char *argv[]) {
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(BOARD_SIZE - i - 1, i + k, BOARD_SIZE);
     }
-    rows.emplace_back(
-        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
+    rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 
@@ -130,8 +127,7 @@ int main(int argc, char *argv[]) {
     for (std::size_t i = 0; i < BOARD_SIZE - k; i++) {
       nonzeros[i] = vectorize_indices(BOARD_SIZE - i - 1 - k, i, BOARD_SIZE);
     }
-    rows.emplace_back(
-        std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
+    rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(Constraint<double>{Ordering::LEQ, 1.0});
   }
 

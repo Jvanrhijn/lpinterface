@@ -95,7 +95,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  //auto grb = create_grb(std::move(lp));
+  // auto grb = create_grb(std::move(lp));
   GurobiSolver grb;
 
   int error;
@@ -154,10 +154,7 @@ TEST(Gurobi, FullProblem) {
   std::vector<Row<double>> rows;
   rows.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}));
   rows.emplace_back(Row<double>({1, 1}, {0, 1}));
-  LinearProgram lp(
-      OptimizationType::Maximize,
-      std::move(rows)
-  );
+  LinearProgram lp(OptimizationType::Maximize, std::move(rows));
 
   std::vector<Constraint<double>> constr = {
       Constraint<double>{Ordering::LEQ, 4.0},

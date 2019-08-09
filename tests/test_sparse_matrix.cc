@@ -92,7 +92,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
               (const uint8_t nrows, const uint8_t ncols)) {
   SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
-  auto cols = *rc::gen::container<std::vector<Column<double>>>(ncols, rc::genRow(ncols, rc::gen::nonZero<double>()));
+  auto cols = *rc::gen::container<std::vector<Column<double>>>(
+      ncols, rc::genRow(ncols, rc::gen::nonZero<double>()));
   sp.add_columns(std::move(cols));
   for (SizeType i = 0; i < nrows; i++) {
     for (SizeType j = 0; j < ncols; j++) {
