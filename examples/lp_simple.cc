@@ -17,6 +17,8 @@ and usage will be the same for each solver.
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 
+#include "common.hpp"
+
 using namespace lpint;
 
 // Wrapper class, showing the use of the common
@@ -31,9 +33,6 @@ class SolverWrapper {
  private:
   std::shared_ptr<LinearProgramSolver> solver_;
 };
-
-template <typename T>
-void print_vector(const std::vector<T>&);
 
 int main() {
   try {
@@ -136,17 +135,4 @@ int main() {
   } catch (const LpException& e) {
     std::cout << e.what() << std::endl;
   }
-}
-
-template <typename T>
-void print_vector(const std::vector<T>& v) {
-  if (v.size() == 0) {
-    std::cout << "[]";
-    return;
-  }
-  std::cout << "[";
-  for (const auto& el : v) {
-    std::cout << el << ", ";
-  }
-  std::cout << "\b\b]";
 }
