@@ -51,8 +51,12 @@ int main() {
     // Add constraints to the LP; constraints consist of a pair
     // (Ordering, value), representing the RHS of the constraint equations
     // including the comparison operator.
-    lp->add_constraints({Constraint<double>{Ordering::LEQ, 4.0},
-                         Constraint<double>{Ordering::GEQ, 1.0}});
+    lp->add_constraints(
+      {
+        Constraint<double>{Ordering::LEQ, 4.0},
+        Constraint<double>{Ordering::GEQ, 1.0}
+      }
+    );
 
     // Set the objective vector. The objective consists of the
     // coefficients of the elements of x in the expression
@@ -60,12 +64,16 @@ int main() {
     // of x. These can generally be real, integer, binary, semi-real or
     // semi-integer, depending on what solver one uses (for instance,
     // SoPlex only supports real variables).
-    lp->set_objective(Objective<double>{
-        {1.0, 1.0, 2.0}, {VarType::Real, VarType::Real, VarType::Real}});
+    lp->set_objective(
+      Objective<double>{
+        {1.0, 1.0, 2.0}, 
+        {VarType::Real, VarType::Real, VarType::Real}
+      }
+    );
 
     // Create solver object.
     // SolverWrapper wrapper(std::make_shared<GurobiSolver>(lp));
-    SolverWrapper wrapper(std::make_shared<SoplexSolver>(lp));
+    SolverWrapper wrapper(std::make_shared<SoplexSolver>(std::move(lp)));
 
     /*
         Alternatively, one can directly flush the data to the LP solver
@@ -109,13 +117,13 @@ int main() {
 
     if (status != Status::Optimal) {
       std::cout << "Optimal solution NOT found" << std::endl;
+      if (status == Status::SuboptimalSolution) {
+        std::cout << "Suboptimal solution found" << std::endl;
+      } else {
+        std::cout << "Hello\n";
+        exit(1);
+      }
     } 
-    
-    if (status == Status::SuboptimalSolution) {
-      std::cout << "Suboptimal solution found" << std::endl;
-    } else {
-      exit(1);
-    }
 
     // Retrieve the solution from the solver object.
     Solution<double> solution = wrapper.solver()->get_solution();
