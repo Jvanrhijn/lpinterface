@@ -9,8 +9,6 @@
 
 #include "common.hpp"
 
-#include "badge.hpp"
-
 namespace lpint {
 
 class SoplexSolver;

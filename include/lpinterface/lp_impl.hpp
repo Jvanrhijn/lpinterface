@@ -5,8 +5,6 @@
 #include "lp.hpp"
 #include "lpinterface.hpp"
 
-#include "badge.hpp"
-
 #include <vector>
 
 namespace lpint {
