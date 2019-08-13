@@ -37,19 +37,16 @@ int main() {
   auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize, 
                                             SparseMatrixType::RowWise);
 
-  std::vector<Row<double>> rows;
-  rows.emplace_back({1, 2, 3}, {0, 1, 2});
-  rows.emplace_back({4, 5, 6}, {1, 2, 3});
-  lp->add_rows(std::move(rows));
+  // add constraints; these represent the constraint equations.
+  // these constraints are equivalent to the equations
+  // x + 3y + 3z      <= 1
+  //     4y + 5z + 6w <= 4
+  // The Row<T> objects are sparse matrix rows in CSR format.
+  std::vector<Constraint<double>> constraints;
+  constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 1.0);
+  constraints.emplace_back(Row<double>({4, 5, 6}, {1, 2, 3}), Ordering::LEQ, 4.0);
+  lp->add_constraints(std::move(constraints));
 
-  // add constraints; these represent the right-hand side of the
-  // constraint equations, together with the upper/lower bounds of each constraint
-  lp->add_constraints(
-    {
-      Constraint<double>{Ordering::LEQ, 3.0},
-      Constraint<double>{Ordering::LEQ, 4.0}
-    }
-  );
 
   // Set the objective function; see the documentation for a list of
   // supported variable types per solver backend
