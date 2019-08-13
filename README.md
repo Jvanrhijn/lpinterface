@@ -27,14 +27,14 @@ struct Wrapper {
 };
 
 template <typename T>
-Wrapper create_solver(std::shared_ptr<LinearProgram> lp) {
-  return Wrapper(std::make_unique<T>(lp));
+Wrapper create_solver(std::unique_ptr<LinearProgram>&& lp) {
+  return Wrapper(std::move(lp));
 }
 
 int main() {
   // construct a simple linear program to maximize an objective function
   // represent the constraint matrix in CSR format
-  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
+  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
   // add constraints; these represent the constraint equations.
   // these constraints are equivalent to the equations
