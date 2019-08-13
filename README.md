@@ -34,8 +34,7 @@ Wrapper create_solver(std::shared_ptr<LinearProgram> lp) {
 int main() {
   // construct a simple linear program to maximize an objective function
   // represent the constraint matrix in CSR format
-  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize, 
-                                            SparseMatrixType::RowWise);
+  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
 
   // add constraints; these represent the constraint equations.
   // these constraints are equivalent to the equations

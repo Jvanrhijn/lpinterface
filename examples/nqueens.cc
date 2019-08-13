@@ -52,8 +52,7 @@ int main(int argc, char *argv[]) {
   }
 
   // setup N-queens problem
-  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize,
-                                            SparseMatrixType::RowWise);
+  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
 
   // Objective: maximize number of queens on the board
   // variable types will be binary, so the objective is

@@ -97,7 +97,6 @@
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  // auto grb = create_grb(std::move(lp));
   GurobiSolver grb;
 
   int error;
@@ -153,7 +152,7 @@
 }
 
  TEST(Gurobi, FullProblem) {
-  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
+  LinearProgram lp(OptimizationType::Maximize);
 
   std::vector<Constraint<double>> constr;
   constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);

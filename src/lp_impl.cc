@@ -2,9 +2,8 @@
 
 namespace lpint {
 
-LinearProgram::LinearProgram(const OptimizationType opt_type,
-                             const SparseMatrixType sptype)
-    : matrix_(sptype), opt_type_(opt_type) {}
+LinearProgram::LinearProgram(const OptimizationType opt_type)
+    : opt_type_(opt_type) {}
 
 std::size_t LinearProgram::num_vars() const { return objective_.values.size(); }
 

@@ -53,8 +53,7 @@ int main(int argc, char* argv[]) {
   try {
     // Create a linear program object; this will hold all
     // data defining a linear program.
-    auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize,
-                                              SparseMatrixType::RowWise);
+    auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
 
     // The constraint matrix is set up in CSR format.
     // Each Constraint consists of a matrix row, an
