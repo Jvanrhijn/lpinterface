@@ -181,10 +181,9 @@ inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
                             rc::gen::arbitrary<double>()));
 }
 
-inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(const std::size_t max_nrows,
-                                                  const std::size_t max_ncols,
-                                                  Gen<lpint::Ordering> genord,
-                                                  Gen<lpint::VarType> genvt) {
+inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
+    const std::size_t max_nrows, const std::size_t max_ncols,
+    Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
   using namespace lpint;
 
   const std::size_t nrows =

@@ -30,7 +30,7 @@ const Objective<double>& LinearProgram::objective() const { return objective_; }
 
 Objective<double>& LinearProgram::objective() { return objective_; }
 
-bool LinearProgram::is_initialized() const { 
+bool LinearProgram::is_initialized() const {
   return !constraints_.empty() && !objective_.values.empty();
 }
 

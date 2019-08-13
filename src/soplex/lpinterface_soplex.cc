@@ -13,7 +13,8 @@ SoplexSolver::SoplexSolver(OptimizationType optim_type) {
 
 SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
     : linear_program_(std::move(lp)) {
-  set_parameter(Param::ObjectiveSense, linear_program_->optimization_type() == OptimizationType::Maximize
+  set_parameter(Param::ObjectiveSense, linear_program_->optimization_type() ==
+                                               OptimizationType::Maximize
                                            ? SoPlex::OBJSENSE_MAXIMIZE
                                            : SoPlex::OBJSENSE_MINIMIZE);
   set_parameter(Param::Verbosity, 0);

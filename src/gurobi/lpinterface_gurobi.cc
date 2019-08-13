@@ -40,7 +40,7 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type) {
       opt_type == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
 
-//GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
+// GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
 //    : linear_program_(other.linear_program_) {
 //  redirect_stdout();
 //  gurobi_model_ = GRBcopymodel(other.gurobi_model_);
@@ -95,10 +95,10 @@ void GurobiSolver::update_program() {
   auto& constraints = linear_program_->constraints();
   for (auto& constraint : constraints) {
     char ord = convert_ordering(constraint.ordering);
-    const auto error = GRBaddconstr(
-        gurobi_model_, constraint.row.num_nonzero(),
-        constraint.row.nonzero_indices().data(), constraint.row.values().data(),
-        ord, constraint.value, nullptr);
+    const auto error = GRBaddconstr(gurobi_model_, constraint.row.num_nonzero(),
+                                    constraint.row.nonzero_indices().data(),
+                                    constraint.row.values().data(), ord,
+                                    constraint.value, nullptr);
     if (error != 0) {
       throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
     }

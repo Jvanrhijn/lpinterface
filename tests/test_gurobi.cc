@@ -11,11 +11,10 @@
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "mock_lp.hpp"
 
- using namespace lpint;
- using namespace testing;
+using namespace lpint;
+using namespace testing;
 
- inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel**
- model) {
+inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
@@ -60,13 +59,13 @@
 
   // add constraints
   std::size_t idx = 0;
-  for (auto& constraint: constraints) {
+  for (auto& constraint : constraints) {
     auto& row = constraint.row;
-    error = GRBaddconstr(
-        *model, row.num_nonzero(), row.nonzero_indices().data(),
-        row.values().data(),
-        GurobiSolver::convert_ordering(constraint.ordering),
-        constraint.value, ("constr" + std::to_string(idx)).c_str());
+    error = GRBaddconstr(*model, row.num_nonzero(),
+                         row.nonzero_indices().data(), row.values().data(),
+                         GurobiSolver::convert_ordering(constraint.ordering),
+                         constraint.value,
+                         ("constr" + std::to_string(idx)).c_str());
     if (error) {
       return error;
     }
@@ -75,7 +74,7 @@
   return 0;
 }
 
- TEST(Gurobi, SetParameters) {
+TEST(Gurobi, SetParameters) {
   auto lp = std::make_unique<MockLinearProgram>();
   EXPECT_CALL(*lp, optimization_type()).Times(1);
   GurobiSolver grb(std::move(lp));
@@ -109,11 +108,10 @@ TEST(Gurobi, UpdateProgram) {
   grb.update_program();
 }
 
-
- RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
+RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 10.0;
 
-  auto lp =  *rc::genLinearProgramPtr(
+  auto lp = *rc::genLinearProgramPtr(
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
       rc::gen::arbitrary<VarType>());
 
@@ -174,7 +172,7 @@ TEST(Gurobi, UpdateProgram) {
   GRBfreeenv(env);
 }
 
- TEST(Gurobi, FullProblem) {
+TEST(Gurobi, FullProblem) {
   auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
   std::vector<Constraint<double>> constr;
@@ -203,7 +201,7 @@ TEST(Gurobi, UpdateProgram) {
   ASSERT_EQ(solution.objective_value, 3.0);
 }
 
- TEST(Gurobi, FullProblemRawData) {
+TEST(Gurobi, FullProblemRawData) {
   // Create the Gurobi solver
   GurobiSolver grb(OptimizationType::Maximize);
 
