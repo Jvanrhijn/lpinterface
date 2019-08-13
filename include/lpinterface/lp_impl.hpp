@@ -16,7 +16,7 @@ class LinearProgram : public LinearProgramInterface {
   LinearProgram(LinearProgram&&) = default;
   LinearProgram& operator=(LinearProgram&&) = default;
 
-  LinearProgram(const OptimizationType opt_type, const SparseMatrixType sptype);
+  LinearProgram(const OptimizationType opt_type);
 
   LinearProgram(const OptimizationType opt_type,
                 std::vector<Constraint<double>>&& constraints,
@@ -49,16 +49,12 @@ class LinearProgram : public LinearProgramInterface {
 
  private:
   Objective<double> objective_;
-  SparseMatrix<double> matrix_;
   std::vector<Constraint<double>> constraints_;
   OptimizationType opt_type_;
   bool initialized_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const LinearProgram& lp) {
-  if (lp.matrix_.type() != SparseMatrixType::RowWise) {
-    throw NotImplementedError();
-  }
   os << lp.opt_type_ << " " << lp.objective_ << std::endl;
   for (const auto& constraint : lp.constraints_) {
     os << constraint << std::endl;

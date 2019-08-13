@@ -97,7 +97,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
-  LinearProgram lp(OptimizationType::Maximize, SparseMatrixType::RowWise);
+  LinearProgram lp(OptimizationType::Maximize);
 
   std::vector<Constraint<double>> constr;
   constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);

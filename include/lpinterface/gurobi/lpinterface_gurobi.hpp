@@ -18,12 +18,12 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   GurobiSolver() = default;
   explicit GurobiSolver(OptimizationType optim_type);
-  explicit GurobiSolver(std::shared_ptr<LinearProgramInterface> lp);
+  explicit GurobiSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
   ~GurobiSolver();
 
   // rule of five: should implement/delete these
-  GurobiSolver(const GurobiSolver&) noexcept;
+  GurobiSolver(const GurobiSolver&) = delete;
   GurobiSolver(GurobiSolver&&) noexcept;
   GurobiSolver& operator=(GurobiSolver other) noexcept;
 
@@ -69,7 +69,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   constexpr static const char* translate_parameter(const Param param);
 
   //! The linear program to solve
-  std::shared_ptr<LinearProgramInterface> linear_program_;
+  std::unique_ptr<LinearProgramInterface> linear_program_;
 
   //! The gurobi environment object
   GRBenv* gurobi_env_;
