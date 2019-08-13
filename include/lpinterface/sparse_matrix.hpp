@@ -49,7 +49,9 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
-      : values_(values), nonzero_indices_(indices) {}
+      : values_(values), nonzero_indices_(indices) {
+        check_entry_valid();
+      }
   virtual ~MatrixEntry() = default;
 
 
@@ -119,6 +121,16 @@ class MatrixEntry {
  protected:
   std::vector<T> values_;
   std::vector<Index> nonzero_indices_;  // indices of nonzero entries
+
+  void check_entry_valid() {
+    // matrix entries are invalid if there are
+    // duplicate nonzero indices present
+    std::set<Index> index_set(nonzero_indices_.begin(), nonzero_indices_.end());
+    if (nonzero_indices_.size() != index_set.size()) {
+      throw InvalidMatrixEntryException();
+    }
+  }
+
 };
 
 template <typename T>
@@ -250,7 +262,6 @@ class SparseMatrix {
       throw MatrixTypeException();
     } else {
       for (auto& entry : columns) {
-        check_entry_valid(entry);
         entries_.emplace_back(std::move(entry));
       }
     }
@@ -267,9 +278,6 @@ class SparseMatrix {
       throw MatrixTypeException();
     } else {
       for (auto& entry : rows) {
-        // entries are invalid if there are two duplicate
-        // nonzero indices present
-        check_entry_valid(entry);
         entries_.emplace_back(std::move(entry));
       }
     }
@@ -305,16 +313,6 @@ class SparseMatrix {
     for (const auto& entry : entries) {
       check_entry_valid(entry);
       entries_.emplace_back(entry);
-    }
-  }
-
-  void check_entry_valid(const MatrixEntry<T>& entry) {
-    // matrix entries are invalid if there are
-    // duplicate nonzero indices present
-    const auto& nonzero_indices = entry.nonzero_indices();
-    std::set<Index> index_set(nonzero_indices.begin(), nonzero_indices.end());
-    if (nonzero_indices.size() != index_set.size()) {
-      throw InvalidMatrixEntryException();
     }
   }
 
