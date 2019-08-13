@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   try {
     // Create a linear program object; this will hold all
     // data defining a linear program.
-    auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
+    auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
     // The constraint matrix is set up in CSR format.
     // Each Constraint consists of a matrix row, an
@@ -77,9 +77,9 @@ int main(int argc, char* argv[]) {
     SolverWrapper wrapper;
 
     if (argv[1] == std::string("gurobi")) {
-      wrapper.insert_solver(std::make_shared<GurobiSolver>(lp));
+      wrapper.insert_solver(std::make_shared<GurobiSolver>(std::move(lp)));
     } else if (argv[1] == std::string("soplex")) {
-      wrapper.insert_solver(std::make_shared<SoplexSolver>(lp));
+      wrapper.insert_solver(std::make_shared<SoplexSolver>(std::move(lp)));
     } else {
       std::cerr << "Unsupported solver backend." << std::endl;
       exit(1);

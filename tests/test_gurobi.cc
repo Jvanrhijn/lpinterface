@@ -14,7 +14,7 @@
  using namespace lpint;
 
  inline GurobiSolver create_grb(LinearProgram&& lp) {
-  GurobiSolver grb(std::make_shared<LinearProgram>(std::move(lp)));
+  GurobiSolver grb(std::make_unique<LinearProgram>(std::move(lp)));
   return grb;
 }
 
@@ -80,9 +80,9 @@
 }
 
  TEST(Gurobi, SetParameters) {
-  auto lp = std::make_shared<MockLinearProgram>();
-  EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
-  GurobiSolver grb(lp);
+  auto lp = std::make_unique<MockLinearProgram>();
+  EXPECT_CALL(*lp, optimization_type()).Times(1);
+  GurobiSolver grb(std::move(lp));
   grb.set_parameter(Param::Threads, 1);
   grb.set_parameter(Param::Verbosity, 0);
 }

@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   }
 
   // setup N-queens problem
-  auto lp = std::make_shared<LinearProgram>(OptimizationType::Maximize);
+  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
   // Objective: maximize number of queens on the board
   // variable types will be binary, so the objective is
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
   lp->add_constraints(std::move(constraints));
 
   // create solver
-  GurobiSolver gurobi(lp);
+  GurobiSolver gurobi(std::move(lp));
 
   // flush data to backend
   gurobi.update_program();
