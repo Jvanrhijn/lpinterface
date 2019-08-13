@@ -181,6 +181,27 @@ inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
                             rc::gen::arbitrary<double>()));
 }
 
+inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(const std::size_t max_nrows,
+                                                  const std::size_t max_ncols,
+                                                  Gen<lpint::Ordering> genord,
+                                                  Gen<lpint::VarType> genvt) {
+  using namespace lpint;
+
+  const std::size_t nrows =
+      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
+  const std::size_t ncols =
+      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
+
+  return gen::makeUnique<LinearProgram>(
+      rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize),
+      rc::gen::container<std::vector<Constraint<double>>>(
+          nrows, rc::genConstraintWithOrdering(
+                     genRow(ncols, rc::gen::arbitrary<double>()),
+                     rc::gen::arbitrary<double>(), std::move(genord))),
+      rc::genSizedObjective(ncols, std::move(genvt),
+                            rc::gen::arbitrary<double>()));
+}
+
 }  // namespace rc
 
 #endif  // LPINTERFACE_GENERATORS_H

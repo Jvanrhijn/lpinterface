@@ -19,7 +19,7 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   SoplexSolver() = default;
   explicit SoplexSolver(OptimizationType optim_type);
-  explicit SoplexSolver(std::shared_ptr<LinearProgramInterface> lp);
+  explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
   ~SoplexSolver() = default;
 
@@ -57,7 +57,7 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  private:
   soplex::SoPlex soplex_;
 
-  std::shared_ptr<LinearProgramInterface> linear_program_;
+  std::unique_ptr<LinearProgramInterface> linear_program_;
 
   Solution<double> solution_;
 

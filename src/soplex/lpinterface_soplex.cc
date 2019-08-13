@@ -5,23 +5,17 @@ namespace lpint {
 using namespace soplex;
 
 SoplexSolver::SoplexSolver(OptimizationType optim_type) {
-  if (!soplex_.setIntParam(SoPlex::OBJSENSE,
-                           optim_type == OptimizationType::Maximize
-                               ? SoPlex::OBJSENSE_MAXIMIZE
-                               : SoPlex::OBJSENSE_MINIMIZE)) {
-    throw FailedToSetParameterException();
-  }
+  set_parameter(Param::ObjectiveSense, optim_type == OptimizationType::Maximize
+                                           ? SoPlex::OBJSENSE_MAXIMIZE
+                                           : SoPlex::OBJSENSE_MINIMIZE);
   set_parameter(Param::Verbosity, 0);
 }
 
-SoplexSolver::SoplexSolver(std::shared_ptr<LinearProgramInterface> lp)
-    : linear_program_(lp) {
-  if (!soplex_.setIntParam(SoPlex::OBJSENSE,
-                           lp->optimization_type() == OptimizationType::Maximize
-                               ? SoPlex::OBJSENSE_MAXIMIZE
-                               : SoPlex::OBJSENSE_MINIMIZE)) {
-    throw FailedToSetParameterException();
-  }
+SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
+    : linear_program_(std::move(lp)) {
+  set_parameter(Param::ObjectiveSense, linear_program_->optimization_type() == OptimizationType::Maximize
+                                           ? SoPlex::OBJSENSE_MAXIMIZE
+                                           : SoPlex::OBJSENSE_MINIMIZE);
   set_parameter(Param::Verbosity, 0);
   // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
   // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==

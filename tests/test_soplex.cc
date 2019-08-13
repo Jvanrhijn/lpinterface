@@ -46,15 +46,10 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   return soplex;
 }
 
-inline SoplexSolver create_spl(LinearProgram&& lp) {
-  SoplexSolver spl(std::make_shared<LinearProgram>(std::move(lp)));
-  return spl;
-}
-
 TEST(Soplex, SetParameters) {
-  auto lp = std::make_shared<MockLinearProgram>();
+  auto lp = std::make_unique<NiceMock<MockLinearProgram>>();
   EXPECT_CALL(*lp, optimization_type()).Times(1);
-  SoplexSolver spl(lp);
+  SoplexSolver spl(std::move(lp));
   spl.set_parameter(Param::Verbosity, 0);
 }
 
@@ -89,13 +84,13 @@ TEST(Soplex, UninitializedLP) {
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
-  auto lp = *rc::genLinearProgram(
+  auto lp = *rc::genLinearProgramPtr(
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
-  auto soplex = configure_soplex(lp);
+  auto soplex = configure_soplex(*lp);
 
-  SoplexSolver solver(std::make_shared<LinearProgram>(std::move(lp)));
+  SoplexSolver solver(std::move(lp));
 
   solver.update_program();
 
@@ -124,20 +119,20 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
-  LinearProgram lp(OptimizationType::Maximize);
+  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
   std::vector<Constraint<double>> constr;
   constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);
   constr.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
 
-  lp.add_constraints(std::move(constr));
+  lp->add_constraints(std::move(constr));
 
   Objective<double> obj{{1.0, 1.0, 2.0},
                         {VarType::Real, VarType::Real, VarType::Real}};
-  lp.set_objective(obj);
+  lp->set_objective(obj);
 
   // Create the solver from the given LP
-  auto spl = create_spl(std::move(lp));
+  SoplexSolver spl(std::move(lp));
 
   // Update the internal Gurobi LP
   spl.update_program();
