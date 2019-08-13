@@ -55,9 +55,10 @@ void SoplexSolver::update_program() {
     soplex_.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
   }
 
+  auto& constraints = linear_program_->constraints();
+
   // add constraints to LP
-  std::size_t i = 0;
-  for (auto& constraint : linear_program_->constraints()) {
+  for (auto& constraint : constraints) {
     DSVector ds_row(constraint.row.num_nonzero());
     // TODO: fix this so we don't have to copy each time
     ds_row.add(constraint.row.num_nonzero(),
@@ -71,8 +72,6 @@ void SoplexSolver::update_program() {
     } else {
       throw UnsupportedConstraintException();
     }
-
-    i++;
   }
 }
 

@@ -10,6 +10,7 @@
 #include "generators.hpp"
 
 using namespace lpint;
+using namespace testing;
 
 inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   using namespace soplex;
@@ -52,9 +53,35 @@ inline SoplexSolver create_spl(LinearProgram&& lp) {
 
 TEST(Soplex, SetParameters) {
   auto lp = std::make_shared<MockLinearProgram>();
-  EXPECT_CALL(*lp.get(), optimization_type()).Times(1);
+  EXPECT_CALL(*lp, optimization_type()).Times(1);
   SoplexSolver spl(lp);
   spl.set_parameter(Param::Verbosity, 0);
+}
+
+TEST(Soplex, UpdateProgram) {
+  auto lp = std::make_unique<NiceMock<MockLinearProgram>>();
+  ON_CALL(*lp, is_initialized()).WillByDefault(Return(true));
+
+  std::vector<Constraint<double>> empty_constr;
+  ON_CALL(*lp, constraints()).WillByDefault(ReturnPointee(&empty_constr));
+
+  Objective<double> empty_obj;
+  ON_CALL(*lp, objective()).WillByDefault(ReturnPointee(&empty_obj));
+
+  EXPECT_CALL(*lp, is_initialized()).Times(1);
+  EXPECT_CALL(*lp, objective()).Times(AtLeast(1));
+  EXPECT_CALL(*lp, constraints()).Times(AtLeast(1));
+  EXPECT_CALL(*lp, optimization_type()).Times(AtLeast(1));
+
+  SoplexSolver spl(std::move(lp));
+  spl.update_program();
+}
+
+TEST(Soplex, UninitializedLP) {
+  auto lp = std::make_unique<NiceMock<MockLinearProgram>>();
+  EXPECT_CALL(*lp, is_initialized()).WillOnce(Return(false));
+  SoplexSolver spl(std::move(lp));
+  EXPECT_THROW(spl.update_program(), LinearProgramNotInitializedException);
 }
 
 // property: any LP should result in the same
