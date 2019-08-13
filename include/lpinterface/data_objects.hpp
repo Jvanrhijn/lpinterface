@@ -87,6 +87,7 @@ struct Constraint {
  */
 template <typename T>
 struct Objective {
+  Objective() = default;
   //! Values of elements in the objective vector.
   std::vector<T> values;
   //! Variable type the objective assigns to each
