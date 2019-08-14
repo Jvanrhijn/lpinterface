@@ -98,7 +98,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-3.6
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -110,7 +110,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-3.6
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -122,7 +122,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-3.7
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -134,7 +134,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-3.7
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -146,7 +146,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -158,7 +158,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
-            - libc++-dev
+            - libstdc++-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -170,7 +170,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
-            - libc++-dev
+            - libstdc++
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -182,7 +182,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
-            - libstdc++-dev
+            - libstdc++
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -222,7 +222,7 @@ script:
   - which ${CXX}
   - which ${CC}
   # generate build files
-  - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1
+  - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
   # collect ccache stats
   - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
