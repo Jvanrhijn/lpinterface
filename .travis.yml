@@ -223,7 +223,7 @@ script:
   - which ${CXX}
   - which ${CC}
   # generate build files
-  - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
+  - cmake -H. -Bbuild -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
   # collect ccache stats
   - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
