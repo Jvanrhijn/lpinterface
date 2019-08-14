@@ -2,6 +2,8 @@
 #define LPINTERFACE_GENERATORS_H
 
 #include <iostream>
+#include <tuple>
+
 #include "rapidcheck.h"
 
 #include "lpinterface.hpp"
@@ -88,11 +90,13 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
 }
 
 // if fixed == true, count is the number of nonzero elements in the row.
-// if fixed == false, count is the maximum number of nonzero elements in the row.
+// if fixed == false, count is the maximum number of nonzero elements in the
+// row.
 template <typename T>
-inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen, bool fixed = false) {
+inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen,
+                                 bool fixed = false) {
   using namespace lpint;
-  std::size_t ncols = fixed? count : *rc::gen::inRange(0ul, count);
+  std::size_t ncols = fixed ? count : *rc::gen::inRange(0ul, count);
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(ncols, std::move(valgen)),
       rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
@@ -163,6 +167,14 @@ struct Arbitrary<lpint::SparseMatrixType> {
   }
 };
 
+template <>
+struct Arbitrary<lpint::OptimizationType> {
+  static Gen<lpint::OptimizationType> arbitrary() {
+    return gen::element(lpint::OptimizationType::Maximize,
+                        lpint::OptimizationType::Minimize);
+  }
+};
+
 inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
                                                   const std::size_t max_ncols,
                                                   Gen<lpint::Ordering> genord,
@@ -175,7 +187,7 @@ inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
       *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
 
   return gen::construct<LinearProgram>(
-      rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize),
+      rc::gen::arbitrary<OptimizationType>(),
       rc::gen::container<std::vector<Constraint<double>>>(
           nrows, rc::genConstraintWithOrdering(
                      genRow(ncols, rc::gen::arbitrary<double>()),
@@ -195,7 +207,7 @@ inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
       *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
 
   return gen::makeUnique<LinearProgram>(
-      rc::gen::element(OptimizationType::Maximize, OptimizationType::Minimize),
+      rc::gen::arbitrary<OptimizationType>(),
       rc::gen::container<std::vector<Constraint<double>>>(
           nrows, rc::genConstraintWithOrdering(
                      genRow(ncols, rc::gen::arbitrary<double>()),
@@ -205,5 +217,61 @@ inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
 }
 
 }  // namespace rc
+
+namespace lpint {
+
+// super ugly helper function to generate raw lp data
+// values, start indices, col indices, rhs, ord, objective, variable type
+inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::vector<double>, std::vector<lpint::Ordering>, std::vector<double>, std::vector<lpint::VarType>> generate_lp_data(const std::size_t max_nrows, const std::size_t max_ncols_per_row) {
+  using namespace lpint;
+  const std::size_t nrows =
+      *rc::gen::inRange(1ul, max_nrows).as("Number of LP rows");
+  const auto ncols_per_row = *rc::gen::container<std::vector<std::size_t>>(
+                                  nrows, rc::gen::inRange(1ul, max_ncols_per_row))
+                                  .as("LP columns per row");
+
+  const int max_ncols =
+      *std::max_element(ncols_per_row.begin(), ncols_per_row.end());
+
+  // generate row values and start indices
+  std::vector<double> values;
+  std::vector<int> start_indices;
+  std::vector<int> col_indices;
+  for (const auto& nvals : ncols_per_row) {
+    const auto vals = *rc::gen::container<std::vector<double>>(
+                           nvals, rc::gen::arbitrary<double>())
+                           .as("Row values");
+    values.insert(values.end(), vals.begin(), vals.end());
+    // TODO check if there is an off-by-one error in here
+    start_indices.push_back(values.size() - nvals);
+    // generate column indices
+    const auto ci = *rc::gen::uniqueCount<std::vector<int>>(
+                         nvals, rc::gen::inRange(0, max_ncols))
+                         .as("Column indices");
+    col_indices.insert(col_indices.end(), ci.begin(), ci.end());
+  }
+
+  // generate RHS values
+  auto rhs = *rc::gen::container<std::vector<double>>(
+                  nrows, rc::gen::arbitrary<double>())
+                  .as("RHS values");
+  // generate ordering values
+  auto ord =
+      *rc::gen::container<std::vector<Ordering>>(
+           nrows, rc::gen::element(Ordering::LEQ, Ordering::EQ, Ordering::GEQ))
+           .as("Constraint orderings");
+  // generatee objective values
+  auto objective =
+      *rc::gen::container<std::vector<double>>(
+           static_cast<std::size_t>(max_ncols), rc::gen::nonZero<double>())
+           .as("Objective values");
+  auto var_type = *rc::gen::container<std::vector<VarType>>(
+                       objective.size(), rc::gen::arbitrary<VarType>())
+                       .as("Variable types");
+
+  return std::make_tuple(values, start_indices, col_indices, rhs, ord, objective, var_type);
+}
+
+}
 
 #endif  // LPINTERFACE_GENERATORS_H

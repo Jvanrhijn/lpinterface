@@ -20,20 +20,20 @@ namespace lpint {
 
 /// Enum representing orderings of values.
 enum class Ordering {
-  LT, /// Supported by:
-  GT, /// Supported by:
-  EQ, /// Supported by: Gurobi.
-  LEQ, /// Supported by: Gurobi, SoPlex.
-  GEQ, /// Supported by: Gurobi, SoPlex.
+  LT,   /// Supported by:
+  GT,   /// Supported by:
+  EQ,   /// Supported by: Gurobi.
+  LEQ,  /// Supported by: Gurobi, SoPlex.
+  GEQ,  /// Supported by: Gurobi, SoPlex.
 };
 
 /// Enum representing possible variable types for an LP.
 enum class VarType {
-  Binary, /// Supported by: Gurobi.
-  Integer, /// Supported by: Gurobi.
-  Real, /// Supported by: Gurobi, SoPlex.
-  SemiReal, /// Supported by: Gurobi.
-  SemiInteger, /// Supported by: Gurobi.
+  Binary,       /// Supported by: Gurobi.
+  Integer,      /// Supported by: Gurobi.
+  Real,         /// Supported by: Gurobi, SoPlex.
+  SemiReal,     /// Supported by: Gurobi.
+  SemiInteger,  /// Supported by: Gurobi.
 };
 
 /**

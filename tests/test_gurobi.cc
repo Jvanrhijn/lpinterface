@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
+#include "../examples/common.hpp"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -199,6 +200,101 @@ TEST(Gurobi, FullProblem) {
 
   ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
   ASSERT_EQ(solution.objective_value, 3.0);
+}
+
+RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
+  const auto sense =
+      *rc::gen::arbitrary<OptimizationType>().as("Objective sense");
+
+  std::vector<double> values, objective, rhs;
+  std::vector<int> start_indices, col_indices;
+  std::vector<VarType> var_type;
+  std::vector<Ordering> ord;
+
+  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) = generate_lp_data(100, 10);
+
+  const int nrows = start_indices.size();
+
+  // configure bare Gurobi
+  GRBenv* env;
+  GRBmodel* model;
+  int error = GRBloadenv(&env, "");
+  error = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
+                      nullptr, nullptr);
+  error = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_OUTPUTFLAG, 0);
+  error = GRBsetintattr(
+      model, GRB_INT_ATTR_MODELSENSE,
+      sense == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
+
+  auto gurobi_var_type = GurobiSolver::convert_variable_type(var_type);
+  error = GRBaddvars(model, objective.size(), 0, nullptr, nullptr, nullptr,
+                     objective.data(), nullptr, nullptr, gurobi_var_type.data(),
+                     nullptr);
+
+  std::vector<char> gurobi_sense(ord.size());
+  std::transform(ord.begin(), ord.end(), gurobi_sense.begin(),
+                 GurobiSolver::convert_ordering);
+
+  error = GRBaddconstrs(model, nrows, values.size(), start_indices.data(),
+                        col_indices.data(), values.data(), gurobi_sense.data(),
+                        rhs.data(), nullptr);
+
+  // now configure LP interface
+  GurobiSolver grb(sense);
+
+  grb.add_variables(std::move(objective), std::move(var_type));
+  grb.add_rows(std::move(values), std::move(start_indices),
+               std::move(col_indices), std::move(ord), std::move(rhs));
+
+  constexpr double TIME_LIMIT = 1.0;
+
+  try {
+    GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
+    grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
+  } catch (const GurobiException& e) {
+    RC_ASSERT(e.code() == error);
+    return;
+  }
+
+  // solve the lp
+  Status status;
+  try {
+    error = GRBoptimize(model);
+    status = grb.solve_primal();
+  } catch (const GurobiException& e) {
+    std::cout << e.what() << std::endl;
+    RC_ASSERT(e.code() == error);
+    return;
+  }
+
+  // retrieve solution info from gurobi
+  int gurobi_status;
+  do {
+    error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &gurobi_status);
+  } while (gurobi_status == GRB_INPROGRESS);
+
+  if (error) {
+    throw GurobiException(error, GRBgeterrormsg(env));
+  }
+
+  // gurobi and interface should return same status
+  RC_ASSERT(GurobiSolver::convert_gurobi_status(gurobi_status) == status);
+
+  if (status == Status::Optimal) {
+    int nvars;
+    GRBgetintattr(model, GRB_INT_ATTR_NUMVARS, &nvars);
+    std::vector<double> solution(static_cast<std::size_t>(nvars));
+    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, solution.size(),
+                               solution.data());
+    RC_ASSERT(solution == grb.get_solution().primal);
+
+    double objval;
+    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+    RC_ASSERT(std::abs(objval - grb.get_solution().objective_value) < 1e-15);
+  }
+
+  GRBfreemodel(model);
+  GRBfreeenv(env);
 }
 
 TEST(Gurobi, FullProblemRawData) {

@@ -15,8 +15,8 @@ namespace lpint {
 
 /// Objective sense for an LP. \ingroup Enumerations
 enum class OptimizationType {
-  Minimize, /// Maximize the objective function value.
-  Maximize, /// Minimize the objective function value.
+  Minimize,  /// Maximize the objective function value.
+  Maximize,  /// Minimize the objective function value.
 };
 
 inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {

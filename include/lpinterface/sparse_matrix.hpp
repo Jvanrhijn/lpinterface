@@ -5,8 +5,8 @@ namespace lpint {
 
 /// Type of sparse matrices supported.
 enum class SparseMatrixType {
-  RowWise, /// CSR encoding.
-  ColumnWise, /// CSC encoding.
+  RowWise,     /// CSR encoding.
+  ColumnWise,  /// CSC encoding.
 };
 
 // matrix entry is templated over T, with T restricted to
@@ -46,10 +46,9 @@ class MatrixEntry {
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
-        check_entry_valid();
-      }
+    check_entry_valid();
+  }
   virtual ~MatrixEntry() = default;
-
 
   /**
    * @brief Indexing operator; can be used identically to a dense vector.
@@ -126,7 +125,6 @@ class MatrixEntry {
       throw InvalidMatrixEntryException();
     }
   }
-
 };
 
 template <typename T>
@@ -141,7 +139,7 @@ class Column : public MatrixEntry<T> {
       : MatrixEntry<T>(values, indices) {}
   Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
   Column() = default;
-  Column<T>& operator=(Column<T>&&) = default; 
+  Column<T>& operator=(Column<T>&&) = default;
 
 // TODO: find a more elegant way to do this
 #if TESTING
@@ -317,6 +315,6 @@ class SparseMatrix {
   std::vector<MatrixEntry<T>> entries_;
 };
 
-}
+}  // namespace lpint
 
-#endif // LPINTERFACE_SPARSE_MATRIX_H
+#endif  // LPINTERFACE_SPARSE_MATRIX_H
