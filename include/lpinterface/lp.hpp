@@ -13,9 +13,6 @@
 /** \namespace lpint */
 namespace lpint {
 
-class SoplexSolver;
-class GurobiSolver;
-
 /// Objective sense for an LP. \ingroup Enumerations
 enum class OptimizationType {
   Minimize, /// Maximize the objective function value.
