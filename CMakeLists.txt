@@ -2,12 +2,24 @@ cmake_minimum_required(VERSION 3.9)
 project(lpinterface)
 set(TARGET lpinterface)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(COVERAGE OFF CACHE BOOL "Coverage")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+endif()
+
+# Need this because Travis doesn't work well with
+# CMAKE_CXX_STANDARD
+if (CI)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+else()
+  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+# Library specific compiler flags
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wpedantic -Wall -Wextra -Wcast-align -Wcast-qual) 
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self)
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast)
@@ -16,15 +28,20 @@ set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wsign-promo -Wstrict-overflow=5 
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused -Wno-unused-parameter -Werror -Wreturn-type -Wunused-variable -Wno-sign-compare)
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wno-unused-command-line-argument)
 
+# Cmake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# include dirs
 include_directories(lib)
 include_directories(include)
 
+# clang-format and clang-tidy
 include(cmake/clang-cxx-dev-tools.cmake)
 
+# source files
 list(APPEND lpinterface_files src/lp_impl.cc)
 
+# Optional dependencies
 find_package(GUROBI)
 
 if (GUROBI_FOUND)
@@ -44,7 +61,8 @@ if (SOPLEX_FOUND)
   list(APPEND lpinterface_files src/soplex/lpinterface_soplex.cc)
 endif(SOPLEX_FOUND)
 
-if (TESTING)
+# Gtest configuration
+if (LPINT_ENABLE_TESTING)
   include(cmake/gtest.cmake)
   include(cmake/gmock.cmake)
   include_directories(SYSTEM lib/rapidcheck/extras/gtest/include)
@@ -53,17 +71,21 @@ if (TESTING)
   add_subdirectory(tests)
 endif()
 
-add_library(${TARGET} STATIC ${lpinterface_files})
+add_library(${TARGET} ${lpinterface_files})
 
+# link optional dependencies
 target_link_libraries(${TARGET} ${LIBS})
 
+# set library compiler options
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
 
+# expose library include directories
 target_include_directories(lpinterface PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include>  # <prefix>/include
 )
 
-if (ENABLE_EXAMPLES)
+# compile examples if desired
+if (LPINT_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif()

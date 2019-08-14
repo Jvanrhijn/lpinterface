@@ -22,9 +22,9 @@ addons:
       - binutils-dev
       - libiberty-dev
       - cmake
-      - libc++-dev
       - libgmp3-dev
       - ccache
+      - libstdc++
 
 matrix:
   include:
@@ -99,6 +99,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -110,6 +111,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -121,6 +123,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -132,6 +135,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -140,8 +144,10 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-4.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -150,8 +156,10 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-4.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -160,8 +168,10 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-5.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -170,9 +180,36 @@ matrix:
         apt:
           sources:
             - llvm-toolchain-trusty-5.0
+            - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-6.0
+            - g++-7
+      env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-6.0
+            - g++-7
+      env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+
 
 before_install:
   - sudo apt-get install doxygen
@@ -186,7 +223,7 @@ script:
   - which ${CXX}
   - which ${CC}
   # generate build files
-  - cmake -H. -Bbuild -DTESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+  - cmake -H. -Bbuild -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
   # collect ccache stats
   - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
