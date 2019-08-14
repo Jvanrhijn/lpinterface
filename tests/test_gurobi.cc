@@ -213,8 +213,6 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
 
   std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) = generate_lp_data(100, 10);
 
-  const int nrows = start_indices.size();
-
   // configure bare Gurobi
   GRBenv* env;
   GRBmodel* model;

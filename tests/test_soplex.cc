@@ -150,6 +150,25 @@ TEST(Soplex, FullProblem) {
   ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
+//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
+//  using namespace soplex;
+//
+//  const auto sense =
+//      *rc::gen::arbitrary<OptimizationType>().as("Objective sense");
+//
+//  std::vector<double> values, objective, rhs;
+//  std::vector<int> start_indices, col_indices;
+//  std::vector<VarType> var_type;
+//  std::vector<Ordering> ord;
+//
+//  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) = generate_lp_data(100, 10);
+//
+//  SoPlex soplex;
+//
+//  soplex.
+//
+//}
+
 TEST(Soplex, FullProblemRawData) {
   // Create the Gurobi solver
   SoplexSolver spl(OptimizationType::Maximize);
