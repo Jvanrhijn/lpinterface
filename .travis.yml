@@ -99,6 +99,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -110,6 +111,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -121,6 +123,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -132,6 +135,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -167,6 +171,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -178,6 +183,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -189,6 +195,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-6.0
+            - g++-7
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
     - os: linux
@@ -200,6 +207,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-6.0
+            - g++-7
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
 
 
