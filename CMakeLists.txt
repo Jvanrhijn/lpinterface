@@ -8,7 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(COVERAGE OFF CACHE BOOL "Coverage")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-list(APPEND CMAKE_CXX_FLAGS -stdlib=libstdc++)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  list(APPEND CMAKE_CXX_FLAGS -stdlib=libstdc++)
+endif()
 
 set(CMAKE_CAPPENDGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wpedantic -Wall -Wextra -Wcast-align -Wcast-qual) 
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self)
