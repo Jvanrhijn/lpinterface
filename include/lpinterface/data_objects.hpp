@@ -151,7 +151,7 @@ inline std::ostream& operator<<(std::ostream& os, const VarType& vtype) {
 
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
-  if (obj.values.size() == 0) set(CMAKE_CAPPENDGS_LIB ${CMAKE_CXX_FLAGS_LIB}{
+  if (obj.values.size() == 0) {
     os << "Objective {}";
     return os;
   }
