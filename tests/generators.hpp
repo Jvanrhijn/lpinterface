@@ -92,9 +92,9 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
 template <typename T>
 inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen, bool fixed = false) {
   using namespace lpint;
-  std::size_t ncols = fixed? count : *rc::gen::inRange(1ul, count);
+  std::size_t ncols = fixed? count : *rc::gen::inRange(0ul, count);
   return gen::construct<Row<T>>(
-      rc::gen::container<std::vector<T>>(count, std::move(valgen)),
+      rc::gen::container<std::vector<T>>(ncols, std::move(valgen)),
       rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
           ncols, rc::gen::inRange(0ul, count)));
 }
