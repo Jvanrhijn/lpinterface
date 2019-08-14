@@ -1,3 +1,4 @@
+/** @file lp.hpp */
 #ifndef LPINTERFACE_LP_H
 #define LPINTERFACE_LP_H
 
@@ -9,19 +10,16 @@
 
 #include "common.hpp"
 
+/** \namespace lpint */
 namespace lpint {
 
 class SoplexSolver;
 class GurobiSolver;
 
-/**
- * @brief Objective sense for an LP.
- */
+/// Objective sense for an LP. \ingroup Enumerations
 enum class OptimizationType {
-  //! Maximize the objective function value.
-  Minimize,
-  //! Minimize the objective function value.
-  Maximize,
+  Minimize, /// Maximize the objective function value.
+  Maximize, /// Minimize the objective function value.
 };
 
 inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {

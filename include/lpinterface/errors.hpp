@@ -145,70 +145,34 @@ class SoplexException : public LpException {
   }
 };
 
-/**
- * @brief Enum class representing LP solution status.
- * If the LP could not be solved to optimality, one can check
- * for any of the status code variants found here.
- */
+/// Enum class representing LP solution status.
 enum class Status : int {
-  //! No Linear Program has been loaded
-  NotLoaded,
-  //! Linear program loaded, but no solution information available.
-  NoInformation,
-  //! Model was solved to optimality, solution available.
-  Optimal,
-  //! Model was proven to be infeasible.
-  Infeasible,
-  //! Model was proven to be either infeasible or unbounded.
-  InfeasibleOrUnbounded,
-  //! Model was proven to be unbounded.
-  Unbounded,
-  //! Optimal objective for model was proven to be worse
-  //! than the value specified in the Cutoff parameter.
-  Cutoff,
-  //! Number of iterations exceeded user-specified iteration limit.
-  IterationLimit,
-  //! Total number of branch-and-cut nodes explored exceeded user-specified
-  //! node limit.
-  NodeLimit,
-  //! Time limit reached.
-  TimeOut,
-  //! Solutions found exceeded solution limit.
-  SolutionLimit,
-  //! Optimization interrupted by user.
-  Interrupted,
-  //! Optimizer ran into unrecoverable numerical difficulties.
-  NumericFailure,
-  //! Could not satisfy tolerances; sub-optimal solution is available.
-  SuboptimalSolution,
-  //! Optimization is currently in progress; encountered when optimization is
-  //! ran
-  //! asynchronously.
-  InProgress,
-  //! User-specified objective limit has been reached.
-  UserObjectiveLimit,
-  //! No ratiotester loaded (SoPlex).
-  NoRatioTester,
-  //! No pricer loaded (SoPlex).
-  NoPricer,
-  //! No solver loaded.
-  NoSolver,
-  //! Solving process aborted to exit decomposition simplex (SoPlex).
-  ExitDecomposition,
-  //! Solving process aborted due to commence decomposition simplex (SoPlex).
-  Decomposition,
-  //! Solving process aborted due to presence of cycling.
-  Cycling,
-  //! Problem solved to optimality, but unscaled solution contains violations.
-  OptimalUnscaledViolations,
-  //! Equivalent to SoPlex NOT_INIT status; unclear from docs what
-  //! this actually means. It might be better to just throw an exception here?
-  NotInitialized,
-  //! Solving process aborted as objective limit has been reached
-  ObjectiveLimit,
-  //! LP has a usable basis (SoPlex), unclear from soplex docs what this
-  //! means.
-  Regular,
+  NotLoaded, /// No Linear Program has been loaded
+  NoInformation, /// Linear program loaded, but no solution information available.
+  Optimal, /// Model was solved to optimality, solution available.
+  Infeasible, /// Model was proven to be infeasible.
+  InfeasibleOrUnbounded, /// Model was proven to be either infeasible or unbounded.
+  Unbounded, /// Model was proven to be unbounded.
+  Cutoff, /// Optimal objective for model was proven to be worse than the value specified in the Cutoff parameter.
+  IterationLimit, /// Number of iterations exceeded user-specified iteration limit.
+  NodeLimit, /// Total number of branch-and-cut nodes explored exceeded user-specified node limit.
+  TimeOut, /// Time limit reached.
+  SolutionLimit, /// Solutions found exceeded solution limit.
+  Interrupted, /// Optimization interrupted by user.
+  NumericFailure, /// Optimizer ran into unrecoverable numerical difficulties.
+  SuboptimalSolution, /// Could not satisfy tolerances; sub-optimal solution is available.
+  InProgress, /// Optimization is currently in progress.
+  UserObjectiveLimit, /// User-specified objective limit has been reached.
+  NoRatioTester, /// No ratiotester loaded (SoPlex).
+  NoPricer, /// No pricer loaded (SoPlex).
+  NoSolver, /// No solver loaded.
+  ExitDecomposition, /// Solving process aborted to exit decomposition simplex (SoPlex).
+  Decomposition, /// Solving process aborted due to commence decomposition simplex (SoPlex).
+  Cycling, /// Solving process aborted due to presence of cycling.
+  OptimalUnscaledViolations, /// Problem solved to optimality, but unscaled solution contains violations.
+  NotInitialized, /// Equivalent to SoPlex NOT_INIT status.
+  ObjectiveLimit, /// Solving process aborted as objective limit has been reached
+  Regular, /// LP has a usable basis (SoPlex).
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Status &status) {
