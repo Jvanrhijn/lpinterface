@@ -9,7 +9,7 @@ set(COVERAGE OFF CACHE BOOL "Coverage")
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  list(APPEND CMAKE_CXX_FLAGS -stdlib=libstdc++)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
 endif()
 
 set(CMAKE_CXX_FLAGS_LIB ${CMAKE_CXX_FLAGS_LIB} -Wpedantic -Wall -Wextra -Wcast-align -Wcast-qual) 
