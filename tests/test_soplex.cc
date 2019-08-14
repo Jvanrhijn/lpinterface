@@ -2,6 +2,7 @@
 #include <rapidcheck/gtest.h>
 
 #include <iostream>
+#include <memory>
 
 #include "lpinterface.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
