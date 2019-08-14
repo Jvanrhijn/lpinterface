@@ -18,36 +18,22 @@
 
 namespace lpint {
 
-/**
- * @brief Enum representing orderings of values.
- */
+/// Enum representing orderings of values.
 enum class Ordering {
-  //! Supported by:
-  LT,
-  //! Supported by:
-  GT,
-  //! Supported by: Gurobi.
-  EQ,
-  //! Supported by: Gurobi, SoPlex.
-  LEQ,
-  //! Supported by: Gurobi, SoPlex.
-  GEQ,
+  LT, /// Supported by:
+  GT, /// Supported by:
+  EQ, /// Supported by: Gurobi.
+  LEQ, /// Supported by: Gurobi, SoPlex.
+  GEQ, /// Supported by: Gurobi, SoPlex.
 };
 
-/**
- * @brief Enum representing possible variable types for an LP.
- */
+/// Enum representing possible variable types for an LP.
 enum class VarType {
-  //! Supported by: Gurobi.
-  Binary,
-  //! Supported by: Gurobi.
-  Integer,
-  //! Supported by: Gurobi, SoPlex.
-  Real,
-  //! Supported by: Gurobi.
-  SemiReal,
-  //! Supported by: Gurobi.
-  SemiInteger,
+  Binary, /// Supported by: Gurobi.
+  Integer, /// Supported by: Gurobi.
+  Real, /// Supported by: Gurobi, SoPlex.
+  SemiReal, /// Supported by: Gurobi.
+  SemiInteger, /// Supported by: Gurobi.
 };
 
 /**
@@ -165,7 +151,7 @@ inline std::ostream& operator<<(std::ostream& os, const VarType& vtype) {
 
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
-  if (obj.values.size() == 0) {
+  if (obj.values.size() == 0) set(CMAKE_CAPPENDGS_LIB ${CMAKE_CXX_FLAGS_LIB}{
     os << "Objective {}";
     return os;
   }

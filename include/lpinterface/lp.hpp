@@ -14,14 +14,10 @@ namespace lpint {
 class SoplexSolver;
 class GurobiSolver;
 
-/**
- * @brief Objective sense for an LP.
- */
+/// Objective sense for an LP.
 enum class OptimizationType {
-  //! Maximize the objective function value.
-  Minimize,
-  //! Minimize the objective function value.
-  Maximize,
+  Minimize, /// Maximize the objective function value.
+  Maximize, /// Minimize the objective function value.
 };
 
 inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {

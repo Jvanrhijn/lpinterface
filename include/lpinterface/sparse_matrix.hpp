@@ -3,14 +3,10 @@
 
 namespace lpint {
 
-/**
- * @brief Type of sparse matrices supported.
- */
+/// Type of sparse matrices supported.
 enum class SparseMatrixType {
-  //! CSR encoding.
-  RowWise,
-  //! CSC encoding.
-  ColumnWise,
+  RowWise, /// CSR encoding.
+  ColumnWise, /// CSC encoding.
 };
 
 // matrix entry is templated over T, with T restricted to
