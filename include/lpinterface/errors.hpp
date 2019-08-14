@@ -185,10 +185,12 @@ enum class Status : int {
   Regular,         /// LP has a usable basis (SoPlex).
 };
 
+// LCOV_EXCL_START
 inline std::ostream &operator<<(std::ostream &os, const Status &status) {
   os << static_cast<int>(status);
   return os;
 }
+// LCOV_EXCL_STOP
 
 }  // namespace lpint
 

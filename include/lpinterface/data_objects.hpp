@@ -96,6 +96,7 @@ struct Solution {
   T objective_value;
 };
 
+// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
   switch (ord) {
     case Ordering::EQ:
@@ -181,6 +182,7 @@ inline std::ostream& operator<<(std::ostream& os, const MatrixEntry<T>& row) {
   os << "\b]}";
   return os;
 }
+// LCOV_EXCL_STOP
 
 }  // namespace lpint
 

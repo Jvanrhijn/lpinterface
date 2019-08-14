@@ -54,6 +54,7 @@ class LinearProgram : public LinearProgramInterface {
   bool initialized_;
 };
 
+// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const LinearProgram& lp) {
   os << lp.opt_type_ << " " << lp.objective_ << std::endl;
   for (const auto& constraint : lp.constraints_) {
@@ -61,6 +62,7 @@ inline std::ostream& operator<<(std::ostream& os, const LinearProgram& lp) {
   }
   return os;
 }
+// LCOV_EXCL_STOP
 
 }  // namespace lpint
 

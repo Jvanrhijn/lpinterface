@@ -19,6 +19,7 @@ enum class OptimizationType {
   Maximize,  /// Minimize the objective function value.
 };
 
+// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
   switch (ot) {
     case (OptimizationType::Maximize):
@@ -34,6 +35,7 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
   }
   return os;
 }
+// LCOV_EXCL_STOP
 
 /**
  * @brief Interface representing linear program formulation.
