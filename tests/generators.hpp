@@ -87,13 +87,16 @@ inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
                gen::container<std::vector<lpint::VarType>>(size, vtgen)));
 }
 
+// if fixed == true, count is the number of nonzero elements in the row.
+// if fixed == false, count is the maximum number of nonzero elements in the row.
 template <typename T>
-inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen) {
+inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen, bool fixed = false) {
   using namespace lpint;
+  std::size_t ncols = fixed? count : *rc::gen::inRange(1ul, count);
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
       rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
-          count, rc::gen::inRange(0ul, count)));
+          ncols, rc::gen::inRange(0ul, count)));
 }
 
 template <typename T>
