@@ -98,7 +98,7 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-3.6
-            - libstdc++-6-dev
+            - libc++-6-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -110,7 +110,7 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-3.6
-            - libstdc++-6-dev
+            - libc++-6-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -122,7 +122,7 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-3.7
-            - libstdc++-6-dev
+            - libc++-6-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -134,7 +134,7 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-3.7
-            - libstdc++-6-dev
+            - libc++-6-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -142,11 +142,11 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-4.0
             - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
-            - libstdc++-6-dev
+            - libc++-4-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -154,11 +154,11 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-4.0
             - ubuntu-toolchain-r-test
           packages:
             - clang-4.0
-            - libstdc++-6-dev
+            - libc++-4-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -166,11 +166,11 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-5.0
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
-            - libstdc++-6-dev
+            - libc++-5-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -178,11 +178,11 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-trusty-5.0
             - ubuntu-toolchain-r-test
           packages:
             - clang-5.0
-            - libstdc++-6-dev
+            - libstdc++-5-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
