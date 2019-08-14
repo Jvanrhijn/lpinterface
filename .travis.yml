@@ -181,6 +181,29 @@ matrix:
             - libc++-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+            - libc++-6-dev
+      env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-5.0
+            - libc++-6-dev
+      env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0"
+
+
 before_install:
   - sudo apt-get install doxygen
 
