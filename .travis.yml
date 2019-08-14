@@ -22,7 +22,6 @@ addons:
       - binutils-dev
       - libiberty-dev
       - cmake
-      - libc++-dev
       - libgmp3-dev
       - ccache
 
@@ -99,6 +98,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - libc++-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -110,6 +110,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - libc++-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.6 && CXX=clang++-3.6"
 
     - os: linux
@@ -121,6 +122,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - libc++-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -132,6 +134,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - libc++-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-3.7 && CXX=clang++-3.7"
 
     - os: linux
@@ -142,6 +145,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
+            - libc++-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -152,6 +156,7 @@ matrix:
             - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
+            - libc++-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
 
     - os: linux
@@ -162,6 +167,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
+            - libc++-dev
       env: BUILD_TYPE=Debug MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
     - os: linux
@@ -172,6 +178,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
+            - libc++-dev
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
 before_install:
