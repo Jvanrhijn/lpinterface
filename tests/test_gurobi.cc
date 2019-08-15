@@ -143,7 +143,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     RC_ASSERT(e.code() == error);
     return;
   }
-  
+
   // retrieve solution info from gurobi
   int gurobi_status;
   do {
@@ -211,7 +211,8 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   std::vector<VarType> var_type;
   std::vector<Ordering> ord;
 
-  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) = generate_lp_data(100, 10);
+  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) =
+      generate_lp_data(100, 10);
 
   // configure bare Gurobi
   GRBenv* env;
@@ -233,9 +234,9 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   std::transform(ord.begin(), ord.end(), gurobi_sense.begin(),
                  GurobiSolver::convert_ordering);
 
-  error = GRBaddconstrs(model, start_indices.size(), values.size(), start_indices.data(),
-                        col_indices.data(), values.data(), gurobi_sense.data(),
-                        rhs.data(), nullptr);
+  error = GRBaddconstrs(model, start_indices.size(), values.size(),
+                        start_indices.data(), col_indices.data(), values.data(),
+                        gurobi_sense.data(), rhs.data(), nullptr);
 
   // now configure LP interface
   GurobiSolver grb(sense);

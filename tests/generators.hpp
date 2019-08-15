@@ -222,20 +222,27 @@ namespace lpint {
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::vector<double>, std::vector<lpint::Ordering>, std::vector<double>, std::vector<lpint::VarType>> generate_lp_data(const std::size_t nrows, const std::size_t ncols) {
+inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>,
+                  std::vector<double>, std::vector<lpint::Ordering>,
+                  std::vector<double>, std::vector<lpint::VarType>>
+generate_lp_data(const std::size_t nrows, const std::size_t ncols) {
   using namespace lpint;
 
-  const auto lp = *rc::genLinearProgram(nrows, ncols, rc::gen::element(Ordering::GEQ, Ordering::LEQ, Ordering::EQ), rc::gen::arbitrary<VarType>());
+  const auto lp = *rc::genLinearProgram(
+      nrows, ncols,
+      rc::gen::element(Ordering::GEQ, Ordering::LEQ, Ordering::EQ),
+      rc::gen::arbitrary<VarType>());
 
   std::vector<double> values, rhs;
   std::vector<int> start_indices, col_indices;
   std::vector<Ordering> ord;
 
-  for (const auto& constraint : lp.constraints()) {
-    const auto& row = constraint.row;
+  for (const auto &constraint : lp.constraints()) {
+    const auto &row = constraint.row;
     values.insert(values.end(), row.values().begin(), row.values().end());
     start_indices.push_back(values.size() - row.values().size());
-    col_indices.insert(col_indices.end(), row.nonzero_indices().begin(), row.nonzero_indices().end());
+    col_indices.insert(col_indices.end(), row.nonzero_indices().begin(),
+                       row.nonzero_indices().end());
     rhs.push_back(constraint.value);
     ord.push_back(constraint.ordering);
   }
@@ -243,9 +250,10 @@ inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::
   std::vector<double> objective = lp.objective().values;
   std::vector<VarType> var_type = lp.objective().variable_types;
 
-  return std::make_tuple(values, start_indices, col_indices, rhs, ord, objective, var_type);
+  return std::make_tuple(values, start_indices, col_indices, rhs, ord,
+                         objective, var_type);
 }
 
-}
+}  // namespace lpint
 
 #endif  // LPINTERFACE_GENERATORS_H
