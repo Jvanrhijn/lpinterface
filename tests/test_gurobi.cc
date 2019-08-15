@@ -233,7 +233,7 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   std::transform(ord.begin(), ord.end(), gurobi_sense.begin(),
                  GurobiSolver::convert_ordering);
 
-  error = GRBaddconstrs(model, nrows, values.size(), start_indices.data(),
+  error = GRBaddconstrs(model, start_indices.size(), values.size(), start_indices.data(),
                         col_indices.data(), values.data(), gurobi_sense.data(),
                         rhs.data(), nullptr);
 
