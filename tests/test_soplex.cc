@@ -150,7 +150,7 @@ TEST(Soplex, FullProblem) {
   ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
-//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
+// RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
 //  using namespace soplex;
 //
 //  const auto sense =
@@ -161,7 +161,8 @@ TEST(Soplex, FullProblem) {
 //  std::vector<VarType> var_type;
 //  std::vector<Ordering> ord;
 //
-//  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) = generate_lp_data(100, 10);
+//  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type)
+//  = generate_lp_data(100, 10);
 //
 //  SoPlex soplex;
 //
