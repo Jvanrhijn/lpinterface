@@ -110,7 +110,7 @@ TEST(Gurobi, UpdateProgram) {
 }
 
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
-  constexpr double TIME_LIMIT = 10.0;
+  constexpr double TIME_LIMIT = 0.1;
 
   auto lp = *rc::genLinearProgramPtr(
       100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
@@ -143,7 +143,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     RC_ASSERT(e.code() == error);
     return;
   }
-
+  
   // retrieve solution info from gurobi
   int gurobi_status;
   do {

@@ -222,52 +222,26 @@ namespace lpint {
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::vector<double>, std::vector<lpint::Ordering>, std::vector<double>, std::vector<lpint::VarType>> generate_lp_data(const std::size_t max_nrows, const std::size_t max_ncols_per_row) {
+inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::vector<double>, std::vector<lpint::Ordering>, std::vector<double>, std::vector<lpint::VarType>> generate_lp_data(const std::size_t nrows, const std::size_t ncols) {
   using namespace lpint;
-  const std::size_t nrows =
-      *rc::gen::inRange(1ul, max_nrows).as("Number of LP rows");
-  const auto ncols_per_row = *rc::gen::container<std::vector<std::size_t>>(
-                                  nrows, rc::gen::inRange(1ul, max_ncols_per_row))
-                                  .as("LP columns per row");
 
-  const int max_ncols =
-      *std::max_element(ncols_per_row.begin(), ncols_per_row.end());
+  const auto lp = *rc::genLinearProgram(nrows, ncols, rc::gen::element(Ordering::GEQ, Ordering::LEQ, Ordering::EQ), rc::gen::arbitrary<VarType>());
 
-  // generate row values and start indices
-  std::vector<double> values;
-  std::vector<int> start_indices;
-  std::vector<int> col_indices;
-  for (const auto& nvals : ncols_per_row) {
-    const auto vals = *rc::gen::container<std::vector<double>>(
-                           nvals, rc::gen::arbitrary<double>())
-                           .as("Row values");
-    values.insert(values.end(), vals.begin(), vals.end());
-    // TODO check if there is an off-by-one error in here
-    start_indices.push_back(values.size() - nvals);
-    // generate column indices
-    const auto ci = *rc::gen::uniqueCount<std::vector<int>>(
-                         nvals, rc::gen::inRange(0, max_ncols))
-                         .as("Column indices");
-    col_indices.insert(col_indices.end(), ci.begin(), ci.end());
+  std::vector<double> values, rhs;
+  std::vector<int> start_indices, col_indices;
+  std::vector<Ordering> ord;
+
+  for (const auto& constraint : lp.constraints()) {
+    const auto& row = constraint.row;
+    values.insert(values.end(), row.values().begin(), row.values().end());
+    start_indices.push_back(values.size() - row.values().size());
+    col_indices.insert(col_indices.end(), row.nonzero_indices().begin(), row.nonzero_indices().end());
+    rhs.push_back(constraint.value);
+    ord.push_back(constraint.ordering);
   }
 
-  // generate RHS values
-  auto rhs = *rc::gen::container<std::vector<double>>(
-                  nrows, rc::gen::arbitrary<double>())
-                  .as("RHS values");
-  // generate ordering values
-  auto ord =
-      *rc::gen::container<std::vector<Ordering>>(
-           nrows, rc::gen::element(Ordering::LEQ, Ordering::EQ, Ordering::GEQ))
-           .as("Constraint orderings");
-  // generatee objective values
-  auto objective =
-      *rc::gen::container<std::vector<double>>(
-           static_cast<std::size_t>(max_ncols), rc::gen::nonZero<double>())
-           .as("Objective values");
-  auto var_type = *rc::gen::container<std::vector<VarType>>(
-                       objective.size(), rc::gen::arbitrary<VarType>())
-                       .as("Variable types");
+  std::vector<double> objective = lp.objective().values;
+  std::vector<VarType> var_type = lp.objective().variable_types;
 
   return std::make_tuple(values, start_indices, col_indices, rhs, ord, objective, var_type);
 }
