@@ -226,7 +226,16 @@ script:
   # generate build files
   - cmake -H. -Bbuild -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
   # run clang-tidy
-  - cd build && make clang-tidy
+  - cd build && make clang-tidy > clang-tidy-output.txt
+  - |
+    if [[ -n $(grep error clang-tidy-output.txt) ]]; then
+      echo "clang-tidy reported errors"
+      echo ""
+      grep --color error clang-tidy-output.txt
+      exit -1
+    else
+      echo -e "\033[1;32m\xE2\x9C\x93 passed:\033[0m clang-tidy";
+    fi
   - cd ..
   # collect ccache stats
   - ccache --show-stats > ccache_before
