@@ -90,11 +90,11 @@ Status SoplexSolver::solve_primal() {
   soplex_.getDualReal(dual);
 
   solution_.primal.resize(static_cast<std::size_t>(prim.dim()));
-  for (std::size_t i = 0; i < prim.dim(); i++) {
+  for (std::size_t i = 0; i < static_cast<std::size_t>(prim.dim()); i++) {
     solution_.primal[i] = prim[i];
   }
   solution_.dual.resize(static_cast<std::size_t>(dual.dim()));
-  for (std::size_t i = 0; i < dual.dim(); i++) {
+  for (std::size_t i = 0; i < static_cast<std::size_t>(dual.dim()); i++) {
     solution_.dual[i] = dual[i];
   }
   solution_.objective_value = soplex_.objValueReal();
