@@ -6,6 +6,15 @@ file(GLOB_RECURSE
      src/*.[chi]pp src/*.[chi]xx src/*.cc src/*.hh src/*.ii src/*.[CHI]
      )
 
+find_package(GUROBI)
+
+if (NOT GUROBI_FOUND)
+  get_filename_component(gurobi_cc src/gurobi/lpinterface_gurobi.cc ABSOLUTE)
+  get_filename_component(gurobi_hpp include/lpinterface/gurobi/lpinterface_gurobi.hpp ABSOLUTE)
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_cc}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_hpp}")
+endif()
+
 # Adding clang-format target if executable is found
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
