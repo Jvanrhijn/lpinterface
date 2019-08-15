@@ -25,6 +25,7 @@ addons:
       - libgmp3-dev
       - ccache
       - libstdc++
+      - clang-tidy
 
 matrix:
   include:
