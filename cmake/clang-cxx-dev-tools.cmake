@@ -26,9 +26,8 @@ if(CLANG_TIDY)
     COMMAND /usr/bin/clang-tidy
     ${ALL_CXX_SOURCE_FILES}
     -checks='cppcoreguidelines-*'
-    -p compile_commands.json
     --
-    ${INCLUDE_DIRECTORIES}
+    -I../include/
     -std=c++14
     )
 endif()

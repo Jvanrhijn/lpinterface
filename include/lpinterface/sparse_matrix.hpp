@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <set>
 
+#include "errors.hpp"
+
 namespace lpint {
 
 /// Type of sparse matrices supported.

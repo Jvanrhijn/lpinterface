@@ -224,6 +224,9 @@ script:
   - which ${CC}
   # generate build files
   - cmake -H. -Bbuild -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1 -DCMAKE_VERBOSE_MAKEFILE=ON
+  # run clang-tidy
+  - cd build && make clang-tidy
+  - cd ..
   # collect ccache stats
   - ccache --show-stats > ccache_before
   - cmake --build build -- -j4
