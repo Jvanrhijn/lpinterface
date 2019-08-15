@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
-#include "../examples/common.hpp"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -203,49 +202,50 @@ TEST(Gurobi, FullProblem) {
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
-  const auto sense =
-      *rc::gen::arbitrary<OptimizationType>().as("Objective sense");
-
-  std::vector<double> values, objective, rhs;
-  std::vector<int> start_indices, col_indices;
-  std::vector<VarType> var_type;
-  std::vector<Ordering> ord;
-
-  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type) =
-      generate_lp_data(100, 10);
+  auto lp_data = generate_lp_data(100, 100, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ), rc::gen::arbitrary<VarType>());
 
   // configure bare Gurobi
   GRBenv* env;
   GRBmodel* model;
+
+  int saved_stdout = dup(1);
+  close(1);
+  int new_stdout = open("/dev/null", O_WRONLY);
+
   int error = GRBloadenv(&env, "");
+
+  close(new_stdout);
+  new_stdout = dup(saved_stdout);
+  close(saved_stdout);
+
   error = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
                       nullptr, nullptr);
   error = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_OUTPUTFLAG, 0);
   error = GRBsetintattr(
       model, GRB_INT_ATTR_MODELSENSE,
-      sense == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
+      lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 
-  auto gurobi_var_type = GurobiSolver::convert_variable_type(var_type);
-  error = GRBaddvars(model, objective.size(), 0, nullptr, nullptr, nullptr,
-                     objective.data(), nullptr, nullptr, gurobi_var_type.data(),
+  auto gurobi_var_type = GurobiSolver::convert_variable_type(lp_data.var_type);
+  error = GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr, nullptr,
+                     lp_data.objective.data(), nullptr, nullptr, gurobi_var_type.data(),
                      nullptr);
 
-  std::vector<char> gurobi_sense(ord.size());
-  std::transform(ord.begin(), ord.end(), gurobi_sense.begin(),
+  std::vector<char> gurobi_sense(lp_data.ord.size());
+  std::transform(lp_data.ord.begin(), lp_data.ord.end(), gurobi_sense.begin(),
                  GurobiSolver::convert_ordering);
 
-  error = GRBaddconstrs(model, start_indices.size(), values.size(),
-                        start_indices.data(), col_indices.data(), values.data(),
-                        gurobi_sense.data(), rhs.data(), nullptr);
+  error = GRBaddconstrs(model, lp_data.start_indices.size(), lp_data.values.size(),
+                        lp_data.start_indices.data(), lp_data.column_indices.data(), lp_data.values.data(),
+                        gurobi_sense.data(), lp_data.rhs.data(), nullptr);
 
   // now configure LP interface
-  GurobiSolver grb(sense);
+  GurobiSolver grb(lp_data.sense);
 
-  grb.add_variables(std::move(objective), std::move(var_type));
-  grb.add_rows(std::move(values), std::move(start_indices),
-               std::move(col_indices), std::move(ord), std::move(rhs));
+  grb.add_variables(std::move(lp_data.objective), std::move(lp_data.var_type));
+  grb.add_rows(std::move(lp_data.values), std::move(lp_data.start_indices),
+               std::move(lp_data.column_indices), std::move(lp_data.ord), std::move(lp_data.rhs));
 
-  constexpr double TIME_LIMIT = 1.0;
+  constexpr double TIME_LIMIT = 0.1;
 
   try {
     GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);

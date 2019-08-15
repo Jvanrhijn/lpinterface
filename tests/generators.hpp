@@ -220,18 +220,24 @@ inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
 
 namespace lpint {
 
+struct RawDataLinearProgram {
+  OptimizationType sense;
+  std::vector<double> values;
+  std::vector<int> start_indices;
+  std::vector<int> column_indices;
+  std::vector<double> rhs;
+  std::vector<Ordering> ord;
+  std::vector<double> objective;
+  std::vector<VarType> var_type;
+};
+
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-inline std::tuple<std::vector<double>, std::vector<int>, std::vector<int>,
-                  std::vector<double>, std::vector<lpint::Ordering>,
-                  std::vector<double>, std::vector<lpint::VarType>>
-generate_lp_data(const std::size_t nrows, const std::size_t ncols) {
+inline RawDataLinearProgram generate_lp_data(const std::size_t nrows, const std::size_t ncols, rc::Gen<Ordering> ogen, rc::Gen<VarType> vgen) {
   using namespace lpint;
 
   const auto lp = *rc::genLinearProgram(
-      nrows, ncols,
-      rc::gen::element(Ordering::GEQ, Ordering::LEQ, Ordering::EQ),
-      rc::gen::arbitrary<VarType>());
+      nrows, ncols, ogen, vgen);
 
   std::vector<double> values, rhs;
   std::vector<int> start_indices, col_indices;
@@ -250,8 +256,8 @@ generate_lp_data(const std::size_t nrows, const std::size_t ncols) {
   std::vector<double> objective = lp.objective().values;
   std::vector<VarType> var_type = lp.objective().variable_types;
 
-  return std::make_tuple(values, start_indices, col_indices, rhs, ord,
-                         objective, var_type);
+  return RawDataLinearProgram{lp.optimization_type(), values, start_indices, col_indices, rhs, ord,
+                         objective, var_type};
 }
 
 }  // namespace lpint
