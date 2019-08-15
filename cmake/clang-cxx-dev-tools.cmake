@@ -23,7 +23,7 @@ find_program(CLANG_TIDY "clang-tidy")
 if(CLANG_TIDY)
   add_custom_target(
     clang-tidy
-    COMMAND /usr/bin/clang-tidy
+    COMMAND clang-tidy
     ${ALL_CXX_SOURCE_FILES}
     -checks='cppcoreguidelines-*'
     --
