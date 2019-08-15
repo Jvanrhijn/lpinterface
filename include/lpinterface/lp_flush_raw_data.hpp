@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "data_objects.hpp"
+
 namespace lpint {
 
 /**

@@ -7,15 +7,20 @@
 namespace lpint {
 
 GurobiSolver::GurobiSolver(std::unique_ptr<LinearProgramInterface>&& lp)
-    : linear_program_(std::move(lp)) {
+    : saved_stdout_(0),
+      new_stdout_(0),
+      linear_program_(std::move(lp)),
+      gurobi_env_(nullptr),
+      gurobi_model_(nullptr) {
   // load environment
-  redirect_stdout();
   GRBloadenv(&gurobi_env_, "");
-  restore_stdout();
   // // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
-  set_parameter(Param::Verbosity, 0);
+  if (const auto error = GRBsetintparam(
+          GRBgetenv(gurobi_model_), translate_parameter(Param::Verbosity), 0)) {
+    throw GurobiException(error);
+  }
 
   // // set optimization type
   GRBsetintattr(
@@ -25,14 +30,20 @@ GurobiSolver::GurobiSolver(std::unique_ptr<LinearProgramInterface>&& lp)
           : GRB_MINIMIZE);
 }
 
-GurobiSolver::GurobiSolver(OptimizationType opt_type) {
-  redirect_stdout();
+GurobiSolver::GurobiSolver(OptimizationType opt_type)
+    : saved_stdout_(0),
+      new_stdout_(0),
+      linear_program_(),
+      gurobi_env_(nullptr),
+      gurobi_model_(nullptr) {
   GRBloadenv(&gurobi_env_, "");
-  restore_stdout();
   // allocate Gurobi model
   GRBnewmodel(gurobi_env_, &gurobi_model_, nullptr, 0, nullptr, nullptr,
               nullptr, nullptr, nullptr);
-  set_parameter(Param::Verbosity, 0);
+  if (const auto error = GRBsetintparam(
+          GRBgetenv(gurobi_model_), translate_parameter(Param::Verbosity), 0)) {
+    throw GurobiException(error);
+  }
 
   // set optimization type
   GRBsetintattr(
@@ -40,21 +51,13 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type) {
       opt_type == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
 
-// GurobiSolver::GurobiSolver(const GurobiSolver& other) noexcept
-//    : linear_program_(other.linear_program_) {
-//  redirect_stdout();
-//  gurobi_model_ = GRBcopymodel(other.gurobi_model_);
-//  gurobi_env_ = GRBgetenv(gurobi_model_);
-//  restore_stdout();
-//}
-
-GurobiSolver& GurobiSolver::operator=(GurobiSolver other) noexcept {
-  swap(*this, other);
-  return *this;
-}
-
 GurobiSolver::GurobiSolver(GurobiSolver&& other) noexcept : GurobiSolver() {
   swap(*this, other);
+}
+
+GurobiSolver& GurobiSolver::operator=(GurobiSolver&& other) noexcept {
+  swap(*this, other);
+  return *this;
 }
 
 GurobiSolver::~GurobiSolver() {
@@ -124,9 +127,16 @@ Status GurobiSolver::solve_primal() {
   if (error) {
     throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
   }
+
   int num_vars;
-  error == GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
+  error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
+
+  if (error) {
+    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
+  }
+
   solution_.primal.resize(static_cast<std::size_t>(num_vars));
+
   error = GRBgetdblattrarray(gurobi_model_, GRB_DBL_ATTR_X, 0, num_vars,
                              solution_.primal.data());
   if (error) {
@@ -190,25 +200,6 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
   if (error) {
     throw GurobiException(error);
   }
-}
-
-void GurobiSolver::redirect_stdout() {
-  // TODO: find better way to disable the license thingy
-  saved_stdout_ = dup(1);
-  close(1);
-  new_stdout_ = open("/dev/null", O_WRONLY);
-  if (new_stdout_ != 1) {
-    throw std::runtime_error("Failed to redirect stdout");
-  }
-}
-
-void GurobiSolver::restore_stdout() {
-  close(new_stdout_);
-  new_stdout_ = dup(saved_stdout_);
-  if (new_stdout_ != 1) {
-    throw std::runtime_error("Failed to redirect stdout");
-  }
-  close(saved_stdout_);
 }
 
 std::vector<char> GurobiSolver::convert_variable_type(

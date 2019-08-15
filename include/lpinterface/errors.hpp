@@ -3,6 +3,38 @@
 
 #include <exception>
 #include <iostream>
+#include <sstream>
+
+namespace {
+
+// shamelessly stolen from stackoverflow
+class Formatter {
+ public:
+  Formatter() {}
+  ~Formatter() {}
+  Formatter(Formatter &&) = delete;
+  Formatter &operator=(Formatter &&) = delete;
+
+  template <typename Type>
+  Formatter &operator<<(const Type &value) {
+    stream_ << value;
+    return *this;
+  }
+
+  std::string str() const { return stream_.str(); }
+  operator std::string() const { return stream_.str(); }
+
+  enum ConvertToString { to_str };
+  std::string operator>>(ConvertToString) { return stream_.str(); }
+
+ private:
+  std::stringstream stream_;
+
+  Formatter(const Formatter &);
+  Formatter &operator=(Formatter &);
+};
+
+}  // namespace
 
 namespace lpint {
 
@@ -13,136 +45,113 @@ namespace lpint {
  * subclassed for each error cause, allowing fine-grained
  * control over various error paths.
  */
-class LpException : public std::exception {};
+class LpException : public std::runtime_error {
+ public:
+  template <typename... Args>
+  LpException(Args... args) : std::runtime_error(std::forward<Args>(args)...) {}
+};
 
 //! Attempt to add rows to a CSC or columns to a CSR matrix.
 class MatrixTypeException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Wrong matrix type assumed";
-  }
+  MatrixTypeException() : LpException("Wrong matrix type assumed") {}
 };
 
 //! Attempt to use a feature that is not yet implemented.
 class NotImplementedError : public LpException {
  public:
-  virtual const char *what() const throw() { return "Feature not implemented"; }
+  NotImplementedError() : LpException("Feature not implemented") {}
 };
 
 //! Attempt to access solution of an unsolved model.
 class ModelNotSolvedException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Model has not yet been solved";
-  }
+  ModelNotSolvedException() : LpException("Model has not yet been solved") {}
 };
 
 //! Attempt set a parameter that is not supported by the current backend.
 class UnsupportedParameterException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Invalid parameter was supplied";
-  }
+  UnsupportedParameterException()
+      : LpException("Invalid parameter was supplied") {}
 };
 
 //! Attempt to set a constaint Ordering that is not supported by the current
 //! backend.
 class UnsupportedConstraintException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Unsupported constraint type was supplied";
-  }
+  UnsupportedConstraintException()
+      : LpException("Unsupported constraint type was supplied") {}
 };
 
 //! Attempt to add a matrix entry containing duplicate indices.
 class InvalidMatrixEntryException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Invalid matrix entry; does your row/column contain duplicate "
-           "indices?";
-  }
+  InvalidMatrixEntryException()
+      : LpException(
+            "Invalid matrix entry; does your row/column contain duplicate "
+            "indices?") {}
 };
 
 //! Attempt to use a variable type that is not supported by the current backend.
 class UnsupportedVariableTypeException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Unsupported variable type for this backend";
-  }
+  UnsupportedVariableTypeException()
+      : LpException("Unsupported variable type for this backend") {}
 };
 
 //! Internal error occured in Gurobi.
 class GurobiException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    // TODO find better way to do this
-    char *message = new char[100];
-    if (!msg_.empty()) {
-      snprintf(message, 99, "Error occured in Gurobi, code %d - %s", code_,
-               msg_.c_str());
-    } else {
-      snprintf(message, 99, "Error occured in Gurobi, code %d", code_);
-    }
-    return message;
-  }
+  GurobiException(int code)
+      : LpException("Error occured in Gurobi, code " + std::to_string(code)),
+        code_(code) {}
 
- public:
-  GurobiException(int code) : code_(code) {}
-  GurobiException(int code, const char *msg) : code_(code), msg_(msg) {}
+  GurobiException(int code, const char *msg)
+      : LpException("Error occured in Gurobi, code " + std::to_string(code) +
+                    "- " + std::string(msg)),
+        code_(code) {}
 
   int code() const { return code_; }
 
  private:
   int code_;
-  std::string msg_;
 };
 
 //! Attempt to use a status code that is not supported.
 class UnknownStatusException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    char *message = new char[100];
-    snprintf(message, 99, "Unknown status code encountered: %d", code_);
-    return message;
-  }
-
- public:
-  UnknownStatusException(int code) : code_(code) {}
-
- private:
-  int code_;
+  UnknownStatusException(int code)
+      : LpException("Unknown status code encountered: " +
+                    std::to_string(code)) {}
 };
 
 //! Attempt to use a feature that is not supported by the current backend.
 class UnsupportedFeatureException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Feature not available for this solver backend";
-  }
+  UnsupportedFeatureException()
+      : LpException("Feature not available for this solver backend") {}
 };
 
 //! Attempt to use an uninitialized LinearProgram object.
 class LinearProgramNotInitializedException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Attempt to access data of un-initialized linear program";
+  LinearProgramNotInitializedException()
+      : LpException("Attempt to access data of un-initialized linear program") {
   }
 };
 
 //! Failed to set a parameter value.
 class FailedToSetParameterException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "Failed to set an LP solver parameter";
-  }
+  FailedToSetParameterException()
+      : LpException("Failed to set an LP solver parameter") {}
 };
 
 //! Internal error occured in SoPlex.
 class SoplexException : public LpException {
  public:
-  virtual const char *what() const throw() {
-    return "SoPlex ran into an error solving an LP";
-  }
+  SoplexException() : LpException("SoPlex ran into an error solving an LP") {}
 };
 
 /// Enum class representing LP solution status.

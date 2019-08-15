@@ -5,19 +5,29 @@ namespace lpint {
 using namespace soplex;
 
 SoplexSolver::SoplexSolver(OptimizationType optim_type) {
-  set_parameter(Param::ObjectiveSense, optim_type == OptimizationType::Maximize
-                                           ? SoPlex::OBJSENSE_MAXIMIZE
-                                           : SoPlex::OBJSENSE_MINIMIZE);
-  set_parameter(Param::Verbosity, 0);
+  if (!soplex_.setIntParam(translate_int_parameter(Param::ObjectiveSense),
+                           optim_type == OptimizationType::Maximize
+                               ? SoPlex::OBJSENSE_MAXIMIZE
+                               : SoPlex::OBJSENSE_MINIMIZE)) {
+    throw FailedToSetParameterException();
+  }
+  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
+    throw FailedToSetParameterException();
+  }
 }
 
 SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
     : linear_program_(std::move(lp)) {
-  set_parameter(Param::ObjectiveSense, linear_program_->optimization_type() ==
-                                               OptimizationType::Maximize
-                                           ? SoPlex::OBJSENSE_MAXIMIZE
-                                           : SoPlex::OBJSENSE_MINIMIZE);
-  set_parameter(Param::Verbosity, 0);
+  if (!soplex_.setIntParam(
+          translate_int_parameter(Param::ObjectiveSense),
+          linear_program_->optimization_type() == OptimizationType::Maximize
+              ? SoPlex::OBJSENSE_MAXIMIZE
+              : SoPlex::OBJSENSE_MINIMIZE)) {
+    throw FailedToSetParameterException();
+  }
+  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
+    throw FailedToSetParameterException();
+  }
   // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
   // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==
   // SparseMatrixType::RowWise?
@@ -79,10 +89,14 @@ Status SoplexSolver::solve_primal() {
   soplex_.getPrimalReal(prim);
   soplex_.getDualReal(dual);
 
-  solution_.primal =
-      std::vector<double>(prim.get_ptr(), prim.get_ptr() + prim.dim());
-  solution_.dual =
-      std::vector<double>(dual.get_ptr(), dual.get_ptr() + dual.dim());
+  solution_.primal.resize(static_cast<std::size_t>(prim.dim()));
+  for (std::size_t i = 0; i < prim.dim(); i++) {
+    solution_.primal[i] = prim[i];
+  }
+  solution_.dual.resize(static_cast<std::size_t>(dual.dim()));
+  for (std::size_t i = 0; i < dual.dim(); i++) {
+    solution_.dual[i] = dual[i];
+  }
   solution_.objective_value = soplex_.objValueReal();
 
   return status;

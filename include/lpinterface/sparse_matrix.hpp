@@ -1,10 +1,10 @@
 #ifndef LPINTERFACE_SPARSE_MATRIX_H
 #define LPINTERFACE_SPARSE_MATRIX_H
 
-#include <type_traits>
-#include <vector>
 #include <algorithm>
 #include <set>
+#include <type_traits>
+#include <vector>
 
 #include "errors.hpp"
 
@@ -49,6 +49,7 @@ class MatrixEntry {
   MatrixEntry() = default;
   MatrixEntry(MatrixEntry<T>&&) = default;
   MatrixEntry(const MatrixEntry<T>&) = delete;
+  MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
@@ -120,7 +121,7 @@ class MatrixEntry {
   //! Obtain a const  iterator to the end of the underlying value array.
   const_iterator end() const { return values_.end(); }
 
- protected:
+ private:
   std::vector<T> values_;
   std::vector<Index> nonzero_indices_;  // indices of nonzero entries
 
@@ -141,12 +142,18 @@ class Column : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Column() = default;
   Column(Column<T>&&) = default;
+  Column(const Column<T>&) = delete;
+
+  Column<T>& operator=(Column<T>&&) = default;
+  Column<T>& operator=(const Column<T>&) = delete;
+
+  ~Column() = default;
+
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
-  Column() = default;
-  Column<T>& operator=(Column<T>&&) = default;
 
 // TODO: find a more elegant way to do this
 #if TESTING
@@ -161,13 +168,17 @@ class Row : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Row() = default;
+
+  Row(const Row<T>&) = delete;
   Row(Row<T>&&) = default;
+  Row<T>& operator=(Row<T>&&) = default;
+  Row<T>& operator=(const Row<T>&) = delete;
+  ~Row() = default;
+
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
-
   Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
-  Row() = default;
-  Row<T>& operator=(Row<T>&&) = default;
 
 // TODO: find a more elegant way to do this
 #if TESTING
@@ -201,10 +212,13 @@ class SparseMatrix {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  SparseMatrix() : type_(SparseMatrixType::RowWise) {}
+
   SparseMatrix(SparseMatrix<T>&&) = default;
   SparseMatrix(const SparseMatrix<T>&) = delete;
-
-  SparseMatrix() : type_(SparseMatrixType::RowWise) {}
+  SparseMatrix& operator=(const SparseMatrix<T>&) = delete;
+  SparseMatrix& operator=(SparseMatrix<T>&&) = default;
+  ~SparseMatrix() = default;
 
   SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
@@ -226,8 +240,6 @@ class SparseMatrix {
       : type_(SparseMatrixType::RowWise) {
     add_rows(std::forward<decltype(rows)>(rows));
   }
-
-  SparseMatrix<T>& operator=(SparseMatrix<T>&&) = default;
 
   //! Return an iterator to the begin of the underlying vector of entries
   iterator begin() { return entries_.begin(); }

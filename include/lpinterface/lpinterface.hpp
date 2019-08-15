@@ -22,6 +22,10 @@ namespace lpint {
 class LinearProgramSolver {
  public:
   LinearProgramSolver() = default;
+  LinearProgramSolver(const LinearProgramSolver&) = default;
+  LinearProgramSolver(LinearProgramSolver&&) = default;
+  LinearProgramSolver& operator=(const LinearProgramSolver&) = default;
+  LinearProgramSolver& operator=(LinearProgramSolver&&) = default;
 
   virtual ~LinearProgramSolver() = default;
 

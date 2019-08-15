@@ -50,6 +50,12 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
  */
 class LinearProgramInterface {
  public:
+  LinearProgramInterface() = default;
+  LinearProgramInterface(const LinearProgramInterface&) = default;
+  LinearProgramInterface(LinearProgramInterface&&) = default;
+  LinearProgramInterface& operator=(const LinearProgramInterface&) = default;
+  LinearProgramInterface& operator=(LinearProgramInterface&&) = default;
+
   virtual ~LinearProgramInterface() = default;
 
   /**

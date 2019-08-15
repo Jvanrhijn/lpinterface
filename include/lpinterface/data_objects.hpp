@@ -51,7 +51,7 @@ struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
 
-  Constraint() = default;
+  Constraint() : row(), ordering(), value() {}
   Constraint(Row<T>&& r, Ordering ord, T val)
       : row(std::move(r)), ordering(ord), value(val) {}
 

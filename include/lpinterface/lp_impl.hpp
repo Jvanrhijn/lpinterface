@@ -11,7 +11,8 @@ namespace lpint {
 
 class LinearProgram : public LinearProgramInterface {
  public:
-  LinearProgram() = default;
+  LinearProgram(const LinearProgram&) = delete;
+  LinearProgram& operator=(const LinearProgram&) = delete;
 
   LinearProgram(LinearProgram&&) = default;
   LinearProgram& operator=(LinearProgram&&) = default;
@@ -51,7 +52,6 @@ class LinearProgram : public LinearProgramInterface {
   Objective<double> objective_;
   std::vector<Constraint<double>> constraints_;
   OptimizationType opt_type_;
-  bool initialized_;
 };
 
 // LCOV_EXCL_START

@@ -16,7 +16,12 @@ namespace lpint {
 
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  GurobiSolver() = default;
+  GurobiSolver()
+      : saved_stdout_(0),
+        new_stdout_(0),
+        linear_program_(),
+        gurobi_env_(nullptr),
+        gurobi_model_(nullptr) {}
   explicit GurobiSolver(OptimizationType optim_type);
   explicit GurobiSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
@@ -25,7 +30,8 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   // rule of five: should implement/delete these
   GurobiSolver(const GurobiSolver&) = delete;
   GurobiSolver(GurobiSolver&&) noexcept;
-  GurobiSolver& operator=(GurobiSolver other) noexcept;
+  GurobiSolver& operator=(const GurobiSolver& other) = delete;
+  GurobiSolver& operator=(GurobiSolver&&) noexcept;
 
   void set_parameter(const Param param, const int value) override;
 
