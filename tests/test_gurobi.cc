@@ -112,7 +112,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
   auto lp = *rc::genLinearProgramPtr(
-      100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
+      10, 10, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
       rc::gen::arbitrary<VarType>());
 
   GRBenv* env = nullptr;
@@ -202,7 +202,7 @@ TEST(Gurobi, FullProblem) {
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
-  auto lp_data = generate_lp_data(100, 100, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ), rc::gen::arbitrary<VarType>());
+  auto lp_data = generate_lp_data(10, 10, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ), rc::gen::arbitrary<VarType>());
 
   // configure bare Gurobi
   GRBenv* env;
