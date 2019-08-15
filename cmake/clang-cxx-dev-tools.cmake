@@ -2,7 +2,8 @@
 # Get all project files
 file(GLOB_RECURSE
      ALL_CXX_SOURCE_FILES
-     *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
+     include/*.[chi]pp include/*.[chi]xx include/*.cc include/*.hh include/*.ii include/*.[CHI]
+     src/*.[chi]pp src/*.[chi]xx src/*.cc src/*.hh src/*.ii src/*.[CHI]
      )
 
 # Adding clang-format target if executable is found
@@ -25,8 +26,9 @@ if(CLANG_TIDY)
     COMMAND /usr/bin/clang-tidy
     ${ALL_CXX_SOURCE_FILES}
     -checks='cppcoreguidelines-*'
+    -p compile_commands.json
     --
     ${INCLUDE_DIRECTORIES}
-    -std=c++11
+    -std=c++14
     )
 endif()

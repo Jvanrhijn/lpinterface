@@ -1,6 +1,11 @@
 #ifndef LPINTERFACE_SPARSE_MATRIX_H
 #define LPINTERFACE_SPARSE_MATRIX_H
 
+#include <type_traits>
+#include <vector>
+#include <algorithm>
+#include <set>
+
 namespace lpint {
 
 /// Type of sparse matrices supported.
