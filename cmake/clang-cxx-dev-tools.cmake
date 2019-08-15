@@ -26,7 +26,6 @@ if(CLANG_TIDY)
     COMMAND clang-tidy
     ${ALL_CXX_SOURCE_FILES}
     -checks='cppcoreguidelines-*'
-    -warnings-as-errors=*
     --
     -I../include/
     -std=c++14

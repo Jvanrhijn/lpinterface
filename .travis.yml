@@ -228,10 +228,10 @@ script:
   # run clang-tidy
   - cd build && make clang-tidy > clang-tidy-output.txt
   - |
-    if [[ -n $(grep error clang-tidy-output.txt) ]]; then
-      echo "clang-tidy reported errors"
+    if [[ -n $(grep -E "warning|error" clang-tidy-output.txt) ]]; then
+      echo "Did not pass clang-tidy checks"
       echo ""
-      grep --color error clang-tidy-output.txt
+      grep --color -E "warning|error" clang-tidy-output.txt
       exit -1
     else
       echo -e "\033[1;32m\xE2\x9C\x93 passed:\033[0m clang-tidy";
