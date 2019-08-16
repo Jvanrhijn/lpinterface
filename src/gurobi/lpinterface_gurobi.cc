@@ -232,20 +232,4 @@ std::vector<char> GurobiSolver::convert_variable_type(
   return value_type;
 }
 
-// TODO: extend
-constexpr const char* GurobiSolver::translate_parameter(const Param param) {
-  switch (param) {
-    case (Param::Verbosity):
-      return "outputflag";
-    case (Param::Threads):
-      return "threads";
-    case (Param::Cutoff):
-      return "Cutoff";
-    case (Param::TimeLimit):
-      return GRB_DBL_PAR_TIMELIMIT;
-    default:
-      throw UnsupportedParameterException();
-  }
-}
-
 }  // namespace lpint

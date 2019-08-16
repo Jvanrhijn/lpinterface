@@ -49,7 +49,10 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   void add_variables(std::vector<double>&& objective_values,
                      std::vector<VarType>&& var_types) override;
 
-  constexpr static Status translate_status(
+  #if __cplusplus >= 201402L
+  constexpr
+  #endif
+  static Status translate_status(
       const soplex::SPxSolver::Status status);
 
  private:
@@ -59,13 +62,23 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   Solution<double> solution_;
 
-  constexpr static soplex::SoPlex::IntParam translate_int_parameter(
+  #if __cplusplus >= 201402L
+  constexpr
+  #endif
+  static soplex::SoPlex::IntParam translate_int_parameter(
       const Param param);
-  constexpr static soplex::SoPlex::RealParam translate_real_parameter(
+
+  #if __cplusplus >= 201402L
+  constexpr
+  #endif
+  static soplex::SoPlex::RealParam translate_real_parameter(
       const Param param);
 };
 
-constexpr Status SoplexSolver::translate_status(
+#if __cplusplus >= 201402L
+constexpr
+#endif
+inline Status SoplexSolver::translate_status(
     const soplex::SPxSolver::Status status) {
   switch (status) {
     case soplex::SPxSolver::Status::ERROR:
@@ -112,6 +125,46 @@ constexpr Status SoplexSolver::translate_status(
       return Status::OptimalUnscaledViolations;
     default:
       throw UnknownStatusException(status);
+  }
+}
+
+// TODO: extend
+#if __cplusplus >= 201402L
+constexpr
+#endif
+inline soplex::SoPlex::IntParam SoplexSolver::translate_int_parameter(
+    const Param param) {
+  using namespace soplex;
+  switch (param) {
+    case (Param::ObjectiveSense):
+      return SoPlex::OBJSENSE;
+    case (Param::Verbosity):
+      return SoPlex::VERBOSITY;
+    case (Param::PrimalOrDual):
+      return SoPlex::ALGORITHM;
+    default:
+      throw UnsupportedParameterException();
+  }
+}
+
+// TODO: extend
+#if __cplusplus >= 201402L
+constexpr
+#endif
+inline soplex::SoPlex::RealParam SoplexSolver::translate_real_parameter(
+    const Param param) {
+  using namespace soplex;
+  switch (param) {
+    case (Param::Infinity):
+      return SoPlex::INFTY;
+    case (Param::TimeLimit):
+      return SoPlex::TIMELIMIT;
+    case (Param::ObjectiveLowerLimit):
+      return SoPlex::OBJLIMIT_LOWER;
+    case (Param::ObjectiveUpperLimit):
+      return SoPlex::OBJLIMIT_UPPER;
+    default:
+      throw UnsupportedParameterException();
   }
 }
 

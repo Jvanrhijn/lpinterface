@@ -5,12 +5,20 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/778d6d1fcbf24b63bb084c22aa3b00d4)](https://www.codacy.com/app/Jvanrhijn/lpinterface?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Jvanrhijn/lpinterface&amp;utm_campaign=Badge_Grade)
 [![docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://jvanrhijn.github.io/lpinterface/)
 [![license](https://img.shields.io/badge/license-MIT-green)]()
-[![stc](https://img.shields.io/badge/std-C%2B%2B14-red)]()
+[![stc](https://img.shields.io/badge/std-C%2B%2B11-green)]()
 
 Common interface for different linear programming and (mixed-)integer programming solvers.
 
-This library usese a polymorphic interface in order to allow seamless interchange of
+This library uses a polymorphic interface in order to allow seamless interchange of
 linear programming solvers in application code.
+
+The library can be built using either C++11 or C++14. Newer versions provide some level
+of static optimization; simply change the relevant line in `CMakeLists.txt`:
+
+~~~cmake
+set(CMAKE_CXX_STANDARD 11) # change to 14, 17, ... if desired
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+~~~
 
 ## Supported solver backends
 
@@ -42,9 +50,9 @@ struct Wrapper {
   Wrapper(std::unique_ptr<LinearProgramSolver>&& s) : solver(std::move(s)) {}
 };
 
-template <typename T>
+template <typename Solver>
 Wrapper create_solver(std::unique_ptr<LinearProgram>&& lp) {
-  return Wrapper(std::move(lp));
+  return Wrapper(std::make_unique<Solver>(std::move(lp)));
 }
 
 int main() {

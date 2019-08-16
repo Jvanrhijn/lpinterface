@@ -63,8 +63,16 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
-  constexpr static char convert_ordering(const Ordering ord);
-  constexpr static Status convert_gurobi_status(int status);
+
+  #if __cplusplus >= 201402L
+  constexpr
+  #endif
+  static char convert_ordering(const Ordering ord);
+
+  #if __cplusplus >= 201402L 
+  constexpr 
+  #endif
+  static Status convert_gurobi_status(int status);
 
  private:
   void redirect_stdout();
@@ -72,7 +80,10 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   int saved_stdout_;
   int new_stdout_;
 
-  constexpr static const char* translate_parameter(const Param param);
+  #if __cplusplus >= 201402L
+  constexpr
+  #endif
+  static const char* translate_parameter(const Param param);
 
   //! The linear program to solve
   std::unique_ptr<LinearProgramInterface> linear_program_;
@@ -96,7 +107,10 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   }
 };
 
-constexpr char GurobiSolver::convert_ordering(const Ordering ord) {
+#if __cplusplus >= 201402L 
+constexpr
+#endif
+inline char GurobiSolver::convert_ordering(const Ordering ord) {
   switch (ord) {
     case Ordering::LEQ:
       return GRB_LESS_EQUAL;
@@ -109,7 +123,10 @@ constexpr char GurobiSolver::convert_ordering(const Ordering ord) {
   }
 }
 
-constexpr Status GurobiSolver::convert_gurobi_status(int status) {
+#if __cplusplus >= 201402L 
+constexpr
+#endif
+inline Status GurobiSolver::convert_gurobi_status(int status) {
   switch (status) {
     case GRB_LOADED:
       return Status::NoInformation;
@@ -144,7 +161,28 @@ constexpr Status GurobiSolver::convert_gurobi_status(int status) {
     default:
       throw UnknownStatusException(status);
   }
+
 }
+
+// TODO: extend
+#if __cplusplus >= 201402L 
+constexpr
+#endif
+inline const char* GurobiSolver::translate_parameter(const Param param) {
+  switch (param) {
+    case (Param::Verbosity):
+      return "outputflag";
+    case (Param::Threads):
+      return "threads";
+    case (Param::Cutoff):
+      return "Cutoff";
+    case (Param::TimeLimit):
+      return GRB_DBL_PAR_TIMELIMIT;
+    default:
+      throw UnsupportedParameterException();
+  }
+}
+
 
 }  // namespace lpint
 
