@@ -202,7 +202,9 @@ TEST(Gurobi, FullProblem) {
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
-  auto lp_data = generate_lp_data(10, 10, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ), rc::gen::arbitrary<VarType>());
+  auto lp_data = generate_lp_data(
+      10, 10, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ),
+      rc::gen::arbitrary<VarType>());
 
   // configure bare Gurobi
   GRBenv* env;
@@ -221,21 +223,23 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   error = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
                       nullptr, nullptr);
   error = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_OUTPUTFLAG, 0);
-  error = GRBsetintattr(
-      model, GRB_INT_ATTR_MODELSENSE,
-      lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
+  error =
+      GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE,
+                    lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE
+                                                                : GRB_MINIMIZE);
 
   auto gurobi_var_type = GurobiSolver::convert_variable_type(lp_data.var_type);
-  error = GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr, nullptr,
-                     lp_data.objective.data(), nullptr, nullptr, gurobi_var_type.data(),
-                     nullptr);
+  error = GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr,
+                     nullptr, lp_data.objective.data(), nullptr, nullptr,
+                     gurobi_var_type.data(), nullptr);
 
   std::vector<char> gurobi_sense(lp_data.ord.size());
   std::transform(lp_data.ord.begin(), lp_data.ord.end(), gurobi_sense.begin(),
                  GurobiSolver::convert_ordering);
 
-  error = GRBaddconstrs(model, lp_data.start_indices.size(), lp_data.values.size(),
-                        lp_data.start_indices.data(), lp_data.column_indices.data(), lp_data.values.data(),
+  error = GRBaddconstrs(model, lp_data.start_indices.size(),
+                        lp_data.values.size(), lp_data.start_indices.data(),
+                        lp_data.column_indices.data(), lp_data.values.data(),
                         gurobi_sense.data(), lp_data.rhs.data(), nullptr);
 
   // now configure LP interface
@@ -243,7 +247,8 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
 
   grb.add_variables(std::move(lp_data.objective), std::move(lp_data.var_type));
   grb.add_rows(std::move(lp_data.values), std::move(lp_data.start_indices),
-               std::move(lp_data.column_indices), std::move(lp_data.ord), std::move(lp_data.rhs));
+               std::move(lp_data.column_indices), std::move(lp_data.ord),
+               std::move(lp_data.rhs));
 
   constexpr double TIME_LIMIT = 0.1;
 

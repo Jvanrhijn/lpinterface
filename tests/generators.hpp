@@ -207,11 +207,13 @@ struct RawDataLinearProgram {
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-inline RawDataLinearProgram generate_lp_data(const std::size_t nrows, const std::size_t ncols, rc::Gen<Ordering> ogen, rc::Gen<VarType> vgen) {
+inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
+                                             const std::size_t ncols,
+                                             rc::Gen<Ordering> ogen,
+                                             rc::Gen<VarType> vgen) {
   using namespace lpint;
 
-  const auto lp = *rc::genLinearProgram(
-      nrows, ncols, ogen, vgen);
+  const auto lp = *rc::genLinearProgram(nrows, ncols, ogen, vgen);
 
   std::vector<double> values, rhs;
   std::vector<int> start_indices, col_indices;
@@ -230,8 +232,14 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows, const std:
   std::vector<double> objective = lp.objective().values;
   std::vector<VarType> var_type = lp.objective().variable_types;
 
-  return RawDataLinearProgram{lp.optimization_type(), values, start_indices, col_indices, rhs, ord,
-                         objective, var_type};
+  return RawDataLinearProgram{lp.optimization_type(),
+                              values,
+                              start_indices,
+                              col_indices,
+                              rhs,
+                              ord,
+                              objective,
+                              var_type};
 }
 
 }  // namespace lpint

@@ -4,6 +4,7 @@ file(GLOB_RECURSE
      ALL_CXX_SOURCE_FILES
      include/*.[chi]pp include/*.[chi]xx include/*.cc include/*.hh include/*.ii include/*.[CHI]
      src/*.[chi]pp src/*.[chi]xx src/*.cc src/*.hh src/*.ii src/*.[CHI]
+     tests/test_*.cc tests/test.cc tests/generators.hpp tests/mock_*.hpp
      )
 
 find_package(GUROBI)
@@ -18,6 +19,7 @@ endif()
 # Adding clang-format target if executable is found
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
+  message("Source files: ${ALL_CXX_SOURCE_FILES}")
   add_custom_target(
     clang-format
     COMMAND /usr/bin/clang-format
