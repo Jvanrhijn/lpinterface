@@ -129,8 +129,7 @@ TEST(Soplex, FullProblem) {
 
   lp->add_constraints(std::move(constr));
 
-  Objective<double> obj{{1.0, 1.0, 2.0},
-                        {VarType::Real, VarType::Real, VarType::Real}};
+  Objective<double> obj({1.0, 1.0, 2.0});
   lp->set_objective(obj);
 
   // Create the solver from the given LP

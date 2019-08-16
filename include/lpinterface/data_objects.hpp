@@ -69,6 +69,14 @@ struct Constraint {
 template <typename T>
 struct Objective {
   Objective() = default;
+  // We can leave variable_types empty, since
+  // Gurobi assumes continuous variables by default.
+  // This might be different in other solvers, so
+  // we'll have to carefully check when adding support.
+  Objective(std::vector<T>&& vals)
+    : values(std::forward<std::vector<T>>(vals)) {}
+  Objective(std::vector<T>&& vals, std::vector<VarType>&& var_types)
+    : values(std::forward<std::vector<T>>(vals)), variable_types(std::forward<std::vector<VarType>>(var_types)) {}
   //! Values of elements in the objective vector.
   std::vector<T> values;
   //! Variable type the objective assigns to each
