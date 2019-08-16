@@ -44,28 +44,6 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
   }
 }
 
-RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices, ()) {
-  SparseMatrix<double> sp(SparseMatrixType::RowWise);
-
-  const auto values = *rc::gen::container<std::vector<double>>(
-      *rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()),
-      rc::gen::arbitrary<double>());
-  auto indices = *rc::gen::unique<std::vector<Index>>(
-      values.size(), rc::gen::inRange(0ul, values.size()));
-
-  const auto from = *rc::gen::inRange(0ul, values.size() / 2);
-  const auto to = *rc::gen::inRange(from + 1, values.size());
-  indices[to] = indices[from];  // make a duplicate index
-  try {
-    std::vector<Row<double>> rows;
-    rows.emplace_back(values, indices);
-    sp.add_rows(std::move(rows));
-    RC_ASSERT(false);
-  } catch (const InvalidMatrixEntryException& e) {
-    RC_ASSERT(true);
-  }
-}
-
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable,
               (const uint8_t nrows, const uint8_t ncols)) {
   SparseMatrix<double> sp(SparseMatrixType::RowWise);

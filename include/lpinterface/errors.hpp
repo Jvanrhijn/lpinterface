@@ -157,6 +157,12 @@ class SoplexException : public LpException {
   SoplexException() : LpException("SoPlex ran into an error solving an LP") {}
 };
 
+class MismatchedDimensionsException : public LpException {
+ public:
+  MismatchedDimensionsException()
+      : LpException("Array dimensions mismatched") {}
+};
+
 /// Enum class representing LP solution status.
 enum class Status : int {
   NotLoaded,      /// No Linear Program has been loaded
