@@ -4,11 +4,25 @@
 [![codecov](https://codecov.io/gh/Jvanrhijn/lpinterface/branch/master/graph/badge.svg)](https://codecov.io/gh/Jvanrhijn/lpinterface)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/778d6d1fcbf24b63bb084c22aa3b00d4)](https://www.codacy.com/app/Jvanrhijn/lpinterface?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Jvanrhijn/lpinterface&amp;utm_campaign=Badge_Grade)
 [![docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://jvanrhijn.github.io/lpinterface/)
+[![license](https://img.shields.io/badge/license-MIT-green)]()
+[![stc](https://img.shields.io/badge/std-C%2B%2B14-red)]()
 
 Common interface for different linear programming and (mixed-)integer programming solvers.
 
 This library usese a polymorphic interface in order to allow seamless interchange of
 linear programming solvers in application code.
+
+### Supported solver backends
+
+* Gurobi
+* SoPlex
+
+### Supported compilers
+
+The code is tested in Travis against:
+
+* GCC 6.0, 7.0, 8.0
+* Clang 3.6, 3.7, 4.0, 5.0, 6.0
 
 ### Example usage
 
@@ -96,15 +110,6 @@ int main() {
 }
 ~~~
 
-### Documentation
-
-jvanrhijn.github.io/lpinterface
-
 ### Examples
 
 See `examples` directory.
-
-### Supported solver backends
-
-* Gurobi
-* SoPlex
