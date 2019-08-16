@@ -50,7 +50,7 @@ RC_GTEST_PROP(SparseMatrix, ErrorIfDuplicateNonzeroIndices, ()) {
   const auto values = *rc::gen::container<std::vector<double>>(
       *rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()),
       rc::gen::arbitrary<double>());
-  auto indices = *rc::gen::uniqueCount<std::vector<Index>>(
+  auto indices = *rc::gen::unique<std::vector<Index>>(
       values.size(), rc::gen::inRange(0ul, values.size()));
 
   const auto from = *rc::gen::inRange(0ul, values.size() / 2);

@@ -8,32 +8,6 @@
 
 #include "lpinterface.hpp"
 
-// hack unique container generators with count parameter into rapidcheck
-namespace rc {
-
-namespace gen {
-
-template <typename Container, typename T, typename F>
-Gen<Container> uniqueByCount(std::size_t count, Gen<T> gen, F &&f) {
-  using Strategy = detail::UniqueContainerStrategy<Decay<F>>;
-  detail::ContainerHelper<Container, Strategy> helper(
-      Strategy(std::forward<F>(f)));
-
-  return [=](const Random &random, int size) {
-    return helper.generate(count, random, size, gen);
-  };
-}
-
-template <typename Container, typename T>
-Gen<Container> uniqueCount(std::size_t count, Gen<T> gen) {
-  return uniqueByCount<Container>(count, std::move(gen),
-                                  [](const T &x) -> const T & { return x; });
-}
-
-}  // namespace gen
-
-}  // namespace rc
-
 namespace rc {
 
 template <typename T>
@@ -99,7 +73,7 @@ inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen,
   std::size_t ncols = fixed ? count : *rc::gen::inRange(0ul, count);
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(ncols, std::move(valgen)),
-      rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
+      rc::gen::unique<std::vector<typename Row<T>::Index>>(
           ncols, rc::gen::inRange(0ul, count)));
 }
 
@@ -109,7 +83,7 @@ inline Gen<lpint::Row<T>> genRow(Gen<T> valgen) {
   const auto count = *rc::gen::arbitrary<std::size_t>();
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
-      rc::gen::uniqueCount<std::vector<typename Row<T>::Index>>(
+      rc::gen::unique<std::vector<typename Row<T>::Index>>(
           count, rc::gen::inRange(0ul, count)));
 }
 
@@ -136,7 +110,7 @@ inline Gen<lpint::Column<T>> genColumn(const std::size_t count, Gen<T> valgen) {
   using namespace lpint;
   return gen::construct<Column<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
-      rc::gen::uniqueCount<std::vector<typename Column<T>::Index>>(
+      rc::gen::unique<std::vector<typename Column<T>::Index>>(
           count, rc::gen::inRange(0ul, count)));
 }
 
@@ -146,7 +120,7 @@ inline Gen<lpint::Column<T>> genColumn(Gen<T> valgen) {
   const auto count = *rc::gen::arbitrary<std::size_t>();
   return gen::construct<Column<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
-      rc::gen::uniqueCount<std::vector<typename Column<T>::Index>>(
+      rc::gen::unique<std::vector<typename Column<T>::Index>>(
           count, rc::gen::inRange(0ul, count)));
 }
 
