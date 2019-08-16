@@ -47,8 +47,11 @@ namespace lpint {
  */
 class LpException : public std::runtime_error {
  public:
+  LpException(const char *msg) : std::runtime_error(msg) {}
+
   template <typename... Args>
-  LpException(Args&&... args) : std::runtime_error(std::forward<Args>(args)...) {}
+  LpException(Args &&... args)
+      : std::runtime_error(std::forward<Args>(args)...) {}
 };
 
 //! Attempt to add rows to a CSC or columns to a CSR matrix.
