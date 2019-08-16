@@ -237,7 +237,7 @@ script:
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
-  - kcov --exclude-pattern=gtest,gmock,rapidcheck,/usr,tests out tests/unit_tests
+  - kcov --exclude-pattern=gtest,gmock,rapidcheck,/usr,tests out tests/unit_tests --gtest_shuffle
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
   - cd ${TRAVIS_BUILD_DIR}
   - doxygen docs/config 
