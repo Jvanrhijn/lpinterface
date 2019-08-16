@@ -185,36 +185,4 @@ void SoplexSolver::add_variables(std::vector<double>&& objective_values,
   }
 }
 
-// TODO: extend
-constexpr SoPlex::IntParam SoplexSolver::translate_int_parameter(
-    const Param param) {
-  switch (param) {
-    case (Param::ObjectiveSense):
-      return SoPlex::OBJSENSE;
-    case (Param::Verbosity):
-      return SoPlex::VERBOSITY;
-    case (Param::PrimalOrDual):
-      return SoPlex::ALGORITHM;
-    default:
-      throw UnsupportedParameterException();
-  }
-}
-
-// TODO: extend
-constexpr SoPlex::RealParam SoplexSolver::translate_real_parameter(
-    const Param param) {
-  switch (param) {
-    case (Param::Infinity):
-      return SoPlex::INFTY;
-    case (Param::TimeLimit):
-      return SoPlex::TIMELIMIT;
-    case (Param::ObjectiveLowerLimit):
-      return SoPlex::OBJLIMIT_LOWER;
-    case (Param::ObjectiveUpperLimit):
-      return SoPlex::OBJLIMIT_UPPER;
-    default:
-      throw UnsupportedParameterException();
-  }
-}
-
 }  // namespace lpint
