@@ -214,22 +214,22 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
 
-  int error = GRBloadenv(&env, "");
+  GRBloadenv(&env, "");
 
   close(new_stdout);
-  new_stdout = dup(saved_stdout);
+  dup(saved_stdout);
   close(saved_stdout);
 
-  error = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
+  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
                       nullptr, nullptr);
-  error = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_OUTPUTFLAG, 0);
-  error =
-      GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE,
-                    lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE
-                                                                : GRB_MINIMIZE);
+  GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_OUTPUTFLAG, 0);
+ 
+  GRBsetintattr(model, GRB_INT_ATTR_MODELSENSE,
+                lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE
+                                                            : GRB_MINIMIZE);
 
   auto gurobi_var_type = GurobiSolver::convert_variable_type(lp_data.var_type);
-  error = GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr,
+  GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr,
                      nullptr, lp_data.objective.data(), nullptr, nullptr,
                      gurobi_var_type.data(), nullptr);
 
@@ -237,7 +237,7 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   std::transform(lp_data.ord.begin(), lp_data.ord.end(), gurobi_sense.begin(),
                  GurobiSolver::convert_ordering);
 
-  error = GRBaddconstrs(model, lp_data.start_indices.size(),
+  int error = GRBaddconstrs(model, lp_data.start_indices.size(),
                         lp_data.values.size(), lp_data.start_indices.data(),
                         lp_data.column_indices.data(), lp_data.values.data(),
                         gurobi_sense.data(), lp_data.rhs.data(), nullptr);
@@ -250,14 +250,16 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
                std::move(lp_data.column_indices), std::move(lp_data.ord),
                std::move(lp_data.rhs));
 
-  constexpr double TIME_LIMIT = 0.1;
+  {
+    constexpr double TIME_LIMIT = 0.1;
 
-  try {
-    GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
-    grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
-  } catch (const GurobiException& e) {
-    RC_ASSERT(e.code() == error);
-    return;
+    try {
+      GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
+      grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
+    } catch (const GurobiException& e) {
+      RC_ASSERT(e.code() == error);
+      return;
+    }
   }
 
   // solve the lp
@@ -288,12 +290,12 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
     int nvars;
     GRBgetintattr(model, GRB_INT_ATTR_NUMVARS, &nvars);
     std::vector<double> solution(static_cast<std::size_t>(nvars));
-    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, solution.size(),
+    GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, solution.size(),
                                solution.data());
     RC_ASSERT(solution == grb.get_solution().primal);
 
     double objval;
-    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+    GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     RC_ASSERT(std::abs(objval - grb.get_solution().objective_value) < 1e-15);
   }
 

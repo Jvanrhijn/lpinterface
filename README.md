@@ -12,19 +12,19 @@ Common interface for different linear programming and (mixed-)integer programmin
 This library usese a polymorphic interface in order to allow seamless interchange of
 linear programming solvers in application code.
 
-### Supported solver backends
+## Supported solver backends
 
-* Gurobi
-* SoPlex
+  * Gurobi
+  * SoPlex
 
-### Supported compilers
+## Supported compilers
 
 The code is tested in Travis against:
 
-* GCC 6.0, 7.0, 8.0
-* Clang 3.6, 3.7, 4.0, 5.0, 6.0
+  * GCC 6.0, 7.0, 8.0
+  * Clang 3.6, 3.7, 4.0, 5.0, 6.0
 
-### Example usage
+## Example usage
 
 In your CMakeLists.txt: `add_subdirectory(path_to_lpinterface)`.
 
@@ -110,6 +110,6 @@ int main() {
 }
 ~~~
 
-### Examples
+## More examples
 
 See `examples` directory.

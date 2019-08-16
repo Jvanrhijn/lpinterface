@@ -14,8 +14,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise,
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
   sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(
       nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
-  for (SizeType i = 0; i < nrows; i++) {
-    for (SizeType j = 0; j < ncols; j++) {
+  for (SizeType i = 0; i < nrows; ++i) {
+    for (SizeType j = 0; j < ncols; ++j) {
       const auto nz = sp.entries()[i].nonzero_indices();
       if (std::find(nz.begin(), nz.end(), j) != nz.end()) {
         RC_ASSERT(sp(i, j) != 0);
@@ -32,8 +32,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise,
   auto cols = *rc::gen::container<std::vector<Column<double>>>(
       ncols, rc::genRow(ncols, rc::gen::nonZero<double>()));
   sp.add_columns(std::move(cols));
-  for (SizeType i = 0; i < nrows; i++) {
-    for (SizeType j = 0; j < ncols; j++) {
+  for (SizeType i = 0; i < nrows; ++i) {
+    for (SizeType j = 0; j < ncols; ++j) {
       const auto nz = sp.entries()[j].nonzero_indices();
       if (std::find(nz.begin(), nz.end(), i) != nz.end()) {
         RC_ASSERT(sp(i, j) != 0);

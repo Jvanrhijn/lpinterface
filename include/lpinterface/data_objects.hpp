@@ -170,7 +170,7 @@ class Column : public MatrixEntry<T> {
 
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
-  Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
+  explicit Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
 };
 
 template <typename T>
@@ -190,7 +190,7 @@ class Row : public MatrixEntry<T> {
 
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
-  Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
+  explicit Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
 };
 
 /**
@@ -235,7 +235,7 @@ struct Objective {
   // Gurobi assumes continuous variables by default.
   // This might be different in other solvers, so
   // we'll have to carefully check when adding support.
-  Objective(std::vector<T>&& vals) : values(std::move(vals)) {}
+  explicit Objective(std::vector<T>&& vals) : values(std::move(vals)) {}
   Objective(std::vector<T>&& vals, std::vector<VarType>&& var_types)
       : values(std::move(vals)), variable_types(std::move(var_types)) {
     if (values.size() != variable_types.size()) {

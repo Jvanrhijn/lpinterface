@@ -51,23 +51,23 @@ class SparseMatrix {
   SparseMatrix& operator=(SparseMatrix<T>&&) = default;
   ~SparseMatrix() = default;
 
-  SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
+  explicit SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
   SparseMatrix(std::vector<Row<T>>&& rows) : type_(SparseMatrixType::RowWise) {
     add_rows(std::forward<decltype(rows)>(rows));
   }
 
-  SparseMatrix(std::vector<Column<T>>&& columns)
+  explicit SparseMatrix(std::vector<Column<T>>&& columns)
       : type_(SparseMatrixType::ColumnWise) {
     add_columns(std::forward<decltype(columns)>(columns));
   }
 
-  SparseMatrix(const std::initializer_list<Column<T>>&& columns)
+  explicit SparseMatrix(const std::initializer_list<Column<T>>&& columns)
       : type_(SparseMatrixType::ColumnWise) {
     add_columns(std::forward<decltype(columns)>(columns));
   }
 
-  SparseMatrix(const std::initializer_list<Row<T>>&& rows)
+  explicit SparseMatrix(const std::initializer_list<Row<T>>&& rows)
       : type_(SparseMatrixType::RowWise) {
     add_rows(std::forward<decltype(rows)>(rows));
   }

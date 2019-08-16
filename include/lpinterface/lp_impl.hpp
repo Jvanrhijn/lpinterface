@@ -17,7 +17,7 @@ class LinearProgram : public LinearProgramInterface {
   LinearProgram(LinearProgram&&) = default;
   LinearProgram& operator=(LinearProgram&&) = default;
 
-  LinearProgram(const OptimizationType opt_type);
+  explicit LinearProgram(const OptimizationType opt_type);
 
   LinearProgram(const OptimizationType opt_type,
                 std::vector<Constraint<double>>&& constraints,

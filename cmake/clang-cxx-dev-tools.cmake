@@ -18,7 +18,6 @@ endif()
 # Adding clang-format target if executable is found
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
-  message("Source files: ${ALL_CXX_SOURCE_FILES}")
   add_custom_target(
     clang-format
     COMMAND /usr/bin/clang-format

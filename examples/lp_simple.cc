@@ -29,7 +29,7 @@ class SolverWrapper {
  public:
   SolverWrapper() = default;
 
-  SolverWrapper(std::shared_ptr<LinearProgramSolver> solver)
+  explicit SolverWrapper(std::shared_ptr<LinearProgramSolver> solver)
       : solver_(solver) {}
 
   void insert_solver(std::shared_ptr<LinearProgramSolver> solver) {

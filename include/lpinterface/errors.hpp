@@ -47,10 +47,10 @@ namespace lpint {
  */
 class LpException : public std::runtime_error {
  public:
-  LpException(const char *msg) : std::runtime_error(msg) {}
+  explicit LpException(const char *msg) : std::runtime_error(msg) {}
 
   template <typename... Args>
-  LpException(Args &&... args)
+  explicit LpException(Args &&... args)
       : std::runtime_error(std::forward<Args>(args)...) {}
 };
 
@@ -106,7 +106,7 @@ class UnsupportedVariableTypeException : public LpException {
 //! Internal error occured in Gurobi.
 class GurobiException : public LpException {
  public:
-  GurobiException(int code)
+  explicit GurobiException(int code)
       : LpException("Error occured in Gurobi, code " + std::to_string(code)),
         code_(code) {}
 
@@ -124,7 +124,7 @@ class GurobiException : public LpException {
 //! Attempt to use a status code that is not supported.
 class UnknownStatusException : public LpException {
  public:
-  UnknownStatusException(int code)
+  explicit UnknownStatusException(int code)
       : LpException("Unknown status code encountered: " +
                     std::to_string(code)) {}
 };
