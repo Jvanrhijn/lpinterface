@@ -70,7 +70,7 @@ template <typename T>
 inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen,
                                  bool fixed = false) {
   using namespace lpint;
-  std::size_t ncols = fixed ? count : *rc::gen::inRange(0ul, count);
+  std::size_t ncols = fixed ? count : *rc::gen::inRange(1ul, count);
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(ncols, std::move(valgen)),
       rc::gen::unique<std::vector<typename Row<T>::Index>>(
@@ -80,7 +80,7 @@ inline Gen<lpint::Row<T>> genRow(const std::size_t count, Gen<T> valgen,
 template <typename T>
 inline Gen<lpint::Row<T>> genRow(Gen<T> valgen) {
   using namespace lpint;
-  const auto count = *rc::gen::arbitrary<std::size_t>();
+  const auto count = *rc::gen::nonZero<std::size_t>();
   return gen::construct<Row<T>>(
       rc::gen::container<std::vector<T>>(count, std::move(valgen)),
       rc::gen::unique<std::vector<typename Row<T>::Index>>(

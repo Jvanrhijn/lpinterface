@@ -81,6 +81,26 @@ TEST(Soplex, UninitializedLP) {
   EXPECT_THROW(spl.update_program(), LinearProgramNotInitializedException);
 }
 
+//RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
+//  // generate a linear program that is not unbounded or infeasible
+//  auto constr = *rc::genConstraintWithOrdering(rc::genRow(100, rc::gen::positive<double>()), 
+//                                               rc::gen::positive<double>(), 
+//                                               rc::gen::just(Ordering::LEQ));
+//  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
+//  const auto count = *rc::gen::inRange(1ul, 100ul);
+//  auto obj = *rc::genSizedObjective(count, rc::gen::just(VarType::Real), rc::gen::nonZero<double>());
+//
+//  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+//  lp->add_constraints(std::move(constrs));
+//  lp->set_objective(std::move(obj));
+//
+//  SoplexSolver soplex(std::move(lp));
+//  soplex.set_parameter(Param::TimeLimit, 0.0);
+//  soplex.update_program();
+//  const auto status = soplex.solve_primal();
+//  RC_ASSERT(status == Status::TimeOut || status == Status::Optimal);
+//}
+
 // property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
