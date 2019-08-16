@@ -15,8 +15,10 @@ namespace lpint {
 
 /// Objective sense for an LP. \ingroup Enumerations
 enum class OptimizationType {
-  Minimize,  /// Maximize the objective function value.
-  Maximize,  /// Minimize the objective function value.
+  //! Maximize the objective function value.
+  Minimize,  
+  //! Minimize the objective function value.
+  Maximize,  
 };
 
 // LCOV_EXCL_START
