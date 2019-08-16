@@ -22,7 +22,7 @@ inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   int error = GRBloadenv(env, "");
 
   close(new_stdout);
-  new_stdout = dup(saved_stdout);
+  dup(saved_stdout);
   close(saved_stdout);
 
   if (error) {
@@ -164,7 +164,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     RC_ASSERT(solution == grb.get_solution().primal);
 
     double objval;
-    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
+    GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     RC_ASSERT(std::abs(objval - grb.get_solution().objective_value) < 1e-15);
   }
 
@@ -250,16 +250,13 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
                std::move(lp_data.column_indices), std::move(lp_data.ord),
                std::move(lp_data.rhs));
 
-  {
+  try {
     constexpr double TIME_LIMIT = 0.1;
-
-    try {
-      GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
-      grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
-    } catch (const GurobiException& e) {
-      RC_ASSERT(e.code() == error);
-      return;
-    }
+    GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
+    grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
+  } catch (const GurobiException& e) {
+    RC_ASSERT(e.code() == error);
+    return;
   }
 
   // solve the lp

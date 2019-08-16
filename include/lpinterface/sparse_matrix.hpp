@@ -53,7 +53,8 @@ class SparseMatrix {
 
   explicit SparseMatrix(SparseMatrixType mtype) : type_(mtype) {}
 
-  SparseMatrix(std::vector<Row<T>>&& rows) : type_(SparseMatrixType::RowWise) {
+  explicit SparseMatrix(std::vector<Row<T>>&& rows)
+      : type_(SparseMatrixType::RowWise) {
     add_rows(std::forward<decltype(rows)>(rows));
   }
 

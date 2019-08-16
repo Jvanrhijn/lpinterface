@@ -14,15 +14,15 @@ linear programming solvers in application code.
 
 ## Supported solver backends
 
-  * Gurobi
-  * SoPlex
+* Gurobi
+* SoPlex
 
 ## Supported compilers
 
 The code is tested in Travis against:
 
-  * GCC 6.0, 7.0, 8.0
-  * Clang 3.6, 3.7, 4.0, 5.0, 6.0
+* GCC 6.0, 7.0, 8.0
+* Clang 3.6, 3.7, 4.0, 5.0, 6.0
 
 ## Example usage
 
