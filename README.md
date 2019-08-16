@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/Jvanrhijn/lpinterface.svg?branch=master)](https://travis-ci.org/Jvanrhijn/lpinterface)
 [![codecov](https://codecov.io/gh/Jvanrhijn/lpinterface/branch/master/graph/badge.svg)](https://codecov.io/gh/Jvanrhijn/lpinterface)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/778d6d1fcbf24b63bb084c22aa3b00d4)](https://www.codacy.com/app/Jvanrhijn/lpinterface?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Jvanrhijn/lpinterface&amp;utm_campaign=Badge_Grade)
+[![docs](https://img.shields.io/badge/docs-gh--pages-blue)](https://jvanrhijn.github.io/lpinterface/)
 
 Common interface for different linear programming and (mixed-)integer programming solvers.
 
