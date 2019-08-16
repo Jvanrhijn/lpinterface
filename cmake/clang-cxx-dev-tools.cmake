@@ -4,7 +4,6 @@ file(GLOB_RECURSE
      ALL_CXX_SOURCE_FILES
      include/*.[chi]pp include/*.[chi]xx include/*.cc include/*.hh include/*.ii include/*.[CHI]
      src/*.[chi]pp src/*.[chi]xx src/*.cc src/*.hh src/*.ii src/*.[CHI]
-     tests/test_*.cc tests/test.cc tests/generators.hpp tests/mock_*.hpp
      )
 
 find_package(GUROBI)
