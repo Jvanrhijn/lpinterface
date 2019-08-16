@@ -7,11 +7,6 @@
 #include <type_traits>
 #include <vector>
 
-// TODO: find a more elegant way to do this
-#ifdef TESTING
-#include <rapidcheck.h>
-#endif
-
 #include "common.hpp"
 #include "errors.hpp"
 #include "sparse_matrix.hpp"

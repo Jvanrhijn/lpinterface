@@ -154,11 +154,6 @@ class Column : public MatrixEntry<T> {
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
-
-// TODO: find a more elegant way to do this
-#if TESTING
-  friend class rc::Arbitrary<Row<T>>;
-#endif
 };
 
 template <typename T>
@@ -179,11 +174,6 @@ class Row : public MatrixEntry<T> {
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
-
-// TODO: find a more elegant way to do this
-#if TESTING
-  friend class rc::Arbitrary<Row<T>>;
-#endif
 };
 
 /**
