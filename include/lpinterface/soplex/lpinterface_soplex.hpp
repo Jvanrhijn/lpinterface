@@ -49,11 +49,11 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   void add_variables(std::vector<double>&& objective_values,
                      std::vector<VarType>&& var_types) override;
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   constexpr
-  #endif
-  static Status translate_status(
-      const soplex::SPxSolver::Status status);
+#endif
+      static Status
+      translate_status(const soplex::SPxSolver::Status status);
 
  private:
   soplex::SoPlex soplex_;
@@ -62,24 +62,24 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   Solution<double> solution_;
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   constexpr
-  #endif
-  static soplex::SoPlex::IntParam translate_int_parameter(
-      const Param param);
+#endif
+      static soplex::SoPlex::IntParam
+      translate_int_parameter(const Param param);
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   constexpr
-  #endif
-  static soplex::SoPlex::RealParam translate_real_parameter(
-      const Param param);
+#endif
+      static soplex::SoPlex::RealParam
+      translate_real_parameter(const Param param);
 };
 
 #if __cplusplus >= 201402L
 constexpr
 #endif
-inline Status SoplexSolver::translate_status(
-    const soplex::SPxSolver::Status status) {
+    inline Status
+    SoplexSolver::translate_status(const soplex::SPxSolver::Status status) {
   switch (status) {
     case soplex::SPxSolver::Status::ERROR:
       throw SoplexException();
@@ -132,8 +132,8 @@ inline Status SoplexSolver::translate_status(
 #if __cplusplus >= 201402L
 constexpr
 #endif
-inline soplex::SoPlex::IntParam SoplexSolver::translate_int_parameter(
-    const Param param) {
+    inline soplex::SoPlex::IntParam
+    SoplexSolver::translate_int_parameter(const Param param) {
   using namespace soplex;
   switch (param) {
     case (Param::ObjectiveSense):
@@ -153,8 +153,8 @@ inline soplex::SoPlex::IntParam SoplexSolver::translate_int_parameter(
 #if __cplusplus >= 201402L
 constexpr
 #endif
-inline soplex::SoPlex::RealParam SoplexSolver::translate_real_parameter(
-    const Param param) {
+    inline soplex::SoPlex::RealParam
+    SoplexSolver::translate_real_parameter(const Param param) {
   using namespace soplex;
   switch (param) {
     case (Param::Infinity):

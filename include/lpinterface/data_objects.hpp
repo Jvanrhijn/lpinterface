@@ -15,29 +15,29 @@ namespace lpint {
 /// Enum representing orderings of values.
 enum class Ordering {
   //! Supported by:
-  LT,   
+  LT,
   //! Supported by:
-  GT,   
+  GT,
   //! Supported by: Gurobi.
-  EQ,   
+  EQ,
   //! Supported by: Gurobi, SoPlex.
-  LEQ,  
+  LEQ,
   //! Supported by: Gurobi, SoPlex.
-  GEQ,  
+  GEQ,
 };
 
 /// Enum representing possible variable types for an LP.
 enum class VarType {
   //! Supported by: Gurobi.
-  Binary,       
+  Binary,
   //! Supported by: Gurobi.
-  Integer,      
+  Integer,
   //! Supported by: Gurobi, SoPlex.
-  Real,         
+  Real,
   //! Supported by: Gurobi.
-  SemiReal,     
+  SemiReal,
   //! Supported by: Gurobi.
-  SemiInteger,  
+  SemiInteger,
 };
 
 // matrix entry is templated over T, with T restricted to
