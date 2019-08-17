@@ -13,6 +13,9 @@
 using namespace lpint;
 using namespace testing;
 
+constexpr const std::size_t nrows = 100;
+constexpr const std::size_t ncols = 100;
+
 inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   using namespace soplex;
 
@@ -81,25 +84,29 @@ TEST(Soplex, UninitializedLP) {
   EXPECT_THROW(spl.update_program(), LinearProgramNotInitializedException);
 }
 
-//RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
-//  // generate a linear program that is not unbounded or infeasible
-//  auto constr = *rc::genConstraintWithOrdering(rc::genRow(100, rc::gen::positive<double>()), 
-//                                               rc::gen::positive<double>(), 
-//                                               rc::gen::just(Ordering::LEQ));
-//  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
-//  const auto count = *rc::gen::inRange(1ul, 100ul);
-//  auto obj = *rc::genSizedObjective(count, rc::gen::just(VarType::Real), rc::gen::nonZero<double>());
-//
-//  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
-//  lp->add_constraints(std::move(constrs));
-//  lp->set_objective(std::move(obj));
-//
-//  SoplexSolver soplex(std::move(lp));
-//  soplex.set_parameter(Param::TimeLimit, 0.0);
-//  soplex.update_program();
-//  const auto status = soplex.solve_primal();
-//  RC_ASSERT(status == Status::TimeOut || status == Status::Optimal);
-//}
+RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto constr = *rc::genConstraintWithOrdering(rc::genRow(100, rc::gen::positive<double>(), true), 
+                                               rc::gen::positive<double>(), 
+                                               rc::gen::just(Ordering::LEQ));
+  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
+  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
+  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end());
+
+  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count), 
+                                    rc::gen::just(VarType::Real), 
+                                    rc::gen::nonZero<double>());
+
+  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+  lp->add_constraints(std::move(constrs));
+  lp->set_objective(std::move(obj));
+
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(Param::TimeLimit, 0.0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
 
 // property: any LP should result in the same
 // answer as SoPlex gives us
@@ -107,7 +114,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto lp = *rc::genLinearProgramPtr(
-      100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
+      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
   auto soplex = configure_soplex(*lp);
@@ -169,7 +176,7 @@ TEST(Soplex, FullProblem) {
   ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
-// RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
+//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
 //  using namespace soplex;
 //
 //  const auto sense =

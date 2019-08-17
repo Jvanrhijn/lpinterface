@@ -14,13 +14,28 @@
 using namespace lpint;
 using namespace testing;
 
+constexpr const std::size_t nrows = 10;
+constexpr const std::size_t ncols = 10;
+
+inline void redirect_stdout(int *saved_stdout, int *new_stdout) {
+  *saved_stdout = dup(1);
+  close(1);
+  *new_stdout = open("/dev/null", O_WRONLY);
+}
+
+inline void restore_stdout(int *saved_stdout, int *new_stdout) {
+  close(*new_stdout);
+  close(*saved_stdout);
+  close(*saved_stdout);
+  delete saved_stdout;
+  delete new_stdout;
+}
+
 inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
-
   int error = GRBloadenv(env, "");
-
   close(new_stdout);
   dup(saved_stdout);
   close(saved_stdout);
@@ -89,6 +104,30 @@ TEST(Gurobi, UninitializedLP) {
   EXPECT_THROW(grb.update_program(), LinearProgramNotInitializedException);
 }
 
+RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
+                                               rc::gen::positive<double>(), 
+                                               rc::gen::just(Ordering::LEQ));
+  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
+  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
+  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end()) + 1;
+
+  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count),
+                                    rc::gen::just(VarType::Real), 
+                                    rc::gen::nonZero<double>());
+
+  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+  lp->add_constraints(std::move(constrs));
+  lp->set_objective(std::move(obj));
+
+  GurobiSolver grb(std::move(lp));
+  grb.set_parameter(Param::TimeLimit, 0.0);
+  grb.update_program();
+  const auto status = grb.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
+
 TEST(Gurobi, UpdateProgram) {
   auto lp = std::make_unique<NiceMock<MockLinearProgram>>();
   ON_CALL(*lp, is_initialized()).WillByDefault(Return(true));
@@ -112,7 +151,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
   auto lp = *rc::genLinearProgramPtr(
-      10, 10, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
+      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
       rc::gen::arbitrary<VarType>());
 
   GRBenv* env = nullptr;
