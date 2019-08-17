@@ -41,7 +41,7 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
                constraint.row.nonzero_indices().data(),
                constraint.row.values().data());
     if (constraint.ordering == Ordering::LEQ) {
-      soplex.addRowReal(LPRow(0, ds_row, constraint.value));
+      soplex.addRowReal(LPRow(-infinity, ds_row, constraint.value));
     } else if (constraint.ordering == Ordering::GEQ) {
       soplex.addRowReal(LPRow(constraint.value, ds_row, infinity));
     } else {

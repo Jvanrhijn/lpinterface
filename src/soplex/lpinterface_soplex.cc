@@ -71,7 +71,7 @@ void SoplexSolver::update_program() {
                constraint.row.values().data());
     // determine constraint
     if (constraint.ordering == Ordering::LEQ) {
-      soplex_.addRowReal(LPRow(0, ds_row, constraint.value));
+      soplex_.addRowReal(LPRow(-infinity, ds_row, constraint.value));
     } else if (constraint.ordering == Ordering::GEQ) {
       soplex_.addRowReal(LPRow(constraint.value, ds_row, infinity));
     } else {

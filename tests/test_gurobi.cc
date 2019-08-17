@@ -14,8 +14,8 @@
 using namespace lpint;
 using namespace testing;
 
-constexpr const std::size_t nrows = 100;
-constexpr const std::size_t ncols = 100;
+constexpr const std::size_t nrows = 10;
+constexpr const std::size_t ncols = 10;
 
 inline void redirect_stdout(int *saved_stdout, int *new_stdout) {
   *saved_stdout = dup(1);
