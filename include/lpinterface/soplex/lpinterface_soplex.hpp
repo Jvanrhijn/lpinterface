@@ -142,6 +142,8 @@ inline soplex::SoPlex::IntParam SoplexSolver::translate_int_parameter(
       return SoPlex::VERBOSITY;
     case (Param::PrimalOrDual):
       return SoPlex::ALGORITHM;
+    case (Param::IterationLimit):
+      return SoPlex::ITERLIMIT;
     default:
       throw UnsupportedParameterException();
   }
