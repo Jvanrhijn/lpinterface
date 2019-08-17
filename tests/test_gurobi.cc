@@ -14,8 +14,8 @@
 using namespace lpint;
 using namespace testing;
 
-constexpr const std::size_t nrows = 10;
-constexpr const std::size_t ncols = 10;
+constexpr const std::size_t nrows = 100;
+constexpr const std::size_t ncols = 100;
 
 inline void redirect_stdout(int *saved_stdout, int *new_stdout) {
   *saved_stdout = dup(1);
@@ -106,27 +106,25 @@ TEST(Gurobi, UninitializedLP) {
 
 RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
-                                               rc::gen::positive<double>(), 
-                                               rc::gen::just(Ordering::LEQ));
-  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
-  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
-  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end()) + 1;
-
-  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count),
-                                    rc::gen::just(VarType::Real), 
-                                    rc::gen::nonZero<double>());
-
-  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
-  lp->add_constraints(std::move(constrs));
-  lp->set_objective(std::move(obj));
-
+  auto lp = gen_simple_valid_lp(nrows, ncols);
   GurobiSolver grb(std::move(lp));
-  grb.set_parameter(Param::TimeLimit, 0.0);
   grb.update_program();
+  grb.set_parameter(Param::TimeLimit, 0.0);
   const auto status = grb.solve_primal();
   RC_ASSERT(status == Status::TimeOut);
 }
+
+RC_GTEST_PROP(Gurobi, IterationLimit, ()) {
+  // generate a linear program that is not unbounded or infeasible,
+  // and requires more than 0 iterations
+  auto lp = gen_simple_valid_lp(10, ncols, 2.0);
+  GurobiSolver grb(std::move(lp));
+  grb.set_parameter(Param::IterationLimit, 0.0);
+  grb.update_program();
+  const auto status = grb.solve_primal();
+  RC_ASSERT(status == Status::IterationLimit);
+}
+
 
 TEST(Gurobi, UpdateProgram) {
   auto lp = std::make_unique<NiceMock<MockLinearProgram>>();

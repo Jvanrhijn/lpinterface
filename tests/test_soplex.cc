@@ -86,26 +86,22 @@ TEST(Soplex, UninitializedLP) {
 
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto constr = *rc::genConstraintWithOrdering(rc::genRow(100, rc::gen::positive<double>(), true), 
-                                               rc::gen::positive<double>(), 
-                                               rc::gen::just(Ordering::LEQ));
-  std::vector<Constraint<double>> constrs; constrs.push_back(std::move(constr));
-  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
-  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end());
-
-  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count), 
-                                    rc::gen::just(VarType::Real), 
-                                    rc::gen::nonZero<double>());
-
-  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
-  lp->add_constraints(std::move(constrs));
-  lp->set_objective(std::move(obj));
-
+  auto lp = gen_simple_valid_lp(1, ncols);
   SoplexSolver soplex(std::move(lp));
   soplex.set_parameter(Param::TimeLimit, 0.0);
   soplex.update_program();
   const auto status = soplex.solve_primal();
   RC_ASSERT(status == Status::TimeOut);
+}
+
+RC_GTEST_PROP(Soplex, IterationLimit, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp(1, ncols);
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(Param::IterationLimit, 0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::IterationLimit);
 }
 
 // property: any LP should result in the same

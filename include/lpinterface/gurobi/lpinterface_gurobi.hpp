@@ -177,7 +177,9 @@ inline const char* GurobiSolver::translate_parameter(const Param param) {
     case (Param::Cutoff):
       return "Cutoff";
     case (Param::TimeLimit):
-      return GRB_DBL_PAR_TIMELIMIT;
+      return "TimeLimit";
+    case (Param::IterationLimit):
+      return "IterationLimit";
     default:
       throw UnsupportedParameterException();
   }
