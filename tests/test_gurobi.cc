@@ -14,13 +14,28 @@
 using namespace lpint;
 using namespace testing;
 
+constexpr const std::size_t nrows = 10;
+constexpr const std::size_t ncols = 10;
+
+inline void redirect_stdout(int *saved_stdout, int *new_stdout) {
+  *saved_stdout = dup(1);
+  close(1);
+  *new_stdout = open("/dev/null", O_WRONLY);
+}
+
+inline void restore_stdout(int *saved_stdout, int *new_stdout) {
+  close(*new_stdout);
+  close(*saved_stdout);
+  close(*saved_stdout);
+  delete saved_stdout;
+  delete new_stdout;
+}
+
 inline int configure_gurobi(LinearProgram& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
-
   int error = GRBloadenv(env, "");
-
   close(new_stdout);
   dup(saved_stdout);
   close(saved_stdout);
@@ -89,6 +104,28 @@ TEST(Gurobi, UninitializedLP) {
   EXPECT_THROW(grb.update_program(), LinearProgramNotInitializedException);
 }
 
+RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp(nrows, ncols);
+  GurobiSolver grb(std::move(lp));
+  grb.update_program();
+  grb.set_parameter(Param::TimeLimit, 0.0);
+  const auto status = grb.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
+
+RC_GTEST_PROP(Gurobi, IterationLimit, ()) {
+  // generate a linear program that is not unbounded or infeasible,
+  // and requires more than 0 iterations
+  auto lp = gen_simple_valid_lp(10, ncols, 2.0);
+  GurobiSolver grb(std::move(lp));
+  grb.set_parameter(Param::IterationLimit, 0.0);
+  grb.update_program();
+  const auto status = grb.solve_primal();
+  RC_ASSERT(status == Status::IterationLimit);
+}
+
+
 TEST(Gurobi, UpdateProgram) {
   auto lp = std::make_unique<NiceMock<MockLinearProgram>>();
   ON_CALL(*lp, is_initialized()).WillByDefault(Return(true));
@@ -112,7 +149,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
   auto lp = *rc::genLinearProgramPtr(
-      10, 10, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
+      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
       rc::gen::arbitrary<VarType>());
 
   GRBenv* env = nullptr;

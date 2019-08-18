@@ -64,15 +64,17 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   constexpr
-  #endif
-  static char convert_ordering(const Ordering ord);
+#endif
+      static char
+      convert_ordering(const Ordering ord);
 
-  #if __cplusplus >= 201402L 
-  constexpr 
-  #endif
-  static Status convert_gurobi_status(int status);
+#if __cplusplus >= 201402L
+  constexpr
+#endif
+      static Status
+      convert_gurobi_status(int status);
 
  private:
   void redirect_stdout();
@@ -80,10 +82,11 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   int saved_stdout_;
   int new_stdout_;
 
-  #if __cplusplus >= 201402L
+#if __cplusplus >= 201402L
   constexpr
-  #endif
-  static const char* translate_parameter(const Param param);
+#endif
+      static const char*
+      translate_parameter(const Param param);
 
   //! The linear program to solve
   std::unique_ptr<LinearProgramInterface> linear_program_;
@@ -107,10 +110,11 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   }
 };
 
-#if __cplusplus >= 201402L 
+#if __cplusplus >= 201402L
 constexpr
 #endif
-inline char GurobiSolver::convert_ordering(const Ordering ord) {
+    inline char
+    GurobiSolver::convert_ordering(const Ordering ord) {
   switch (ord) {
     case Ordering::LEQ:
       return GRB_LESS_EQUAL;
@@ -123,10 +127,11 @@ inline char GurobiSolver::convert_ordering(const Ordering ord) {
   }
 }
 
-#if __cplusplus >= 201402L 
+#if __cplusplus >= 201402L
 constexpr
 #endif
-inline Status GurobiSolver::convert_gurobi_status(int status) {
+    inline Status
+    GurobiSolver::convert_gurobi_status(int status) {
   switch (status) {
     case GRB_LOADED:
       return Status::NoInformation;
@@ -161,14 +166,14 @@ inline Status GurobiSolver::convert_gurobi_status(int status) {
     default:
       throw UnknownStatusException(status);
   }
-
 }
 
 // TODO: extend
-#if __cplusplus >= 201402L 
+#if __cplusplus >= 201402L
 constexpr
 #endif
-inline const char* GurobiSolver::translate_parameter(const Param param) {
+    inline const char*
+    GurobiSolver::translate_parameter(const Param param) {
   switch (param) {
     case (Param::Verbosity):
       return "outputflag";
@@ -177,12 +182,13 @@ inline const char* GurobiSolver::translate_parameter(const Param param) {
     case (Param::Cutoff):
       return "Cutoff";
     case (Param::TimeLimit):
-      return GRB_DBL_PAR_TIMELIMIT;
+      return "TimeLimit";
+    case (Param::IterationLimit):
+      return "IterationLimit";
     default:
       throw UnsupportedParameterException();
   }
 }
-
 
 }  // namespace lpint
 

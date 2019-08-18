@@ -13,6 +13,9 @@
 using namespace lpint;
 using namespace testing;
 
+constexpr const std::size_t nrows = 100;
+constexpr const std::size_t ncols = 100;
+
 inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
   using namespace soplex;
 
@@ -38,7 +41,7 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
                constraint.row.nonzero_indices().data(),
                constraint.row.values().data());
     if (constraint.ordering == Ordering::LEQ) {
-      soplex.addRowReal(LPRow(0, ds_row, constraint.value));
+      soplex.addRowReal(LPRow(-infinity, ds_row, constraint.value));
     } else if (constraint.ordering == Ordering::GEQ) {
       soplex.addRowReal(LPRow(constraint.value, ds_row, infinity));
     } else {
@@ -81,13 +84,33 @@ TEST(Soplex, UninitializedLP) {
   EXPECT_THROW(spl.update_program(), LinearProgramNotInitializedException);
 }
 
+RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp(1, ncols);
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(Param::TimeLimit, 0.0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
+
+RC_GTEST_PROP(Soplex, IterationLimit, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp(1, ncols);
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(Param::IterationLimit, 0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::IterationLimit);
+}
+
 // property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto lp = *rc::genLinearProgramPtr(
-      100, 100, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
+      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
   auto soplex = configure_soplex(*lp);
@@ -149,7 +172,7 @@ TEST(Soplex, FullProblem) {
   ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
 }
 
-// RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
+//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
 //  using namespace soplex;
 //
 //  const auto sense =

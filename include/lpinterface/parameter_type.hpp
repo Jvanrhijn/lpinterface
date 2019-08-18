@@ -28,6 +28,8 @@ enum class Param {
   Verbosity,
   //! Whether to solve the primal (0) or dual (1) LP.
   PrimalOrDual,
+  //! Maximum number of iterations for simplex algorithm.
+  IterationLimit,
 };
 
 }  // namespace lpint
