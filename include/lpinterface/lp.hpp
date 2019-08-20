@@ -85,6 +85,10 @@ class ILinearProgramHandle {
    * @brief Set the objective function to be used.
    */
   virtual void set_objective(const Objective<double>& objective) = 0;
+
+  virtual std::vector<Constraint<double>> constraints() const = 0;
+
+  virtual Objective<double> objective() const = 0;
 };
 
 }  // namespace lpint

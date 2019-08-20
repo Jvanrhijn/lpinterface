@@ -21,7 +21,8 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   SoplexSolver() = default;
   explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
-    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})), lp_handle_(lp_handle) {}
+    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})), lp_handle_(lp_handle) {
+    }
   explicit SoplexSolver(OptimizationType optim_type);
   //explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
@@ -66,7 +67,6 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   std::shared_ptr<soplex::SoPlex> soplex_;
 
   LinearProgramHandleSoplex lp_handle_;
-  //std::unique_ptr<LinearProgramInterface> linear_program_;
 
   Solution<double> solution_;
 

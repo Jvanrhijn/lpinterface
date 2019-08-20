@@ -30,6 +30,10 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   OptimizationType optimization_type() const override;
 
+  std::vector<Constraint<double>> constraints() const override;
+
+  Objective<double> objective() const override;
+
   std::shared_ptr<soplex::SoPlex> soplex(detail::Badge<SoplexSolver>) {
       return soplex_;
   }
@@ -38,6 +42,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   std::shared_ptr<soplex::SoPlex> soplex_;
 
   OptimizationType sense_;
+  int callcount = 0;
 
 };
 

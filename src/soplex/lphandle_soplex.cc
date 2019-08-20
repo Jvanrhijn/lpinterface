@@ -38,4 +38,33 @@ std::size_t LinearProgramHandleSoplex::num_vars() const {
 
 }
 
+std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
+    const auto nrows = static_cast<std::size_t>(soplex_->numRowsReal());
+    std::vector<Constraint<double>> constraints;
+    for (std::size_t i = 0; i < nrows; i++) {
+        auto lb = soplex_->lhsReal(i);
+        auto ub = soplex_->rhsReal(i);
+
+        Row<double> row;
+        const auto sv = soplex_->rowVectorRealInternal(i);
+        for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
+            const auto element = sv.element(j);
+            row.nonzero_indices().push_back(element.idx);
+            row.values().push_back(element.val);
+        }
+
+        constraints.emplace_back(std::move(row), lb, ub);
+    }
+    return constraints;
+}
+
+Objective<double> LinearProgramHandleSoplex::objective() const {
+    const auto nvars = num_vars();
+    std::vector<double> values;
+    for (std::size_t i = 0; i < nvars; i++) {
+        values.push_back(soplex_->objReal(i));
+    }
+    return Objective<double>(std::move(values));
+}
+
 } // namespace lpint
