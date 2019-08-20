@@ -219,8 +219,8 @@ struct Constraint {
                 "T must be arithmetic in order to be ordered");
 
   Constraint() : row(), lower_bound(), upper_bound() {}
-  Constraint(Row<T>&& r, T lower_bound, T upper_bound)
-      : row(std::move(r)), lower_bound(lower_bound), upper_bound(upper_bound) {}
+  Constraint(Row<T>&& r, T lb, T ub)
+      : row(std::move(r)), lower_bound(lb), upper_bound(ub) {}
 
   Row<T> row;
   //! Ordering type of this constraint, see Ordering for possible variants.
