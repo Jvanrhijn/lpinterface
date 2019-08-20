@@ -42,28 +42,30 @@ inline soplex::SoPlex configure_soplex(const LinearProgramHandleSoplex& lp) {
   return soplex;
 }
 
-//RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
-//  // generate a linear program that is not unbounded or infeasible
-//  auto lp = gen_simple_valid_lp(1, ncols);
-//  SoplexSolver soplex(std::move(lp));
-//  soplex.set_parameter(Param::TimeLimit, 0.0);
-//  soplex.update_program();
-//  const auto status = soplex.solve_primal();
-//  RC_ASSERT(status == Status::TimeOut);
-//}
-//
-//RC_GTEST_PROP(Soplex, IterationLimit, ()) {
-//  // generate a linear program that is not unbounded or infeasible
-//  auto lp = gen_simple_valid_lp(1, ncols);
-//  SoplexSolver soplex(std::move(lp));
-//  soplex.set_parameter(Param::IterationLimit, 0);
-//  soplex.update_program();
-//  const auto status = soplex.solve_primal();
-//  RC_ASSERT(status == Status::IterationLimit);
-//}
-//
-//// property: any LP should result in the same
-//// answer as SoPlex gives us
+RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp<LinearProgramHandleSoplex>(1, ncols);
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(::Param::Verbosity, 0);
+  soplex.set_parameter(Param::TimeLimit, 0.0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
+
+RC_GTEST_PROP(Soplex, IterationLimit, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp<LinearProgramHandleSoplex>(1, ncols);
+  SoplexSolver soplex(std::move(lp));
+  soplex.set_parameter(::Param::Verbosity, 0);
+  soplex.set_parameter(Param::IterationLimit, 0);
+  soplex.update_program();
+  const auto status = soplex.solve_primal();
+  RC_ASSERT(status == Status::IterationLimit);
+}
+
+// property: any LP should result in the same
+// answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
@@ -101,8 +103,6 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
-  //auto lp = std::make_unique<LinearProgramHandleSoplex>();
-  //LinearProgramHandleSoplex lp;
   SoplexSolver spl(OptimizationType::Maximize);
 
   spl.linear_program().set_objective_sense(OptimizationType::Maximize);
