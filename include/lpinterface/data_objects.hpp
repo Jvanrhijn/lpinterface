@@ -76,6 +76,9 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
+  MatrixEntry(const std::size_t size)
+    : values_(size), nonzero_indices_(size) {}
+
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
     if (values_.size() != nonzero_indices_.size()) {
@@ -169,6 +172,7 @@ class Column : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Column(const std::size_t size) : MatrixEntry<T>(size) {}
   Column() = default;
   Column(Column<T>&&) = default;
   Column(const Column<T>&) = delete;
@@ -190,6 +194,7 @@ class Row : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  Row(const std::size_t size) : MatrixEntry<T>(size) {}
   Row() = default;
 
   Row(const Row<T>&) = delete;
@@ -217,7 +222,6 @@ template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
-
   Constraint() : row(), lower_bound(), upper_bound() {}
   Constraint(Row<T>&& r, T lb, T ub)
       : row(std::move(r)), lower_bound(lb), upper_bound(ub) {}

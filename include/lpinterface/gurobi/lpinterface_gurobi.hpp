@@ -11,6 +11,7 @@
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
+#include "lpinterface/gurobi/lphandle_gurobi.hpp"
 
 namespace lpint {
 
@@ -19,19 +20,16 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   GurobiSolver()
       : saved_stdout_(0),
         new_stdout_(0),
-        linear_program_(),
         gurobi_env_(nullptr),
-        gurobi_model_(nullptr) {}
+        gurobi_model_(nullptr),
+        lp_handle_() {}
   explicit GurobiSolver(OptimizationType optim_type);
-  explicit GurobiSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
-  ~GurobiSolver();
-
-  // rule of five: should implement/delete these
+  ~GurobiSolver() = default;
   GurobiSolver(const GurobiSolver&) = delete;
-  GurobiSolver(GurobiSolver&&) noexcept;
+  GurobiSolver(GurobiSolver&&) = default;
   GurobiSolver& operator=(const GurobiSolver& other) = delete;
-  GurobiSolver& operator=(GurobiSolver&&) noexcept;
+  GurobiSolver& operator=(GurobiSolver&&) = default;
 
   void set_parameter(const Param param, const int value) override;
 
@@ -45,9 +43,9 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   Status solution_status() const override;
 
-  const LinearProgramInterface& linear_program() const override;
+  const ILinearProgramHandle& linear_program() const override;
 
-  LinearProgramInterface& linear_program() override;
+  ILinearProgramHandle& linear_program() override;
 
   const Solution<double>& get_solution() const override;
 
@@ -88,33 +86,25 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
       static const char*
       translate_parameter(const Param param);
 
-  //! The linear program to solve
-  std::unique_ptr<LinearProgramInterface> linear_program_;
-
   //! The gurobi environment object
-  GRBenv* gurobi_env_;
+  std::shared_ptr<GRBenv> gurobi_env_;
 
   //! The gurobi model object
-  GRBmodel* gurobi_model_;
+  std::shared_ptr<GRBmodel> gurobi_model_;
+
+  //! The linear program to solve
+  LinearProgramHandleGurobi lp_handle_;
 
   //! The solution vector
   Solution<double> solution_;
 
-  // copy-and-swap idiom
-  friend void swap(GurobiSolver& first, GurobiSolver& second) noexcept {
-    using std::swap;
-    swap(first.linear_program_, second.linear_program_);
-    swap(first.gurobi_env_, second.gurobi_env_);
-    swap(first.gurobi_model_, second.gurobi_model_);
-    swap(first.solution_, second.solution_);
-  }
 };
 
 #if __cplusplus >= 201402L
 constexpr
 #endif
     inline char
-    GurobiSolver::convert_ordering(const Ordering ord) {
+    convert_ordering(const Ordering ord) {
   switch (ord) {
     case Ordering::LEQ:
       return GRB_LESS_EQUAL;
