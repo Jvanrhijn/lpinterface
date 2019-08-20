@@ -50,30 +50,22 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
  * The interface provides methods to modify the LP internally, as well
  * access the LP structure.
  */
-class LinearProgramInterface {
+class ILinearProgramHandle {
  public:
-  LinearProgramInterface() = default;
-  LinearProgramInterface(const LinearProgramInterface&) = default;
-  LinearProgramInterface(LinearProgramInterface&&) = default;
-  LinearProgramInterface& operator=(const LinearProgramInterface&) = default;
-  LinearProgramInterface& operator=(LinearProgramInterface&&) = default;
+  ILinearProgramHandle() = default;
+  ILinearProgramHandle(const ILinearProgramHandle&) = default;
+  ILinearProgramHandle(ILinearProgramHandle&&) = default;
+  ILinearProgramHandle& operator=(const ILinearProgramHandle&) = default;
+  ILinearProgramHandle& operator=(ILinearProgramHandle&&) = default;
 
-  virtual ~LinearProgramInterface() = default;
+  virtual ~ILinearProgramHandle() = default;
 
   /**
    * @brief Get the number of variables in the LP.
    */
   virtual std::size_t num_vars() const = 0;
 
-  /**
-   * @brief Get a const reference to the vector of constraints.
-   */
-  virtual const std::vector<Constraint<double>>& constraints() const = 0;
-
-  /**
-   * @brief Get a reference to the vector of constraints.
-   */
-  virtual std::vector<Constraint<double>>& constraints() = 0;
+  virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
    * @brief Add a set of constraints to the LP formulation.
@@ -82,7 +74,7 @@ class LinearProgramInterface {
       std::vector<Constraint<double>>&& constraints) = 0;
 
   /**
-   * @brief Retrieve the optimization type of this LinearProgramInterface.
+   * @brief Retrieve the optimization type of this ILinearProgramHandle.
    * The Optimization type can be either Type::Minimize or
    * Type::Maximize, which correspond to the LP formulations
    * min c^T * x and max c^T * x, respectively.
@@ -93,24 +85,6 @@ class LinearProgramInterface {
    * @brief Set the objective function to be used.
    */
   virtual void set_objective(const Objective<double>& objective) = 0;
-
-  /**
-   * @brief Get a const reference to the objective function.
-   */
-  virtual const Objective<double>& objective() const = 0;
-
-  /**
-   * @brief Get a reference to the objective function.
-   */
-  virtual Objective<double>& objective() = 0;
-
-  /**
-   * @brief Check whether the LP is initialized.
-   *
-   * @return true The LP data is ready to be flushed to a solver backend.
-   * @return false The LP data cannot be safely flushed to a backend.
-   */
-  virtual bool is_initialized() const = 0;
 };
 
 }  // namespace lpint

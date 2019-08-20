@@ -155,46 +155,46 @@ struct Arbitrary<lpint::OptimizationType> {
   }
 };
 
-inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
-                                                  const std::size_t max_ncols,
-                                                  Gen<lpint::Ordering> genord,
-                                                  Gen<lpint::VarType> genvt) {
-  using namespace lpint;
-
-  const std::size_t nrows =
-      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
-  const std::size_t ncols =
-      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
-
-  return gen::construct<LinearProgram>(
-      rc::gen::arbitrary<OptimizationType>(),
-      rc::gen::container<std::vector<Constraint<double>>>(
-          nrows, rc::genConstraintWithOrdering(
-                     genRow(ncols, rc::gen::arbitrary<double>()),
-                     rc::gen::arbitrary<double>(), std::move(genord))),
-      rc::genSizedObjective(ncols, std::move(genvt),
-                            rc::gen::arbitrary<double>()));
-}
-
-inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
-    const std::size_t max_nrows, const std::size_t max_ncols,
-    Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
-  using namespace lpint;
-
-  const std::size_t nrows =
-      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
-  const std::size_t ncols =
-      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
-
-  return gen::makeUnique<LinearProgram>(
-      rc::gen::arbitrary<OptimizationType>(),
-      rc::gen::container<std::vector<Constraint<double>>>(
-          nrows, rc::genConstraintWithOrdering(
-                     genRow(ncols, rc::gen::arbitrary<double>()),
-                     rc::gen::arbitrary<double>(), std::move(genord))),
-      rc::genSizedObjective(ncols, std::move(genvt),
-                            rc::gen::arbitrary<double>()));
-}
+//inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
+//                                                  const std::size_t max_ncols,
+//                                                  Gen<lpint::Ordering> genord,
+//                                                  Gen<lpint::VarType> genvt) {
+//  using namespace lpint;
+//
+//  const std::size_t nrows =
+//      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
+//  const std::size_t ncols =
+//      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
+//
+//  return gen::construct<LinearProgram>(
+//      rc::gen::arbitrary<OptimizationType>(),
+//      rc::gen::container<std::vector<Constraint<double>>>(
+//          nrows, rc::genConstraintWithOrdering(
+//                     genRow(ncols, rc::gen::arbitrary<double>()),
+//                     rc::gen::arbitrary<double>(), std::move(genord))),
+//      rc::genSizedObjective(ncols, std::move(genvt),
+//                            rc::gen::arbitrary<double>()));
+//}
+//
+//inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
+//    const std::size_t max_nrows, const std::size_t max_ncols,
+//    Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
+//  using namespace lpint;
+//
+//  const std::size_t nrows =
+//      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
+//  const std::size_t ncols =
+//      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
+//
+//  return gen::makeUnique<LinearProgram>(
+//      rc::gen::arbitrary<OptimizationType>(),
+//      rc::gen::container<std::vector<Constraint<double>>>(
+//          nrows, rc::genConstraintWithOrdering(
+//                     genRow(ncols, rc::gen::arbitrary<double>()),
+//                     rc::gen::arbitrary<double>(), std::move(genord))),
+//      rc::genSizedObjective(ncols, std::move(genvt),
+//                            rc::gen::arbitrary<double>()));
+//}
 
 }  // namespace rc
 
@@ -213,62 +213,62 @@ struct RawDataLinearProgram {
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
-                                             const std::size_t ncols,
-                                             rc::Gen<Ordering> ogen,
-                                             rc::Gen<VarType> vgen) {
-  using namespace lpint;
-
-  const auto lp = *rc::genLinearProgram(nrows, ncols, ogen, vgen);
-
-  std::vector<double> values, lb, ub;
-  std::vector<int> start_indices, col_indices;
-
-  for (const auto &constraint : lp.constraints()) {
-    const auto &row = constraint.row;
-    values.insert(values.end(), row.values().begin(), row.values().end());
-    start_indices.push_back(values.size() - row.values().size());
-    col_indices.insert(col_indices.end(), row.nonzero_indices().begin(),
-                       row.nonzero_indices().end());
-    lb.push_back(constraint.lower_bound);
-    ub.push_back(constraint.upper_bound);
-  }
-
-  std::vector<double> objective = lp.objective().values;
-  std::vector<VarType> var_type = lp.objective().variable_types;
-
-  return RawDataLinearProgram{lp.optimization_type(),
-                              values,
-                              start_indices,
-                              col_indices,
-                              lb,
-                              ub,
-                              objective,
-                              var_type};
-}
-
-inline std::unique_ptr<lpint::LinearProgram> gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
-                                                                 double ub = lpint::LPINT_INFINITY) {
-  std::vector<Constraint<double>> constrs;
-  for (std::size_t i = 0; i < nrows; i++) {
-    auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
-                                                 rc::gen::positive<double>(),
-                                                 rc::gen::just(Ordering::LEQ));
-    constrs.push_back(std::move(constr));
-  }
-  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
-  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end()) + 1;
-
-  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count), 
-                                    rc::gen::just(VarType::Real), 
-                                    rc::gen::positive<double>());
-
-  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
-  lp->add_constraints(std::move(constrs));
-  lp->set_objective(std::move(obj));
-  return lp;
-}
-
+//inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
+//                                             const std::size_t ncols,
+//                                             rc::Gen<Ordering> ogen,
+//                                             rc::Gen<VarType> vgen) {
+//  using namespace lpint;
+//
+//  const auto lp = *rc::genLinearProgram(nrows, ncols, ogen, vgen);
+//
+//  std::vector<double> values, lb, ub;
+//  std::vector<int> start_indices, col_indices;
+//
+//  for (const auto &constraint : lp.constraints()) {
+//    const auto &row = constraint.row;
+//    values.insert(values.end(), row.values().begin(), row.values().end());
+//    start_indices.push_back(values.size() - row.values().size());
+//    col_indices.insert(col_indices.end(), row.nonzero_indices().begin(),
+//                       row.nonzero_indices().end());
+//    lb.push_back(constraint.lower_bound);
+//    ub.push_back(constraint.upper_bound);
+//  }
+//
+//  std::vector<double> objective = lp.objective().values;
+//  std::vector<VarType> var_type = lp.objective().variable_types;
+//
+//  return RawDataLinearProgram{lp.optimization_type(),
+//                              values,
+//                              start_indices,
+//                              col_indices,
+//                              lb,
+//                              ub,
+//                              objective,
+//                              var_type};
+//}
+//
+//inline std::unique_ptr<lpint::LinearProgram> gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
+//                                                                 double ub = lpint::LPINT_INFINITY) {
+//  std::vector<Constraint<double>> constrs;
+//  for (std::size_t i = 0; i < nrows; i++) {
+//    auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
+//                                                 rc::gen::positive<double>(),
+//                                                 rc::gen::just(Ordering::LEQ));
+//    constrs.push_back(std::move(constr));
+//  }
+//  const auto& nonzero_indices = constrs.front().row.nonzero_indices();
+//  const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end()) + 1;
+//
+//  auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count), 
+//                                    rc::gen::just(VarType::Real), 
+//                                    rc::gen::positive<double>());
+//
+//  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+//  lp->add_constraints(std::move(constrs));
+//  lp->set_objective(std::move(obj));
+//  return lp;
+//}
+//
 }  // namespace lpint
 
 #endif  // LPINTERFACE_GENERATORS_H

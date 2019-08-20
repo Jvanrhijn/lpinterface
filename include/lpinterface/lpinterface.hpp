@@ -32,12 +32,12 @@ class LinearProgramSolver {
   /**
    * @brief Get immutable access to the underlying Linear Program object.
    */
-  virtual const LinearProgramInterface& linear_program() const = 0;
+  virtual const ILinearProgramHandle& linear_program() const = 0;
 
   /**
    * @brief Get mutable access to the underlying Linear Program object
    */
-  virtual LinearProgramInterface& linear_program() = 0;
+  virtual ILinearProgramHandle& linear_program() = 0;
 
   /**
    * @brief Set an integer-valued parameter in the internal LP solver.

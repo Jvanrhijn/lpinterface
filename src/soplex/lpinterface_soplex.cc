@@ -4,84 +4,57 @@ namespace lpint {
 
 using namespace soplex;
 
-SoplexSolver::SoplexSolver(OptimizationType optim_type) {
-  if (!soplex_.setIntParam(translate_int_parameter(Param::ObjectiveSense),
-                           optim_type == OptimizationType::Maximize
-                               ? SoPlex::OBJSENSE_MAXIMIZE
-                               : SoPlex::OBJSENSE_MINIMIZE)) {
-    throw FailedToSetParameterException();
-  }
-  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
+SoplexSolver::SoplexSolver(OptimizationType optim_type) 
+  : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_)
+{
+  lp_handle_.set_objective_sense(optim_type);
+  if (!soplex_->setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
     throw FailedToSetParameterException();
   }
 }
 
-SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
-    : linear_program_(std::move(lp)) {
-  if (!soplex_.setIntParam(
-          translate_int_parameter(Param::ObjectiveSense),
-          linear_program_->optimization_type() == OptimizationType::Maximize
-              ? SoPlex::OBJSENSE_MAXIMIZE
-              : SoPlex::OBJSENSE_MINIMIZE)) {
-    throw FailedToSetParameterException();
-  }
-  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
-    throw FailedToSetParameterException();
-  }
-  // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
-  // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==
-  // SparseMatrixType::RowWise?
-  //  SoPlex::REPRESENTATION_ROW : SoPlex::REPRESENTATION_COLUMN);
-}
+//SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
+//    : linear_program_(std::move(lp)) {
+//  if (!soplex_.setIntParam(
+//          translate_int_parameter(Param::ObjectiveSense),
+//          linear_program_->optimization_type() == OptimizationType::Maximize
+//              ? SoPlex::OBJSENSE_MAXIMIZE
+//              : SoPlex::OBJSENSE_MINIMIZE)) {
+//    throw FailedToSetParameterException();
+//  }
+//  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
+//    throw FailedToSetParameterException();
+//  }
+//  // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
+//  // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==
+//  // SparseMatrixType::RowWise?
+//  //  SoPlex::REPRESENTATION_ROW : SoPlex::REPRESENTATION_COLUMN);
+//}
 
 void SoplexSolver::set_parameter(const Param param, const int value) {
-  if (!soplex_.setIntParam(translate_int_parameter(param), value)) {
+  if (!soplex_->setIntParam(translate_int_parameter(param), value)) {
     throw FailedToSetParameterException();
   }
 }
 
 void SoplexSolver::set_parameter(const Param param, const double value) {
-  if (!soplex_.setRealParam(translate_real_parameter(param), value)) {
+  if (!soplex_->setRealParam(translate_real_parameter(param), value)) {
     throw FailedToSetParameterException();
   }
 }
 
 void SoplexSolver::update_program() {
-  // can't push data to LP if data does not exist
-  if (!linear_program_->is_initialized()) {
-    throw LinearProgramNotInitializedException();
-  }
 
-  const auto& objective = linear_program_->objective();
-
-  // add variables to LP
-  DSVector dummycol(0);
-  for (const auto& coefficient : objective.values) {
-    soplex_.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
-  }
-
-  auto& constraints = linear_program_->constraints();
-
-  // add constraints to LP
-  for (auto& constraint : constraints) {
-    DSVector ds_row(constraint.row.num_nonzero());
-    // TODO: fix this so we don't have to copy each time
-    ds_row.add(constraint.row.num_nonzero(),
-               constraint.row.nonzero_indices().data(),
-               constraint.row.values().data());
-    // determine constraint
-    soplex_.addRowReal(LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
-  }
 }
 
 Status SoplexSolver::solve_primal() {
-  const auto status = translate_status(soplex_.optimize());
+  const auto status = translate_status(soplex_->optimize());
 
-  DVector prim(soplex_.numColsReal());
-  DVector dual(soplex_.numRowsReal());
+  DVector prim(soplex_->numColsReal());
+  DVector dual(soplex_->numRowsReal());
 
-  soplex_.getPrimalReal(prim);
-  soplex_.getDualReal(dual);
+  soplex_->getPrimalReal(prim);
+  soplex_->getDualReal(dual);
 
   solution_.primal.resize(static_cast<std::size_t>(prim.dim()));
   for (std::size_t i = 0; i < static_cast<std::size_t>(prim.dim()); i++) {
@@ -91,7 +64,7 @@ Status SoplexSolver::solve_primal() {
   for (std::size_t i = 0; i < static_cast<std::size_t>(dual.dim()); i++) {
     solution_.dual[i] = dual[i];
   }
-  solution_.objective_value = soplex_.objValueReal();
+  solution_.objective_value = soplex_->objValueReal();
 
   return status;
 }
@@ -99,15 +72,15 @@ Status SoplexSolver::solve_primal() {
 Status SoplexSolver::solve_dual() { return solve_primal(); }
 
 Status SoplexSolver::solution_status() const {
-  return translate_status(soplex_.status());
+  return translate_status(soplex_->status());
 }
 
-const LinearProgramInterface& SoplexSolver::linear_program() const {
-  return *linear_program_;
+const ILinearProgramHandle& SoplexSolver::linear_program() const {
+  return lp_handle_;
 }
 
-LinearProgramInterface& SoplexSolver::linear_program() {
-  return *linear_program_;
+ILinearProgramHandle& SoplexSolver::linear_program() {
+  return lp_handle_;
 }
 
 const Solution<double>& SoplexSolver::get_solution() const { return solution_; }
@@ -138,7 +111,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
 
     DSVector ds_row(nnz);
     ds_row.add(nnz, nonzero_indices.data(), row.data());
-    soplex_.addRowReal(LPRow(lb[i], ds_row, ub[i]));
+    soplex_->addRowReal(LPRow(lb[i], ds_row, ub[i]));
   }
   // have to do the last one manually since the logic differs slightly
   const int last_start_idx = start_indices[start_indices.size() - 1];
@@ -148,7 +121,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
   int nnz = row.size();
   DSVector ds_row(nnz);
   ds_row.add(nnz, nonzero_indices.data(), row.data());
-  soplex_.addRowReal(LPRow(lb[start_indices.size()-1], ds_row, ub[start_indices.size() - 1]));
+  soplex_->addRowReal(LPRow(lb[start_indices.size()-1], ds_row, ub[start_indices.size() - 1]));
 }
 
 void SoplexSolver::add_variables(std::vector<double>&& objective_values,
@@ -162,7 +135,7 @@ void SoplexSolver::add_variables(std::vector<double>&& objective_values,
   DSVector dummycol(0);
   const std::size_t nvars = objective_values.size();
   for (std::size_t i = 0; i < nvars; i++) {
-    soplex_.addColReal(LPCol(objective_values[i], dummycol, infinity, 0.0));
+    soplex_->addColReal(LPCol(objective_values[i], dummycol, infinity, 0.0));
   }
 }
 

@@ -40,7 +40,7 @@ include_directories(include)
 include(cmake/clang-cxx-dev-tools.cmake)
 
 # source files
-list(APPEND lpinterface_files src/lp_impl.cc)
+#list(APPEND lpinterface_files src/lp_impl.cc)
 
 # Optional dependencies
 #find_package(GUROBI)
@@ -59,7 +59,9 @@ if (SOPLEX_FOUND)
   message(STATUS "Found SoPlex: TRUE")
   include_directories(${SOPLEX_INCLUDE_DIRS})
   list(APPEND LIBS ${SOPLEX_LIBRARIES})
-  list(APPEND lpinterface_files src/soplex/lpinterface_soplex.cc)
+  list(APPEND lpinterface_files 
+        src/soplex/lpinterface_soplex.cc
+        src/soplex/lphandle_soplex.cc)
 endif(SOPLEX_FOUND)
 
 # Gtest configuration
