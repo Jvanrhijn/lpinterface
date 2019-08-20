@@ -43,15 +43,15 @@ include(cmake/clang-cxx-dev-tools.cmake)
 list(APPEND lpinterface_files src/lp_impl.cc)
 
 # Optional dependencies
-find_package(GUROBI)
-
-if (GUROBI_FOUND)
-  message(STATUS "Found Gurobi: TRUE")
-  include_directories(${GUROBI_INCLUDE_DIRS})
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
-  list(APPEND LIBS gurobi81)
-  list(APPEND lpinterface_files src/gurobi/lpinterface_gurobi.cc)
-endif(GUROBI_FOUND)
+#find_package(GUROBI)
+#
+#if (GUROBI_FOUND)
+#  message(STATUS "Found Gurobi: TRUE")
+#  include_directories(${GUROBI_INCLUDE_DIRS})
+#  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
+#  list(APPEND LIBS gurobi81)
+#  list(APPEND lpinterface_files src/gurobi/lpinterface_gurobi.cc)
+#endif(GUROBI_FOUND)
 
 find_package(SOPLEX)
 
