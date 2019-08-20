@@ -70,13 +70,7 @@ void SoplexSolver::update_program() {
                constraint.row.nonzero_indices().data(),
                constraint.row.values().data());
     // determine constraint
-    if (constraint.ordering == Ordering::LEQ) {
-      soplex_.addRowReal(LPRow(-infinity, ds_row, constraint.value));
-    } else if (constraint.ordering == Ordering::GEQ) {
-      soplex_.addRowReal(LPRow(constraint.value, ds_row, infinity));
-    } else {
-      throw UnsupportedConstraintException();
-    }
+    soplex_.addRowReal(LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
   }
 }
 
@@ -122,16 +116,16 @@ void SoplexSolver::add_columns(
     __attribute__((unused)) std::vector<double>&& values,
     __attribute__((unused)) std::vector<int>&& start_indices,
     __attribute__((unused)) std::vector<int>&& row_indices,
-    __attribute__((unused)) std::vector<Ordering>&& ord,
-    __attribute__((unused)) std::vector<double>&& rhs) {
+    __attribute__((unused)) std::vector<double>&& lb,
+    __attribute__((unused)) std::vector<double>&& ub) {
   throw UnsupportedFeatureException();
 }
 
 void SoplexSolver::add_rows(std::vector<double>&& values,
                             std::vector<int>&& start_indices,
                             std::vector<int>&& col_indices,
-                            std::vector<Ordering>&& ord,
-                            std::vector<double>&& rhs) {
+                            std::vector<double>&& lb,
+                            std::vector<double>&& ub) {
   std::size_t nrows = start_indices.size();
   for (std::size_t i = 0; i < nrows - 1; i++) {
     const int nnz = start_indices[i + 1] - start_indices[i];
@@ -144,13 +138,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
 
     DSVector ds_row(nnz);
     ds_row.add(nnz, nonzero_indices.data(), row.data());
-    if (ord[i] == Ordering::LEQ) {
-      soplex_.addRowReal(LPRow(0, ds_row, rhs[i]));
-    } else if (ord[i] == Ordering::GEQ) {
-      soplex_.addRowReal(LPRow(rhs[i], ds_row, infinity));
-    } else {
-      throw UnsupportedConstraintException();
-    }
+    soplex_.addRowReal(LPRow(lb[i], ds_row, ub[i]));
   }
   // have to do the last one manually since the logic differs slightly
   const int last_start_idx = start_indices[start_indices.size() - 1];
@@ -160,14 +148,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
   int nnz = row.size();
   DSVector ds_row(nnz);
   ds_row.add(nnz, nonzero_indices.data(), row.data());
-
-  if (ord[start_indices.size() - 1] == Ordering::LEQ) {
-    soplex_.addRowReal(LPRow(0, ds_row, rhs[start_indices.size() - 1]));
-  } else if (ord[start_indices.size() - 1] == Ordering::GEQ) {
-    soplex_.addRowReal(LPRow(rhs[start_indices.size() - 1], ds_row, infinity));
-  } else {
-    throw UnsupportedConstraintException();
-  }
+  soplex_.addRowReal(LPRow(lb[start_indices.size()-1], ds_row, ub[start_indices.size() - 1]));
 }
 
 void SoplexSolver::add_variables(std::vector<double>&& objective_values,

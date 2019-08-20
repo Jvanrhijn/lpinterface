@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <algorithm>
 
 #include "rapidcheck.h"
 
@@ -46,10 +47,14 @@ struct Arbitrary<lpint::Objective<T>> {
 template <typename T>
 inline Gen<lpint::Constraint<T>> genConstraintWithOrdering(
     Gen<lpint::Row<T>> rowgen, Gen<T> vgen, Gen<lpint::Ordering> ogen) {
+  auto bound1 = *vgen;
+  auto bound2 = *rc::gen::distinctFrom(vgen, bound1);
+  auto ub = std::max(bound1, bound2);
+  auto lb = std::min(bound1, bound2);
   return gen::build<lpint::Constraint<T>>(
       gen::set(&lpint::Constraint<T>::row, rowgen),
-      gen::set(&lpint::Constraint<T>::ordering, ogen),
-      gen::set(&lpint::Constraint<T>::value, vgen));
+      gen::set(&lpint::Constraint<T>::lower_bound, rc::gen::just(lb)),
+      gen::set(&lpint::Constraint<T>::upper_bound, rc::gen::just(ub)));
 }
 
 template <typename T>
@@ -95,13 +100,14 @@ struct Arbitrary<lpint::Row<T>> {
   }
 };
 
+// TODO: fix s.t. lower_bound <= upper_bound
 template <typename T>
 struct Arbitrary<lpint::Constraint<T>> {
   static Gen<lpint::Constraint<T>> arbitrary() {
     return gen::build<lpint::Constraint<T>>(
-        gen::set(&lpint::Constraint<T>::value),
+        gen::set(&lpint::Constraint<T>::lower_bound),
         gen::set(&lpint::Constraint<T>::row),
-        gen::set(&lpint::Constraint<T>::ordering));
+        gen::set(&lpint::Constraint<T>::upper_bound));
   }
 };
 
@@ -199,8 +205,8 @@ struct RawDataLinearProgram {
   std::vector<double> values;
   std::vector<int> start_indices;
   std::vector<int> column_indices;
-  std::vector<double> rhs;
-  std::vector<Ordering> ord;
+  std::vector<double> lb;
+  std::vector<double> ub;
   std::vector<double> objective;
   std::vector<VarType> var_type;
 };
@@ -215,9 +221,8 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
 
   const auto lp = *rc::genLinearProgram(nrows, ncols, ogen, vgen);
 
-  std::vector<double> values, rhs;
+  std::vector<double> values, lb, ub;
   std::vector<int> start_indices, col_indices;
-  std::vector<Ordering> ord;
 
   for (const auto &constraint : lp.constraints()) {
     const auto &row = constraint.row;
@@ -225,8 +230,8 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
     start_indices.push_back(values.size() - row.values().size());
     col_indices.insert(col_indices.end(), row.nonzero_indices().begin(),
                        row.nonzero_indices().end());
-    rhs.push_back(constraint.value);
-    ord.push_back(constraint.ordering);
+    lb.push_back(constraint.lower_bound);
+    ub.push_back(constraint.upper_bound);
   }
 
   std::vector<double> objective = lp.objective().values;
@@ -236,8 +241,8 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
                               values,
                               start_indices,
                               col_indices,
-                              rhs,
-                              ord,
+                              lb,
+                              ub,
                               objective,
                               var_type};
 }
@@ -247,7 +252,7 @@ inline std::unique_ptr<lpint::LinearProgram> gen_simple_valid_lp(std::size_t nro
   std::vector<Constraint<double>> constrs;
   for (std::size_t i = 0; i < nrows; i++) {
     auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
-                                                 ub == LPINT_INFINITY? rc::gen::positive<double>() : rc::gen::just(ub), 
+                                                 rc::gen::positive<double>(),
                                                  rc::gen::just(Ordering::LEQ));
     constrs.push_back(std::move(constr));
   }

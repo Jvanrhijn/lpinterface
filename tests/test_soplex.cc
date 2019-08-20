@@ -40,13 +40,7 @@ inline soplex::SoPlex configure_soplex(const LinearProgram& lp) {
     ds_row.add(constraint.row.values().size(),
                constraint.row.nonzero_indices().data(),
                constraint.row.values().data());
-    if (constraint.ordering == Ordering::LEQ) {
-      soplex.addRowReal(LPRow(-infinity, ds_row, constraint.value));
-    } else if (constraint.ordering == Ordering::GEQ) {
-      soplex.addRowReal(LPRow(constraint.value, ds_row, infinity));
-    } else {
-      throw UnsupportedConstraintException();
-    }
+    soplex.addRowReal(LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
   }
   return soplex;
 }
@@ -147,8 +141,8 @@ TEST(Soplex, FullProblem) {
   auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
 
   std::vector<Constraint<double>> constr;
-  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 4.0);
-  constr.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
+  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
+  constr.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
 
   lp->add_constraints(std::move(constr));
 
@@ -200,15 +194,15 @@ TEST(Soplex, FullProblemRawData) {
     std::vector<double> values = {1, 2, 3, 1, 1};
     std::vector<int> start_indices = {0, 3};
     std::vector<int> col_indices = {0, 1, 2, 0, 1};
-    std::vector<double> rhs = {4.0, 1.0};
-    std::vector<Ordering> ord = {Ordering::LEQ, Ordering::GEQ};
+    std::vector<double> lb = {-LPINT_INFINITY, 1.0};
+    std::vector<double> ub = {4.0, LPINT_INFINITY};
     std::vector<double> objective = {1.0, 1.0, 2.0};
     std::vector<VarType> var_type = {VarType::Real, VarType::Real,
                                      VarType::Real};
 
     spl.add_variables(std::move(objective), std::move(var_type));
     spl.add_rows(std::move(values), std::move(start_indices),
-                 std::move(col_indices), std::move(ord), std::move(rhs));
+                 std::move(col_indices), std::move(lb), std::move(ub));
   }
 
   // Solve the primal LP problem

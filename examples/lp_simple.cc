@@ -59,9 +59,8 @@ int main(int argc, char* argv[]) {
     // Each Constraint consists of a matrix row, an
     // ordering, and a bound.
     std::vector<Constraint<double>> constraints;
-    constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ,
-                             4.0);
-    constraints.emplace_back(Row<double>({1, 1}, {0, 1}), Ordering::GEQ, 1.0);
+    constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
+    constraints.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
     lp->add_constraints(std::move(constraints));
 
     // Set the objective vector. The objective consists of the

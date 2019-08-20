@@ -97,11 +97,10 @@ void GurobiSolver::update_program() {
   // set constraints
   auto& constraints = linear_program_->constraints();
   for (auto& constraint : constraints) {
-    char ord = convert_ordering(constraint.ordering);
-    const auto error = GRBaddconstr(gurobi_model_, constraint.row.num_nonzero(),
+    const auto error = GRBaddrangeconstr(gurobi_model_, constraint.row.num_nonzero(),
                                     constraint.row.nonzero_indices().data(),
-                                    constraint.row.values().data(), ord,
-                                    constraint.value, nullptr);
+                                    constraint.row.values().data(), constraint.lower_bound,
+                                    constraint.upper_bound, nullptr);
     if (error != 0) {
       throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
     }
@@ -129,10 +128,13 @@ Status GurobiSolver::solve_primal() {
   }
 
   int num_vars;
-  error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
-
-  if (error) {
-    throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
+  if (linear_program_ != nullptr) {
+    num_vars = static_cast<int>(linear_program_->num_vars());
+  } else {
+    error = GRBgetintattr(gurobi_model_, GRB_INT_ATTR_NUMVARS, &num_vars);
+    if (error) {
+      throw GurobiException(error, GRBgeterrormsg(gurobi_env_));
+    }
   }
 
   solution_.primal.resize(static_cast<std::size_t>(num_vars));
@@ -170,23 +172,19 @@ void GurobiSolver::add_columns(
     __attribute__((unused)) std::vector<double>&& values,
     __attribute__((unused)) std::vector<int>&& start_indices,
     __attribute__((unused)) std::vector<int>&& row_indices,
-    __attribute__((unused)) std::vector<Ordering>&& ord,
-    __attribute__((unused)) std::vector<double>&& rhs) {
+    __attribute__((unused)) std::vector<double>&& lb,
+    __attribute__((unused)) std::vector<double>&& ub) {
   throw UnsupportedFeatureException();
 }
 
 void GurobiSolver::add_rows(std::vector<double>&& values,
                             std::vector<int>&& start_indices,
                             std::vector<int>&& col_indices,
-                            std::vector<Ordering>&& ord,
-                            std::vector<double>&& rhs) {
-  std::vector<char> ord_grb;
-  for (const auto& ordering : ord) {
-    ord_grb.push_back(convert_ordering(ordering));
-  }
-  const auto error = GRBaddconstrs(
+                            std::vector<double>&& lb,
+                            std::vector<double>&& ub) {
+  const auto error = GRBaddrangeconstrs(
       gurobi_model_, start_indices.size(), values.size(), start_indices.data(),
-      col_indices.data(), values.data(), ord_grb.data(), rhs.data(), nullptr);
+      col_indices.data(), values.data(), lb.data(), ub.data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }

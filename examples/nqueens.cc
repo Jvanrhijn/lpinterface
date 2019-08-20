@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     std::iota(nonzeros.begin(), nonzeros.end(), i * BOARD_SIZE);
     rows.emplace_back(std::vector<double>(BOARD_SIZE, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   // - max one queen in each column: sum_i X_{ij} <= 1, forall j
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
     rows.emplace_back(std::vector<double>(BOARD_SIZE, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   //// - max one queen per sub-diagonal: sum_i X_{i + k, i} <= 1 for k < N
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
     }
     rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   // - max one queen per super-diagonal: sum_i X{i, i + k} <= 1 for k < N
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     }
     rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   // - max one queen per anti-sub-diagonal: sum_i X{N - i, i + k + 1} <= 1, k <=
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     }
     rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   // - max one queen per anti-super-diagonal:, sum_i X{N - i - k, i + 1} <= 1, k
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     }
     rows.emplace_back(std::vector<double>(BOARD_SIZE - k, 1.0), nonzeros);
     constraints.push_back(
-        Constraint<double>(std::move(rows.back()), Ordering::LEQ, 1.0));
+        Constraint<double>(std::move(rows.back()), -LPINT_INFINITY, 1.0));
   }
 
   // add rows and constraints to LP

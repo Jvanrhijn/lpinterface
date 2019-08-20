@@ -218,15 +218,17 @@ struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
 
-  Constraint() : row(), ordering(), value() {}
-  Constraint(Row<T>&& r, Ordering ord, T val)
-      : row(std::move(r)), ordering(ord), value(val) {}
+  Constraint() : row(), lower_bound(), upper_bound() {}
+  Constraint(Row<T>&& r, T lower_bound, T upper_bound)
+      : row(std::move(r)), lower_bound(lower_bound), upper_bound(upper_bound) {}
 
   Row<T> row;
   //! Ordering type of this constraint, see Ordering for possible variants.
-  Ordering ordering;
-  //! Value of right-hand-side vector of constraints.
-  T value;
+  //Ordering ordering;
+  //! Lower bound of constraint equation.
+  T lower_bound;
+  //! Upper bound of constraint equation.
+  T upper_bound;
 };
 
 /**
@@ -301,7 +303,7 @@ inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Constraint<T>& constraint) {
-  os << constraint.row << " " << constraint.ordering << " " << constraint.value;
+  os << constraint.lower_bound << " <= " << constraint.row << " <= " << constraint.upper_bound;
   return os;
 }
 

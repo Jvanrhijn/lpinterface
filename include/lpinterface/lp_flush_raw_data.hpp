@@ -23,14 +23,14 @@ class FlushRawData {
    * @param values Column values.
    * @param start_indices Starting indices columns in values.
    * @param row_indices Row indices of values in columns
-   * @param ord Ordering of the column constraint.
-   * @param rhs RHS of column.
+   * @param lb Lower bound of the column constraint.
+   * @param ub Upper bound of the column constraint.
    */
   virtual void add_columns(std::vector<T>&& values,
                            std::vector<int>&& start_indices,
                            std::vector<int>&& row_indices,
-                           std::vector<Ordering>&& ord,
-                           std::vector<T>&& rhs) = 0;
+                           std::vector<T>&& lb,
+                           std::vector<T>&& ub) = 0;
 
   /**
    * @brief Add rows to the LP in CSR format.
@@ -38,13 +38,14 @@ class FlushRawData {
    * @param values Row values.
    * @param start_indices Starting indices rows in values.
    * @param row_indices Column indices of values in rows
-   * @param ord Ordering of the row constraint.
-   * @param rhs RHS of row.
+   * @param lb Lower bound of the row constraint.
+   * @param ub Upper bound of the row constraint.
    */
   virtual void add_rows(std::vector<T>&& values,
                         std::vector<int>&& start_indices,
                         std::vector<int>&& col_indices,
-                        std::vector<Ordering>&& ord, std::vector<T>&& rhs) = 0;
+                        std::vector<T>&& lb, 
+                        std::vector<T>&& ub) = 0;
 
   /**
    * @brief Add variables to the LP.
