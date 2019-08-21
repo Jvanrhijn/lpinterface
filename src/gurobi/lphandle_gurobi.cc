@@ -11,6 +11,7 @@ void LinearProgramHandleGurobi::set_objective_sense(
   detail::gurobi_function_checked(
       GRBsetintattr, grb_model_.get(), GRB_INT_ATTR_MODELSENSE,
       objsense == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
+  detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
 void LinearProgramHandleGurobi::add_constraints(

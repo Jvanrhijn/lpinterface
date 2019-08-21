@@ -201,9 +201,9 @@ inline Handle genLinearProgramHandle(
                                                 rc::gen::nonZero<double>());
 
   Handle h;
+  h.set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
   h.set_objective(std::move(objective));
   h.add_constraints(std::move(constraints));
-  h.set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
   return h;
 }
 

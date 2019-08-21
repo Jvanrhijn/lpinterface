@@ -268,6 +268,11 @@ struct Objective {
   std::vector<VarType> variable_types;
 };
 
+template <class T>
+bool operator==(const Objective<T>& left, const Objective<T> right) {
+  return left.variable_types == right.variable_types && left.values == right.values;
+}
+
 /**
  * @brief Struct representing the solution of a linear program.
  *

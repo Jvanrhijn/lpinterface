@@ -30,7 +30,7 @@ inline void restore_stdout(int *saved_stdout, int *new_stdout) {
   delete new_stdout;
 }
 
-inline int configure_gurobi(LinearProgramHandleGurobi& lp, GRBenv** env, GRBmodel** model) {
+inline int configure_gurobi(const LinearProgramHandleGurobi& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
@@ -59,10 +59,11 @@ inline int configure_gurobi(LinearProgramHandleGurobi& lp, GRBenv** env, GRBmode
     return error;
   }
   // add variables
+  auto obj = lp.objective();
   error = GRBaddvars(
-      *model, lp.num_vars(), 0, nullptr, nullptr, nullptr,
-      lp.objective().values.data(), nullptr, nullptr,
-      LinearProgramHandleGurobi::convert_variable_type(lp.objective().variable_types).data(),
+      *model, obj.values.size(), 0, nullptr, nullptr, nullptr,
+      obj.values.data(), nullptr, nullptr,
+      LinearProgramHandleGurobi::convert_variable_type(obj.variable_types).data(),
       nullptr);
 
   if (error) {
@@ -106,7 +107,7 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
     constraints_backup.emplace_back(std::move(row), lb, ub);
   }
   GurobiSolver grb(OptimizationType::Maximize);
-  // also need to create variables or gurobi will throw
+  // first need to create variables or gurobi will throw
   auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<VarType>(), rc::gen::arbitrary<double>());
   grb.linear_program().set_objective(std::move(obj));
   grb.linear_program().add_constraints(std::move(constraints));
@@ -114,15 +115,27 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
   RC_ASSERT(constraints_backup == retrieved_constraints);
 }
 
-//RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
-//  // generate a linear program that is not unbounded or infeasible
-//  auto lp = gen_simple_valid_lp<LinearProgramHandleGurobi>(nrows, ncols);
-//  GurobiSolver grb(std::move(lp));
-//  grb.update_program();
-//  grb.set_parameter(Param::TimeLimit, 0.0);
-//  const auto status = grb.solve_primal();
-//  RC_ASSERT(status == Status::TimeOut);
-//}
+RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
+  auto count = *rc::gen::inRange<std::size_t>(0, ncols);
+  auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<VarType>(), rc::gen::arbitrary<double>());
+
+  std::vector<double> vals = obj.values;
+  std::vector<VarType> vts = obj.variable_types;
+  Objective<double> obj_backup(std::move(vals), std::move(vts));
+
+  GurobiSolver grb(*rc::gen::arbitrary<OptimizationType>());
+  grb.linear_program().set_objective(std::move(obj));
+  RC_ASSERT(obj_backup == grb.linear_program().objective());
+}
+
+RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
+  // generate a linear program that is not unbounded or infeasible
+  auto lp = gen_simple_valid_lp<LinearProgramHandleGurobi>(nrows, ncols);
+  GurobiSolver grb(std::move(lp));
+  grb.set_parameter(Param::TimeLimit, 0.0);
+  const auto status = grb.solve_primal();
+  RC_ASSERT(status == Status::TimeOut);
+}
 
 ////RC_GTEST_PROP(Gurobi, IterationLimit, ()) {
 ////  // generate a linear program that is not unbounded or infeasible,
@@ -147,16 +160,16 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  GurobiSolver grb;
+  auto lp_backup = lp;
+
+  GurobiSolver grb(std::move(lp));
 
   int error;
   try {
-    error = configure_gurobi(lp, &env, &model);
+    error = configure_gurobi(lp_backup, &env, &model);
     GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
-    grb = GurobiSolver(std::move(lp));
     grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
     grb.set_parameter(Param::Verbosity, 0);
-    grb.update_program();
   } catch (const GurobiException& e) {
     RC_ASSERT(e.code() == error);
     return;
