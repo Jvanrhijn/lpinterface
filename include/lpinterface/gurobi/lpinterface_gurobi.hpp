@@ -9,33 +9,19 @@
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"
 #include "lpinterface/gurobi/lphandle_gurobi.hpp"
+#include "lpinterface/gurobi/lputil_gurobi.hpp"
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
 
 namespace lpint {
 
-namespace detail {
-
-inline GRBenv* create_gurobi_env() {
-  GRBenv* env;
-  GRBloadenv(&env, "");
-  return env;
-}
-
-inline GRBmodel* create_gurobi_model(GRBenv* env) {
-  GRBmodel* model;
-  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
-              nullptr);
-  return model;
-}
-
-}  // namespace detail
-
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   GurobiSolver() : gurobi_env_(nullptr), gurobi_model_(nullptr), lp_handle_() {}
   explicit GurobiSolver(OptimizationType optim_type);
+  explicit GurobiSolver(LinearProgramHandleGurobi&& lp_handle)
+    : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})), gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})), lp_handle_(std::move(lp_handle)) {}
 
   ~GurobiSolver() = default;
   GurobiSolver(const GurobiSolver&) = delete;

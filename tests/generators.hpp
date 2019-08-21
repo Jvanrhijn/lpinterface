@@ -191,14 +191,14 @@ inline Handle genLinearProgramHandle(
   auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
     nrows, 
     rc::genConstraintWithOrdering(
-      genRow(ncols, rc::gen::arbitrary<double>()),
+      genRow(ncols, rc::gen::nonZero<double>()),
       rc::gen::arbitrary<double>(),
       std::move(genord))
     );
 
   auto objective = *rc::genSizedObjective(ncols, 
                                                 std::move(genvt), 
-                                                rc::gen::arbitrary<double>());
+                                                rc::gen::nonZero<double>());
 
   Handle h;
   h.set_objective(std::move(objective));
@@ -261,7 +261,7 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
 
 template <class Handle>
 inline Handle gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
-                                                                 double ub = lpint::LPINT_INFINITY) {
+                                  double ub = lpint::LPINT_INFINITY) {
   std::vector<Constraint<double>> constrs;
   for (std::size_t i = 0; i < nrows; i++) {
     auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 

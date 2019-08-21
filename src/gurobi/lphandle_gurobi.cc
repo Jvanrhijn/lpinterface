@@ -3,9 +3,7 @@
 namespace lpint {
 
 std::size_t LinearProgramHandleGurobi::num_vars() const {
-  int nvars;
-  GRBgetintattr(grb_model_.get(), GRB_INT_ATTR_NUMVARS, &nvars);
-  return static_cast<std::size_t>(nvars);
+  return num_vars_;
 }
 
 void LinearProgramHandleGurobi::set_objective_sense(
@@ -33,9 +31,9 @@ void LinearProgramHandleGurobi::add_constraints(
 
 void LinearProgramHandleGurobi::set_objective(
     Objective<double>&& objective) {
-  const auto nvars = objective.values.size();
+  num_vars_ = objective.values.size();
   detail::gurobi_function_checked(
-      GRBaddvars, grb_model_.get(), nvars, 0, nullptr, nullptr, nullptr,
+      GRBaddvars, grb_model_.get(), num_vars_, 0, nullptr, nullptr, nullptr,
       objective.values.data(), nullptr, nullptr,
       convert_variable_type(objective.variable_types).data(), nullptr);
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
@@ -54,7 +52,7 @@ std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
   int nconstr;
   detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(),
                                   GRB_INT_ATTR_NUMCONSTRS, &nconstr);
-  // retrieve number of variables
+  // retrieve number of variables in gurobi
   int nvars;
   detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(),
                                   GRB_INT_ATTR_NUMVARS, &nvars);
@@ -111,5 +109,14 @@ Objective<double> LinearProgramHandleGurobi::objective() const {
   }
   return Objective<double>(std::move(values), std::move(var_types));
 }
+
+std::shared_ptr<GRBmodel> LinearProgramHandleGurobi::gurobi_model(detail::Badge<GurobiSolver>) const {
+  return grb_model_;
+}
+
+std::shared_ptr<GRBenv> LinearProgramHandleGurobi::gurobi_env(detail::Badge<GurobiSolver>) const {
+  return grb_env_;
+}
+
 
 }  // namespace lpint

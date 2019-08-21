@@ -9,33 +9,21 @@
 #include "gurobi_c.h"
 
 #include "lpinterface/lp.hpp"
+#include "lpinterface/gurobi/lputil_gurobi.hpp"
+#include "lpinterface/badge.hpp"
 
 namespace lpint {
 
-namespace detail {
-
-template <class F, class... Args>
-void gurobi_function_checked(F f, GRBmodel* g, Args... args) {
-  if (int error = f(g, std::forward<Args>(args)...)) {
-    throw GurobiException(error, GRBgeterrormsg(GRBgetenv(g)));
-  }
-}
-
-template <class F, class... Args>
-void gurobi_function_checked(F f, GRBenv* g, Args... args) {
-  if (int error = f(g, std::forward<Args>(args)...)) {
-    throw GurobiException(error, GRBgeterrormsg(g));
-  }
-}
-
-}  // namespace detail
+class GurobiSolver;
 
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
-  LinearProgramHandleGurobi() = default;
+  LinearProgramHandleGurobi()
+    : grb_env_(detail::create_gurobi_env(), &GRBfreeenv),
+      grb_model_(detail::create_gurobi_model(grb_env_.get()), &GRBfreemodel) {}
   LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel,
                             std::shared_ptr<GRBenv> grbenv)
-      : grb_model_(grbmodel), grb_env_(grbenv) {}
+      : grb_env_(grbenv), grb_model_(grbmodel) {}
 
   std::size_t num_vars() const override;
 
@@ -51,15 +39,20 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   Objective<double> objective() const override;
 
+  std::shared_ptr<GRBmodel> gurobi_model(detail::Badge<GurobiSolver>) const;
+  std::shared_ptr<GRBenv> gurobi_env(detail::Badge<GurobiSolver>) const;
+
   inline static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
 
  private:
-  std::shared_ptr<GRBmodel> grb_model_;
   std::shared_ptr<GRBenv> grb_env_;
+  std::shared_ptr<GRBmodel> grb_model_;
 
   std::vector<double> upper_bounds;
   std::vector<double> lower_bounds;
+
+  std::size_t num_vars_ = 0;
 };
 
 std::vector<char> LinearProgramHandleGurobi::convert_variable_type(
