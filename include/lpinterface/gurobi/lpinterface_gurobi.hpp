@@ -15,12 +15,26 @@
 
 namespace lpint {
 
+namespace detail {
+
+inline GRBenv *create_gurobi_env() {
+  GRBenv *env;
+  GRBloadenv(&env, "");
+  return env;
+}
+
+inline GRBmodel *create_gurobi_model(GRBenv *env) {
+  GRBmodel *model;
+  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
+  return model;
+}
+
+}
+
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   GurobiSolver()
-      : saved_stdout_(0),
-        new_stdout_(0),
-        gurobi_env_(nullptr),
+      : gurobi_env_(nullptr),
         gurobi_model_(nullptr),
         lp_handle_() {}
   explicit GurobiSolver(OptimizationType optim_type);
@@ -75,11 +89,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
       convert_gurobi_status(int status);
 
  private:
-  void redirect_stdout();
-  void restore_stdout();
-  int saved_stdout_;
-  int new_stdout_;
-
 #if __cplusplus >= 201402L
   constexpr
 #endif

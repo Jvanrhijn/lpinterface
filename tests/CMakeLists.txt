@@ -28,12 +28,12 @@ set(test_files
 
 list(APPEND LIBS lpinterface)
 
-#find_package(GUROBI)
-#if (GUROBI_FOUND)
-  #list(APPEND test_files test_gurobi.cc)
-  #include_directories(${GUROBI_INCLUDE_DIRS})
-  #list(APPEND LIBS gurobi81)
-#endif (GUROBI_FOUND)
+find_package(GUROBI)
+if (GUROBI_FOUND)
+ list(APPEND test_files test_gurobi.cc)
+ include_directories(${GUROBI_INCLUDE_DIRS})
+ list(APPEND LIBS gurobi81)
+endif (GUROBI_FOUND)
 
 find_package(SOPLEX)
 if (SOPLEX_FOUND)

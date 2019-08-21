@@ -49,26 +49,26 @@ OptimizationType LinearProgramHandleGurobi::optimization_type() const {
 std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
     throw NotImplementedError();
     // retrieve number of constraints
-    //int nconstr;
-    //GRBgetintattr(grb_model_.get(), GRB_INT_ATTR_NUMCONSTRS, &nconstr);
-    //std::vector<Constraint<double>> constraints;
-    //for (int i = 0; i < nconstr; i++) {
-    //    int nnz;
-    //    // retrieve size of data
-    //    if (auto error = GRBgetconstrs(grb_model_.get(), &nnz, nullptr, nullptr, nullptr, i, 1)) {
-    //        throw GurobiException(error, GRBgeterrormsg(grb_env_.get()));
-    //    }
-    //    // allocate data
-    //    Row<double> row(nnz);
-    //    int cbeg;
-    //    if (auto error = GRBgetconstrs(grb_model_.get(), &nnz, &cbeg, row.nonzero_indices.data(), row.values().data(), i, 1)) {
-    //        throw GurobiException(error, GRBgeterrormsg(grb_env_.get()));
-    //    }
-    //    double lb, ub;
-    //    GRBgetdblattrelement(grb_model_.get(), GRB_DBL_ATTR_LHS, i, &lb);
-    //    GRBgetdblattrelement(grb_model_.get(), GRB_DBL_ATTR_RHS, i, &ub);
-    //    vonstr
-    //}
+    int nconstr;
+    GRBgetintattr(grb_model_.get(), GRB_INT_ATTR_NUMCONSTRS, &nconstr);
+    std::vector<Constraint<double>> constraints;
+    for (int i = 0; i < nconstr; i++) {
+        int nnz;
+        // retrieve size of data
+        if (auto error = GRBgetconstrs(grb_model_.get(), &nnz, nullptr, nullptr, nullptr, i, 1)) {
+            throw GurobiException(error, GRBgeterrormsg(grb_env_.get()));
+        }
+        // allocate data
+        Row<double> row(static_cast<std::size_t>(nnz));
+        int cbeg;
+        if (auto error = GRBgetconstrs(grb_model_.get(), &nnz, &cbeg, row.nonzero_indices().data(), row.values().data(), i, 1)) {
+            throw GurobiException(error, GRBgeterrormsg(grb_env_.get()));
+        }
+        double rhs;
+        char sense;
+        GRBgetdblattrelement(grb_model_.get(), GRB_DBL_ATTR_RHS, i, &rhs);
+        GRBgetcharattrelement(grb_model_.get(), GRB_CHAR_ATTR_SENSE, i, &sense);
+    }
 }
 
 Objective<double> LinearProgramHandleGurobi::objective() const {

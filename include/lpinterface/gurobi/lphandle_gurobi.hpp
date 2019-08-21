@@ -48,11 +48,12 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   Objective<double> objective() const override;
 
+  inline static std::vector<char> convert_variable_type(const std::vector<VarType>& var_types);
+
  private:
   std::shared_ptr<GRBmodel> grb_model_;
   std::shared_ptr<GRBenv> grb_env_;
 
-  static std::vector<char> convert_variable_type(const std::vector<VarType>& var_types);
 
 };
 

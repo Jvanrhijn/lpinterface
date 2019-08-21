@@ -8,15 +8,9 @@
 namespace lpint {
 
 GurobiSolver::GurobiSolver(OptimizationType opt_type)
-    : saved_stdout_(0),
-      new_stdout_(0),
-      gurobi_env_(nullptr, &GRBfreeenv),//, [](GRBenv *p) {GRBloadenv(&p, ""); }),
-      gurobi_model_(nullptr, &GRBfreemodel),
-      lp_handle_(gurobi_model_, gurobi_env_) { //, [&](GRBmodel *p) {GRBnewmodel(gurobi_env_.get(), &p, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr); }) {
-  auto grbenv = gurobi_env_.get();
-  auto grbmodel = gurobi_model_.get();
-  GRBloadenv(&grbenv, "");
-  GRBnewmodel(gurobi_env_.get(), &grbmodel, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
+    : gurobi_env_(detail::create_gurobi_env(), &GRBfreeenv),
+      gurobi_model_(detail::create_gurobi_model(gurobi_env_.get()), &GRBfreemodel),
+      lp_handle_(gurobi_model_, gurobi_env_) { 
   lp_handle_.set_objective_sense(opt_type);
   if (const auto error = GRBsetintparam(
           GRBgetenv(gurobi_model_.get()), translate_parameter(Param::Verbosity), 0)) {
@@ -128,7 +122,7 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
   const auto error =
       GRBaddvars(gurobi_model_.get(), objective_values.size(), 0, nullptr, nullptr,
                  nullptr, objective_values.data(), nullptr, nullptr,
-                 convert_variable_type(var_types).data(), nullptr);
+                 LinearProgramHandleGurobi::convert_variable_type(var_types).data(), nullptr);
   if (error) {
     throw GurobiException(error);
   }

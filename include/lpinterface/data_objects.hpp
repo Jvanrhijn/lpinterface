@@ -165,6 +165,11 @@ class MatrixEntry {
   }
 };
 
+template <class T>
+bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
+  return left.nonzero_indices() == right.nonzero_indices() && left.values() == right.values();
+}
+
 template <typename T>
 class Column : public MatrixEntry<T> {
  public:
@@ -234,6 +239,11 @@ struct Constraint {
   //! Upper bound of constraint equation.
   T upper_bound;
 };
+
+template <class T>
+bool operator==(const Constraint<T>& left, const Constraint<T>& right) {
+  return left.upper_bound == right.upper_bound && left.lower_bound == right.lower_bound && left.row == right.row;
+}
 
 /**
  * @brief Struct representing the objective vector.
