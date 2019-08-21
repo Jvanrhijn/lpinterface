@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <cstddef>
+#include <type_traits>
 
 #include "gurobi_c.h"
 
@@ -11,22 +12,23 @@
 
 namespace lpint {
 
-class GrbData {
- public:
-  GrbData() {
-    GRBloadenv(&gurobi_env, "");
-    GRBnewmodel(gurobi_env, &gurobi_model, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
-  }
-  
-  ~GrbData() {
-    GRBfreeenv(gurobi_env);
-    GRBfreemodel(gurobi_model);
-  }
+namespace detail {
 
- private:
-  GRBenv *gurobi_env;
-  GRBmodel *gurobi_model;
-};
+template <class F, class ...Args>
+void gurobi_function_checked(F f, GRBmodel *g, Args... args) {
+  if (int error = f(g, std::forward<Args>(args)...)) {
+    throw GurobiException(error, GRBgeterrormsg(GRBgetenv(g)));
+  }
+}
+
+template <class F, class ...Args>
+void gurobi_function_checked(F f, GRBenv *g, Args... args) {
+  if (int error = f(g, std::forward<Args>(args)...)) {
+    throw GurobiException(error, GRBgeterrormsg(g));
+  }
+}
+
+}
 
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
