@@ -164,6 +164,9 @@ class MatrixEntry {
   }
 };
 
+// TODO: fix this for the case that left and right are non-equal permutations
+// of each other, e.g. left == Entry {[1, 2] [0, 1]}, right == Entry {[2, 1], [0, 1]}.
+// This example currently incorrectly evaluates as equal.
 template <class T>
 bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
   return std::is_permutation(left.nonzero_indices().begin(),
@@ -182,14 +185,6 @@ class Column : public MatrixEntry<T> {
  public:
   Column(const std::size_t size) : MatrixEntry<T>(size) {}
   Column() = default;
-  Column(Column<T>&&) = default;
-  Column(const Column<T>&) = delete;
-
-  Column<T>& operator=(Column<T>&&) = default;
-  Column<T>& operator=(const Column<T>&) = delete;
-
-  ~Column() = default;
-
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   explicit Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
@@ -204,13 +199,6 @@ class Row : public MatrixEntry<T> {
  public:
   Row(const std::size_t size) : MatrixEntry<T>(size) {}
   Row() = default;
-
-  Row(const Row<T>&) = delete;
-  Row(Row<T>&&) = default;
-  Row<T>& operator=(Row<T>&&) = default;
-  Row<T>& operator=(const Row<T>&) = delete;
-  ~Row() = default;
-
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   explicit Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
