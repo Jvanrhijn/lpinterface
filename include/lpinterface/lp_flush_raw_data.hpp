@@ -28,8 +28,7 @@ class FlushRawData {
    */
   virtual void add_columns(std::vector<T>&& values,
                            std::vector<int>&& start_indices,
-                           std::vector<int>&& row_indices,
-                           std::vector<T>&& lb,
+                           std::vector<int>&& row_indices, std::vector<T>&& lb,
                            std::vector<T>&& ub) = 0;
 
   /**
@@ -43,8 +42,7 @@ class FlushRawData {
    */
   virtual void add_rows(std::vector<T>&& values,
                         std::vector<int>&& start_indices,
-                        std::vector<int>&& col_indices,
-                        std::vector<T>&& lb, 
+                        std::vector<int>&& col_indices, std::vector<T>&& lb,
                         std::vector<T>&& ub) = 0;
 
   /**

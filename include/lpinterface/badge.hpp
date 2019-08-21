@@ -7,12 +7,12 @@ namespace detail {
 
 template <typename T>
 class Badge {
-    friend T;
-    Badge() {}
+  friend T;
+  Badge() {}
 };
 
-} // namespace detail
+}  // namespace detail
 
-} // namespace lpint
+}  // namespace lpint
 
-#endif // LPINTERFACE_BADGE_H
+#endif  // LPINTERFACE_BADGE_H

@@ -6,6 +6,7 @@
 
 #include "soplex.h"
 
+#include "lpinterface/badge.hpp"
 #include "lpinterface/common.hpp"
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"
@@ -13,7 +14,6 @@
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/soplex/lphandle_soplex.hpp"
-#include "lpinterface/badge.hpp"
 
 namespace lpint {
 
@@ -21,10 +21,10 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   SoplexSolver() = default;
   explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
-    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})), lp_handle_(lp_handle) {
-    }
+      : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
+        lp_handle_(lp_handle) {}
   explicit SoplexSolver(OptimizationType optim_type);
-  //explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
+  // explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
   void set_parameter(const Param param, const int value) override;
 
@@ -46,13 +46,10 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   void add_columns(std::vector<double>&& values,
                    std::vector<int>&& start_indices,
-                   std::vector<int>&& row_indices, 
-                   std::vector<double>&& lb,
+                   std::vector<int>&& row_indices, std::vector<double>&& lb,
                    std::vector<double>&& ub) override;
-  void add_rows(std::vector<double>&& values, 
-                std::vector<int>&& start_indices,
-                std::vector<int>&& col_indices, 
-                std::vector<double>&& lb,
+  void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
+                std::vector<int>&& col_indices, std::vector<double>&& lb,
                 std::vector<double>&& ub) override;
   void add_variables(std::vector<double>&& objective_values,
                      std::vector<VarType>&& var_types) override;

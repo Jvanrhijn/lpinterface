@@ -8,35 +8,33 @@
 #include "lpinterface/common.hpp"
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"
+#include "lpinterface/gurobi/lphandle_gurobi.hpp"
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
-#include "lpinterface/gurobi/lphandle_gurobi.hpp"
 
 namespace lpint {
 
 namespace detail {
 
-inline GRBenv *create_gurobi_env() {
-  GRBenv *env;
+inline GRBenv* create_gurobi_env() {
+  GRBenv* env;
   GRBloadenv(&env, "");
   return env;
 }
 
-inline GRBmodel *create_gurobi_model(GRBenv *env) {
-  GRBmodel *model;
-  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr);
+inline GRBmodel* create_gurobi_model(GRBenv* env) {
+  GRBmodel* model;
+  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
+              nullptr);
   return model;
 }
 
-}
+}  // namespace detail
 
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  GurobiSolver()
-      : gurobi_env_(nullptr),
-        gurobi_model_(nullptr),
-        lp_handle_() {}
+  GurobiSolver() : gurobi_env_(nullptr), gurobi_model_(nullptr), lp_handle_() {}
   explicit GurobiSolver(OptimizationType optim_type);
 
   ~GurobiSolver() = default;
@@ -106,7 +104,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   //! The solution vector
   Solution<double> solution_;
-
 };
 
 #if __cplusplus >= 201402L

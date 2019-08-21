@@ -1,10 +1,10 @@
 #ifndef LPINTERFACE_LPHANDLE_GUROBI_H
 #define LPINTERFACE_LPHANDLE_GUROBI_H
 
-#include <memory>
-#include <vector>
 #include <cstddef>
+#include <memory>
 #include <type_traits>
+#include <vector>
 
 #include "gurobi_c.h"
 
@@ -14,27 +14,28 @@ namespace lpint {
 
 namespace detail {
 
-template <class F, class ...Args>
-void gurobi_function_checked(F f, GRBmodel *g, Args... args) {
+template <class F, class... Args>
+void gurobi_function_checked(F f, GRBmodel* g, Args... args) {
   if (int error = f(g, std::forward<Args>(args)...)) {
     throw GurobiException(error, GRBgeterrormsg(GRBgetenv(g)));
   }
 }
 
-template <class F, class ...Args>
-void gurobi_function_checked(F f, GRBenv *g, Args... args) {
+template <class F, class... Args>
+void gurobi_function_checked(F f, GRBenv* g, Args... args) {
   if (int error = f(g, std::forward<Args>(args)...)) {
     throw GurobiException(error, GRBgeterrormsg(g));
   }
 }
 
-}
+}  // namespace detail
 
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
   LinearProgramHandleGurobi() = default;
-  LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel, std::shared_ptr<GRBenv> grbenv)
-    : grb_model_(grbmodel), grb_env_(grbenv) {}
+  LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel,
+                            std::shared_ptr<GRBenv> grbenv)
+      : grb_model_(grbmodel), grb_env_(grbenv) {}
 
   std::size_t num_vars() const override;
 
@@ -50,7 +51,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   Objective<double> objective() const override;
 
-  inline static std::vector<char> convert_variable_type(const std::vector<VarType>& var_types);
+  inline static std::vector<char> convert_variable_type(
+      const std::vector<VarType>& var_types);
 
  private:
   std::shared_ptr<GRBmodel> grb_model_;
@@ -58,8 +60,6 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   std::vector<double> upper_bounds;
   std::vector<double> lower_bounds;
-
-
 };
 
 std::vector<char> LinearProgramHandleGurobi::convert_variable_type(
@@ -92,6 +92,6 @@ std::vector<char> LinearProgramHandleGurobi::convert_variable_type(
   return value_type;
 }
 
-} // namespace lpint
+}  // namespace lpint
 
-#endif // LPINTERFACE_LPHANDLE_GUROBI_H
+#endif  // LPINTERFACE_LPHANDLE_GUROBI_H

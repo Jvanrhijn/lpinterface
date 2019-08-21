@@ -6,8 +6,8 @@
 
 #include "soplex.h"
 
-#include "lpinterface/lp.hpp"
 #include "lpinterface/badge.hpp"
+#include "lpinterface/lp.hpp"
 
 namespace lpint {
 
@@ -15,10 +15,9 @@ class SoplexSolver;
 
 class LinearProgramHandleSoplex : public ILinearProgramHandle {
  public:
-  LinearProgramHandleSoplex() 
-    : soplex_(std::make_shared<soplex::SoPlex>()) {}
+  LinearProgramHandleSoplex() : soplex_(std::make_shared<soplex::SoPlex>()) {}
   LinearProgramHandleSoplex(std::shared_ptr<soplex::SoPlex> soplex)
-    : soplex_(soplex) {}
+      : soplex_(soplex) {}
 
   void add_constraints(std::vector<Constraint<double>>&& constraints) override;
 
@@ -35,7 +34,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   Objective<double> objective() const override;
 
   std::shared_ptr<soplex::SoPlex> soplex(detail::Badge<SoplexSolver>) {
-      return soplex_;
+    return soplex_;
   }
 
  private:
@@ -43,10 +42,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   OptimizationType sense_;
   int callcount = 0;
-
 };
 
+}  // namespace lpint
 
-} // namespace lpint
-
-#endif // LPINTERFACE_LPHANDLE_SOPLEX_H
+#endif  // LPINTERFACE_LPHANDLE_SOPLEX_H

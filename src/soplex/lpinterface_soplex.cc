@@ -4,16 +4,15 @@ namespace lpint {
 
 using namespace soplex;
 
-SoplexSolver::SoplexSolver(OptimizationType optim_type) 
-  : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_)
-{
+SoplexSolver::SoplexSolver(OptimizationType optim_type)
+    : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_) {
   lp_handle_.set_objective_sense(optim_type);
   if (!soplex_->setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
     throw FailedToSetParameterException();
   }
 }
 
-//SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
+// SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
 //    : linear_program_(std::move(lp)) {
 //  if (!soplex_.setIntParam(
 //          translate_int_parameter(Param::ObjectiveSense),
@@ -43,9 +42,7 @@ void SoplexSolver::set_parameter(const Param param, const double value) {
   }
 }
 
-void SoplexSolver::update_program() {
-
-}
+void SoplexSolver::update_program() {}
 
 Status SoplexSolver::solve_primal() {
   const auto status = translate_status(soplex_->optimize());
@@ -79,9 +76,7 @@ const ILinearProgramHandle& SoplexSolver::linear_program() const {
   return lp_handle_;
 }
 
-ILinearProgramHandle& SoplexSolver::linear_program() {
-  return lp_handle_;
-}
+ILinearProgramHandle& SoplexSolver::linear_program() { return lp_handle_; }
 
 const Solution<double>& SoplexSolver::get_solution() const { return solution_; }
 
@@ -121,7 +116,8 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
   int nnz = row.size();
   DSVector ds_row(nnz);
   ds_row.add(nnz, nonzero_indices.data(), row.data());
-  soplex_->addRowReal(LPRow(lb[start_indices.size()-1], ds_row, ub[start_indices.size() - 1]));
+  soplex_->addRowReal(LPRow(lb[start_indices.size() - 1], ds_row,
+                            ub[start_indices.size() - 1]));
 }
 
 void SoplexSolver::add_variables(std::vector<double>&& objective_values,

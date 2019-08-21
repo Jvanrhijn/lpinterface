@@ -76,8 +76,7 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
-  MatrixEntry(const std::size_t size)
-    : values_(size), nonzero_indices_(size) {}
+  MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
@@ -167,8 +166,11 @@ class MatrixEntry {
 
 template <class T>
 bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
-  return std::is_permutation(left.nonzero_indices().begin(), left.nonzero_indices().end(), right.nonzero_indices().begin())
-    && std::is_permutation(left.values().begin(), left.values().end(), right.values().begin());
+  return std::is_permutation(left.nonzero_indices().begin(),
+                             left.nonzero_indices().end(),
+                             right.nonzero_indices().begin()) &&
+         std::is_permutation(left.values().begin(), left.values().end(),
+                             right.values().begin());
 }
 
 template <typename T>
@@ -234,7 +236,7 @@ struct Constraint {
 
   Row<T> row;
   //! Ordering type of this constraint, see Ordering for possible variants.
-  //Ordering ordering;
+  // Ordering ordering;
   //! Lower bound of constraint equation.
   T lower_bound;
   //! Upper bound of constraint equation.
@@ -243,9 +245,9 @@ struct Constraint {
 
 template <class T>
 bool operator==(const Constraint<T>& left, const Constraint<T>& right) {
-  return std::abs(left.upper_bound - right.upper_bound) < 1e-15 
-    && std::abs(left.lower_bound - right.lower_bound) < 1e-15
-    && left.row == right.row;
+  return std::abs(left.upper_bound - right.upper_bound) < 1e-15 &&
+         std::abs(left.lower_bound - right.lower_bound) < 1e-15 &&
+         left.row == right.row;
 }
 
 /**
@@ -320,7 +322,8 @@ inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Constraint<T>& constraint) {
-  os << constraint.lower_bound << " <= " << constraint.row << " <= " << constraint.upper_bound;
+  os << constraint.lower_bound << " <= " << constraint.row
+     << " <= " << constraint.upper_bound;
   return os;
 }
 
