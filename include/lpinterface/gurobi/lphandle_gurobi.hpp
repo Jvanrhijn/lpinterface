@@ -42,6 +42,9 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   std::shared_ptr<GRBmodel> gurobi_model(detail::Badge<GurobiSolver>) const;
   std::shared_ptr<GRBenv> gurobi_env(detail::Badge<GurobiSolver>) const;
 
+  // TODO: find a better way to do this!!!
+  void set_num_vars(detail::Badge<GurobiSolver>, std::size_t nvars) { num_vars_ = nvars; }
+
   inline static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
 

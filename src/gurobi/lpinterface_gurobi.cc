@@ -114,6 +114,7 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
   if (error) {
     throw GurobiException(error);
   }
+  lp_handle_.set_num_vars(detail::Badge<GurobiSolver>{}, objective_values.size());
 }
 
 }  // namespace lpint
