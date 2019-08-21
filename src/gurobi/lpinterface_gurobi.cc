@@ -20,13 +20,15 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type)
 }
 
 void GurobiSolver::set_parameter(const Param param, const int value) {
-  detail::gurobi_function_checked(GRBsetintparam, GRBgetenv(gurobi_model_.get()),
-                                        translate_parameter(param), value); 
+  detail::gurobi_function_checked(GRBsetintparam,
+                                  GRBgetenv(gurobi_model_.get()),
+                                  translate_parameter(param), value);
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
-  detail::gurobi_function_checked(GRBsetdblparam, GRBgetenv(gurobi_model_.get()),
-                                        translate_parameter(param), value);
+  detail::gurobi_function_checked(GRBsetdblparam,
+                                  GRBgetenv(gurobi_model_.get()),
+                                  translate_parameter(param), value);
 }
 
 void GurobiSolver::update_program() {}
@@ -114,7 +116,8 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
   if (error) {
     throw GurobiException(error);
   }
-  lp_handle_.set_num_vars(detail::Badge<GurobiSolver>{}, objective_values.size());
+  lp_handle_.set_num_vars(detail::Badge<GurobiSolver>{},
+                          objective_values.size());
 }
 
 }  // namespace lpint

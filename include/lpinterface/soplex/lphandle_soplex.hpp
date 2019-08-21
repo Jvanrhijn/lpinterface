@@ -40,7 +40,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
  private:
   std::shared_ptr<soplex::SoPlex> soplex_;
 
-  OptimizationType sense_= OptimizationType::Maximize;
+  OptimizationType sense_ = OptimizationType::Maximize;
   int callcount = 0;
 };
 

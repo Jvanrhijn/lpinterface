@@ -21,7 +21,9 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   GurobiSolver() : gurobi_env_(nullptr), gurobi_model_(nullptr), lp_handle_() {}
   explicit GurobiSolver(OptimizationType optim_type);
   explicit GurobiSolver(LinearProgramHandleGurobi&& lp_handle)
-    : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})), gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})), lp_handle_(std::move(lp_handle)) {}
+      : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})),
+        gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})),
+        lp_handle_(std::move(lp_handle)) {}
 
   ~GurobiSolver() = default;
   GurobiSolver(const GurobiSolver&) = delete;

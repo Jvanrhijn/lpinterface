@@ -165,8 +165,8 @@ class MatrixEntry {
 };
 
 // TODO: fix this for the case that left and right are non-equal permutations
-// of each other, e.g. left == Entry {[1, 2] [0, 1]}, right == Entry {[2, 1], [0, 1]}.
-// This example currently incorrectly evaluates as equal.
+// of each other, e.g. left == Entry {[1, 2] [0, 1]}, right == Entry {[2, 1],
+// [0, 1]}. This example currently incorrectly evaluates as equal.
 template <class T>
 bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
   return std::is_permutation(left.nonzero_indices().begin(),
@@ -270,7 +270,8 @@ struct Objective {
 
 template <class T>
 bool operator==(const Objective<T>& left, const Objective<T> right) {
-  return left.variable_types == right.variable_types && left.values == right.values;
+  return left.variable_types == right.variable_types &&
+         left.values == right.values;
 }
 
 /**

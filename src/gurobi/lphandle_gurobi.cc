@@ -2,9 +2,7 @@
 
 namespace lpint {
 
-std::size_t LinearProgramHandleGurobi::num_vars() const {
-  return num_vars_;
-}
+std::size_t LinearProgramHandleGurobi::num_vars() const { return num_vars_; }
 
 void LinearProgramHandleGurobi::set_objective_sense(
     const OptimizationType objsense) {
@@ -19,8 +17,7 @@ void LinearProgramHandleGurobi::add_constraints(
   for (auto& constraint : constraints) {
     detail::gurobi_function_checked(
         GRBaddrangeconstr, grb_model_.get(), constraint.row.num_nonzero(),
-        constraint.row.nonzero_indices().data(),
-        constraint.row.values().data(),
+        constraint.row.nonzero_indices().data(), constraint.row.values().data(),
         constraint.lower_bound, constraint.upper_bound, nullptr);
     // keep track of these internally since
     // gurobi mixes them up with the range variables
@@ -30,8 +27,7 @@ void LinearProgramHandleGurobi::add_constraints(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
-void LinearProgramHandleGurobi::set_objective(
-    Objective<double>&& objective) {
+void LinearProgramHandleGurobi::set_objective(Objective<double>&& objective) {
   num_vars_ = objective.values.size();
   detail::gurobi_function_checked(
       GRBaddvars, grb_model_.get(), num_vars_, 0, nullptr, nullptr, nullptr,
@@ -111,13 +107,14 @@ Objective<double> LinearProgramHandleGurobi::objective() const {
   return Objective<double>(std::move(values), std::move(var_types));
 }
 
-std::shared_ptr<GRBmodel> LinearProgramHandleGurobi::gurobi_model(detail::Badge<GurobiSolver>) const {
+std::shared_ptr<GRBmodel> LinearProgramHandleGurobi::gurobi_model(
+    detail::Badge<GurobiSolver>) const {
   return grb_model_;
 }
 
-std::shared_ptr<GRBenv> LinearProgramHandleGurobi::gurobi_env(detail::Badge<GurobiSolver>) const {
+std::shared_ptr<GRBenv> LinearProgramHandleGurobi::gurobi_env(
+    detail::Badge<GurobiSolver>) const {
   return grb_env_;
 }
-
 
 }  // namespace lpint

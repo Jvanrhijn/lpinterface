@@ -8,9 +8,9 @@
 
 #include "gurobi_c.h"
 
-#include "lpinterface/lp.hpp"
-#include "lpinterface/gurobi/lputil_gurobi.hpp"
 #include "lpinterface/badge.hpp"
+#include "lpinterface/gurobi/lputil_gurobi.hpp"
+#include "lpinterface/lp.hpp"
 
 namespace lpint {
 
@@ -19,8 +19,9 @@ class GurobiSolver;
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
   LinearProgramHandleGurobi()
-    : grb_env_(detail::create_gurobi_env(), &GRBfreeenv),
-      grb_model_(detail::create_gurobi_model(grb_env_.get()), &GRBfreemodel) {}
+      : grb_env_(detail::create_gurobi_env(), &GRBfreeenv),
+        grb_model_(detail::create_gurobi_model(grb_env_.get()), &GRBfreemodel) {
+  }
   LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel,
                             std::shared_ptr<GRBenv> grbenv)
       : grb_env_(grbenv), grb_model_(grbmodel) {}
@@ -43,7 +44,9 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   std::shared_ptr<GRBenv> gurobi_env(detail::Badge<GurobiSolver>) const;
 
   // TODO: find a better way to do this!!!
-  void set_num_vars(detail::Badge<GurobiSolver>, std::size_t nvars) { num_vars_ = nvars; }
+  void set_num_vars(detail::Badge<GurobiSolver>, std::size_t nvars) {
+    num_vars_ = nvars;
+  }
 
   inline static std::vector<char> convert_variable_type(
       const std::vector<VarType>& var_types);
