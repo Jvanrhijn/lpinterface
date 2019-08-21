@@ -196,12 +196,12 @@ inline Handle genLinearProgramHandle(
       std::move(genord))
     );
 
-  const auto objective = *rc::genSizedObjective(ncols, 
+  auto objective = *rc::genSizedObjective(ncols, 
                                                 std::move(genvt), 
                                                 rc::gen::arbitrary<double>());
 
   Handle h;
-  h.set_objective(objective);
+  h.set_objective(std::move(objective));
   h.add_constraints(std::move(constraints));
   h.set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
   return h;

@@ -25,7 +25,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
-  void set_objective(const Objective<double>& objective) override;
+  void set_objective(Objective<double>&& objective) override;
 
   OptimizationType optimization_type() const override;
 
@@ -40,7 +40,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
  private:
   std::shared_ptr<soplex::SoPlex> soplex_;
 
-  OptimizationType sense_;
+  OptimizationType sense_= OptimizationType::Maximize;
   int callcount = 0;
 };
 

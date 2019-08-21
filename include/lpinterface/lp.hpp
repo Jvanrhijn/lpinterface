@@ -84,7 +84,7 @@ class ILinearProgramHandle {
   /**
    * @brief Set the objective function to be used.
    */
-  virtual void set_objective(const Objective<double>& objective) = 0;
+  virtual void set_objective(Objective<double>&& objective) = 0;
 
   virtual std::vector<Constraint<double>> constraints() const = 0;
 

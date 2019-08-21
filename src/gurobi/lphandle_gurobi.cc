@@ -17,11 +17,11 @@ void LinearProgramHandleGurobi::set_objective_sense(
 
 void LinearProgramHandleGurobi::add_constraints(
     std::vector<Constraint<double>>&& constraints) {
-  for (const auto& constraint : constraints) {
+  for (auto& constraint : constraints) {
     detail::gurobi_function_checked(
         GRBaddrangeconstr, grb_model_.get(), constraint.row.num_nonzero(),
-        const_cast<int*>(constraint.row.nonzero_indices().data()),
-        const_cast<double*>(constraint.row.values().data()),
+        constraint.row.nonzero_indices().data(),
+        constraint.row.values().data(),
         constraint.lower_bound, constraint.upper_bound, nullptr);
     // keep track of these internally since
     // gurobi mixes them up with the range variables
@@ -32,11 +32,11 @@ void LinearProgramHandleGurobi::add_constraints(
 }
 
 void LinearProgramHandleGurobi::set_objective(
-    const Objective<double>& objective) {
+    Objective<double>&& objective) {
   const auto nvars = objective.values.size();
   detail::gurobi_function_checked(
       GRBaddvars, grb_model_.get(), nvars, 0, nullptr, nullptr, nullptr,
-      const_cast<double*>(objective.values.data()), nullptr, nullptr,
+      objective.values.data(), nullptr, nullptr,
       convert_variable_type(objective.variable_types).data(), nullptr);
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }

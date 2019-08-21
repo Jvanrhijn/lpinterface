@@ -45,7 +45,7 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   OptimizationType optimization_type() const override;
 
-  void set_objective(const Objective<double>& objective) override;
+  void set_objective(Objective<double>&& objective) override;
 
   std::vector<Constraint<double>> constraints() const override;
 

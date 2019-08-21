@@ -17,7 +17,7 @@ void LinearProgramHandleSoplex::add_constraints(
 }
 
 void LinearProgramHandleSoplex::set_objective(
-    const Objective<double>& objective) {
+    Objective<double>&& objective) {
   DSVector dummy(0);
   for (const auto& coefficient : objective.values) {
     soplex_->addColReal(LPCol(coefficient, dummy, infinity, 0.0));
