@@ -21,6 +21,10 @@ void LinearProgramHandleGurobi::add_constraints(std::vector<Constraint<double>>&
                                             const_cast<double*>(constraint.row.values().data()),
                                             constraint.lower_bound,
                                             constraint.upper_bound, nullptr);
+        // keep track of these internally since
+        // gurobi mixes them up with the range variables
+        lower_bounds.push_back(constraint.lower_bound);
+        upper_bounds.push_back(constraint.upper_bound);
     }
     detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
@@ -44,26 +48,25 @@ std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
     // retrieve number of constraints
     int nconstr;
     detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(), GRB_INT_ATTR_NUMCONSTRS, &nconstr);
+    // retrieve number of variables
     int nvars;
     detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(), GRB_INT_ATTR_NUMVARS, &nvars);
-    std::cout << "Nvars: " << nvars << std::endl;
+
     std::vector<Constraint<double>> constraints;
-    for (int i = 0; i < nconstr; i++) {
+    for (std::size_t i = 0; i < nconstr; i++) {
         // retrieve size of data
         int nnz;
         detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz, nullptr, nullptr, nullptr, i, 1);
         // allocate data
-        Row<double> row(static_cast<std::size_t>(nnz));
+        std::vector<double> values(static_cast<std::size_t>(nnz));
+        std::vector<int> indices(static_cast<std::size_t>(nnz));
         int cbeg;
-        detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz, &cbeg, row.nonzero_indices().data(), row.values().data(), i, 1);
-        // range constraints add extra variables to keep track of range,
-        // so to get the bounds of this constraint we check the corresponding
-        // range variable.
-        double lb, ub;
-        detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(), GRB_DBL_ATTR_LB, nvars + i - 1, &lb);
-        detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(), GRB_DBL_ATTR_UB, nvars + i - 1, &ub);
-        constraints.emplace_back(std::move(row), lb, ub);
+        detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz, &cbeg, indices.data(), values.data(), i, 1);
+
+        Row<double> row(std::vector<double>(values.begin(), values.end() - 1), std::vector<int>(indices.begin(), indices.end() - 1));
+        constraints.emplace_back(std::move(row), lower_bounds[i], upper_bounds[i]);
     }
+
     return constraints;
 }
 

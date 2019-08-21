@@ -23,7 +23,7 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
     rc::genConstraintWithOrdering(
       rc::genRow(
         ncols, 
-        rc::gen::arbitrary<double>()), 
+        rc::gen::nonZero<double>()), 
       rc::gen::arbitrary<double>(), rc::gen::arbitrary<Ordering>()));
   std::vector<Constraint<double>> constraints_backup;
   for (const auto& constr : constraints) {

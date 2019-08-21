@@ -167,7 +167,8 @@ class MatrixEntry {
 
 template <class T>
 bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
-  return left.nonzero_indices() == right.nonzero_indices() && left.values() == right.values();
+  return std::is_permutation(left.nonzero_indices().begin(), left.nonzero_indices().end(), right.nonzero_indices().begin())
+    && std::is_permutation(left.values().begin(), left.values().end(), right.values().begin());
 }
 
 template <typename T>
@@ -242,7 +243,9 @@ struct Constraint {
 
 template <class T>
 bool operator==(const Constraint<T>& left, const Constraint<T>& right) {
-  return left.upper_bound == right.upper_bound && left.lower_bound == right.lower_bound && left.row == right.row;
+  return std::abs(left.upper_bound - right.upper_bound) < 1e-15 
+    && std::abs(left.lower_bound - right.lower_bound) < 1e-15
+    && left.row == right.row;
 }
 
 /**

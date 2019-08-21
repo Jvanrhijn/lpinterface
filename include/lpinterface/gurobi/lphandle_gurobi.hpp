@@ -56,6 +56,9 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   std::shared_ptr<GRBmodel> grb_model_;
   std::shared_ptr<GRBenv> grb_env_;
 
+  std::vector<double> upper_bounds;
+  std::vector<double> lower_bounds;
+
 
 };
 
