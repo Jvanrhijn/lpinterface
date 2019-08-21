@@ -2,6 +2,7 @@
 #define LPINTERFACE_LPUTIL_GUROBI_H
 
 #include "gurobi_c.h"
+#include "lpinterface/errors.hpp"
 
 namespace lpint {
 
