@@ -11,13 +11,13 @@ GurobiSolver::GurobiSolver()
     : gurobi_env_(detail::create_gurobi_env(), &GRBfreeenv),
       gurobi_model_(detail::create_gurobi_model(gurobi_env_.get()),
                     &GRBfreemodel),
-      lp_handle_(gurobi_model_, gurobi_env_) {}
+      lp_handle_({}, gurobi_model_, gurobi_env_) {}
 
 GurobiSolver::GurobiSolver(OptimizationType opt_type)
     : gurobi_env_(detail::create_gurobi_env(), &GRBfreeenv),
       gurobi_model_(detail::create_gurobi_model(gurobi_env_.get()),
                     &GRBfreemodel),
-      lp_handle_(gurobi_model_, gurobi_env_) {
+      lp_handle_({}, gurobi_model_, gurobi_env_) {
   lp_handle_.set_objective_sense(opt_type);
   // set optimization type
   detail::gurobi_function_checked(

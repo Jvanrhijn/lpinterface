@@ -15,7 +15,8 @@ class SoplexSolver;
 
 class LinearProgramHandleSoplex : public ILinearProgramHandle {
  public:
-  LinearProgramHandleSoplex(std::shared_ptr<soplex::SoPlex> soplex)
+  LinearProgramHandleSoplex(detail::Badge<SoplexSolver>,
+                            std::shared_ptr<soplex::SoPlex> soplex)
       : soplex_(soplex) {}
 
   void add_constraints(std::vector<Constraint<double>>&& constraints) override;

@@ -18,7 +18,8 @@ class GurobiSolver;
 
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
-  LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel,
+  LinearProgramHandleGurobi(detail::Badge<GurobiSolver>,
+                            std::shared_ptr<GRBmodel> grbmodel,
                             std::shared_ptr<GRBenv> grbenv)
       : grb_env_(grbenv), grb_model_(grbmodel) {}
 
