@@ -7,11 +7,11 @@ namespace lpint {
 
 namespace detail {
 
-const double* begin(const soplex::DVector& v) {
+inline const double* begin(const soplex::DVector& v) {
     return v.get_const_ptr();
 }
 
-const double* end(const soplex::DVector& v) {
+inline const double* end(const soplex::DVector& v) {
     const auto u = v.get_const_ptr();
     return &u[v.dim()];
 }
