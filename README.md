@@ -64,18 +64,20 @@ int main() {
   // Create the polymorphic solver backend.
   // Switch out the type parameter to change
   // solver backends.
-  auto wrapper = create_solver<GurobiSolver>(lp);
+  auto wrapper = create_solver<GurobiSolver>();
 
   // Retrieve a handle to the linear program from
   // the solver
   auto& lp = wrapper.solver->linear_program();
+  
+  lp.set_objective_sense(OptimizationType::Maximize);
 
   // Set the objective function; see the documentation for a list of
   // supported variable types per solver backend.
   // NOTE: the objective function should be set before
   // adding constraints, so the solver knows how many variables
   // there are in the program.
-  lp->set_objective(
+  lp.set_objective(
     Objective<double>{
       {1, 2, 3, 4}, {VarType::Real, VarType::Integer, VarType::Binary, VarType::Real}
     }
@@ -83,18 +85,17 @@ int main() {
 
   // Add constraints; these represent the constraint equations.
   // These constraints are equivalent to the equations
-  // x + 3y + 3z      <= 1
-  //     4y + 5z + 6w <= 4
+  // -inf <= x + 3y + 3z      <= 1
+  // -inf <=     4y + 5z + 6w <= 4
   // The Row<T> objects are sparse matrix rows in CSR format.
   std::vector<Constraint<double>> constraints;
-  constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), Ordering::LEQ, 1.0);
-  constraints.emplace_back(Row<double>({4, 5, 6}, {1, 2, 3}), Ordering::LEQ, 4.0);
-  lp->add_constraints(std::move(constraints));
+  constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 1.0);
+  constraints.emplace_back(Row<double>({4, 5, 6}, {1, 2, 3}), -LPINT_INFINITY, 4.0);
+  lp.add_constraints(std::move(constraints));
 
   // set solver parameters, see Param documentation for all
   // possible parameter settings.
   wrapper.solver->set_parameter(Param::TimeLimit, 10.0);
-  wrapper.solver->set_parameter(Param::IterationLimit, 10);
   wrapper.solver->set_parameter(Param::Verbosity, 0);
   
   // solve the LP.
