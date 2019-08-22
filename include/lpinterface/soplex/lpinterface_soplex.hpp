@@ -6,26 +6,28 @@
 
 #include "soplex.h"
 
+#include "lpinterface/badge.hpp"
 #include "lpinterface/common.hpp"
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
+#include "lpinterface/soplex/lphandle_soplex.hpp"
 
 namespace lpint {
 
 class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  SoplexSolver() = default;
+  // explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
+  //    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
+  //      lp_handle_(lp_handle) {}
+  SoplexSolver();
   explicit SoplexSolver(OptimizationType optim_type);
-  explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
   void set_parameter(const Param param, const int value) override;
 
   void set_parameter(const Param param, const double value) override;
-
-  void update_program() override;
 
   Status solve_primal() override;
 
@@ -33,19 +35,19 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   Status solution_status() const override;
 
-  const LinearProgramInterface& linear_program() const override;
+  const ILinearProgramHandle& linear_program() const override;
 
-  LinearProgramInterface& linear_program() override;
+  ILinearProgramHandle& linear_program() override;
 
   const Solution<double>& get_solution() const override;
 
   void add_columns(std::vector<double>&& values,
                    std::vector<int>&& start_indices,
-                   std::vector<int>&& row_indices, std::vector<Ordering>&& ord,
-                   std::vector<double>&& rhs) override;
+                   std::vector<int>&& row_indices, std::vector<double>&& lb,
+                   std::vector<double>&& ub) override;
   void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
-                std::vector<int>&& col_indices, std::vector<Ordering>&& ord,
-                std::vector<double>&& rhs) override;
+                std::vector<int>&& col_indices, std::vector<double>&& lb,
+                std::vector<double>&& ub) override;
   void add_variables(std::vector<double>&& objective_values,
                      std::vector<VarType>&& var_types) override;
 
@@ -56,9 +58,9 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
       translate_status(const soplex::SPxSolver::Status status);
 
  private:
-  soplex::SoPlex soplex_;
+  std::shared_ptr<soplex::SoPlex> soplex_;
 
-  std::unique_ptr<LinearProgramInterface> linear_program_;
+  LinearProgramHandleSoplex lp_handle_;
 
   Solution<double> solution_;
 

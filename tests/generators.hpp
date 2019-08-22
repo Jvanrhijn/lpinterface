@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <algorithm>
 
 #include "rapidcheck.h"
 
@@ -46,10 +47,14 @@ struct Arbitrary<lpint::Objective<T>> {
 template <typename T>
 inline Gen<lpint::Constraint<T>> genConstraintWithOrdering(
     Gen<lpint::Row<T>> rowgen, Gen<T> vgen, Gen<lpint::Ordering> ogen) {
+  auto bound1 = *vgen;
+  auto bound2 = *rc::gen::distinctFrom(vgen, bound1);
+  auto ub = std::max(bound1, bound2);
+  auto lb = std::min(bound1, bound2);
   return gen::build<lpint::Constraint<T>>(
       gen::set(&lpint::Constraint<T>::row, rowgen),
-      gen::set(&lpint::Constraint<T>::ordering, ogen),
-      gen::set(&lpint::Constraint<T>::value, vgen));
+      gen::set(&lpint::Constraint<T>::lower_bound, rc::gen::just(lb)),
+      gen::set(&lpint::Constraint<T>::upper_bound, rc::gen::just(ub)));
 }
 
 template <typename T>
@@ -95,13 +100,14 @@ struct Arbitrary<lpint::Row<T>> {
   }
 };
 
+// TODO: fix s.t. lower_bound <= upper_bound
 template <typename T>
 struct Arbitrary<lpint::Constraint<T>> {
   static Gen<lpint::Constraint<T>> arbitrary() {
     return gen::build<lpint::Constraint<T>>(
-        gen::set(&lpint::Constraint<T>::value),
+        gen::set(&lpint::Constraint<T>::lower_bound),
         gen::set(&lpint::Constraint<T>::row),
-        gen::set(&lpint::Constraint<T>::ordering));
+        gen::set(&lpint::Constraint<T>::upper_bound));
   }
 };
 
@@ -149,28 +155,30 @@ struct Arbitrary<lpint::OptimizationType> {
   }
 };
 
-inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
-                                                  const std::size_t max_ncols,
-                                                  Gen<lpint::Ordering> genord,
-                                                  Gen<lpint::VarType> genvt) {
-  using namespace lpint;
+//inline Gen<lpint::LinearProgram> genLinearProgram(const std::size_t max_nrows,
+//                                                  const std::size_t max_ncols,
+//                                                  Gen<lpint::Ordering> genord,
+//                                                  Gen<lpint::VarType> genvt) {
+//  using namespace lpint;
+//
+//  const std::size_t nrows =
+//      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
+//  const std::size_t ncols =
+//      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
+//
+//  return gen::construct<LinearProgram>(
+//      rc::gen::arbitrary<OptimizationType>(),
+//      rc::gen::container<std::vector<Constraint<double>>>(
+//          nrows, rc::genConstraintWithOrdering(
+//                     genRow(ncols, rc::gen::arbitrary<double>()),
+//                     rc::gen::arbitrary<double>(), std::move(genord))),
+//      rc::genSizedObjective(ncols, std::move(genvt),
+//                            rc::gen::arbitrary<double>()));
+//}
+//
 
-  const std::size_t nrows =
-      *rc::gen::inRange<std::size_t>(1, max_nrows).as("Rows in LP");
-  const std::size_t ncols =
-      *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
-
-  return gen::construct<LinearProgram>(
-      rc::gen::arbitrary<OptimizationType>(),
-      rc::gen::container<std::vector<Constraint<double>>>(
-          nrows, rc::genConstraintWithOrdering(
-                     genRow(ncols, rc::gen::arbitrary<double>()),
-                     rc::gen::arbitrary<double>(), std::move(genord))),
-      rc::genSizedObjective(ncols, std::move(genvt),
-                            rc::gen::arbitrary<double>()));
-}
-
-inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
+template <class Solver>
+inline Solver genLinearProgramSolver(
     const std::size_t max_nrows, const std::size_t max_ncols,
     Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
   using namespace lpint;
@@ -180,14 +188,23 @@ inline Gen<std::unique_ptr<lpint::LinearProgram>> genLinearProgramPtr(
   const std::size_t ncols =
       *rc::gen::inRange<std::size_t>(1, max_ncols).as("Columns in LP");
 
-  return gen::makeUnique<LinearProgram>(
-      rc::gen::arbitrary<OptimizationType>(),
-      rc::gen::container<std::vector<Constraint<double>>>(
-          nrows, rc::genConstraintWithOrdering(
-                     genRow(ncols, rc::gen::arbitrary<double>()),
-                     rc::gen::arbitrary<double>(), std::move(genord))),
-      rc::genSizedObjective(ncols, std::move(genvt),
-                            rc::gen::arbitrary<double>()));
+  auto constraints = *rc::gen::container<std::vector<Constraint<double>>>(
+    nrows, 
+    rc::genConstraintWithOrdering(
+      genRow(ncols, rc::gen::nonZero<double>()),
+      rc::gen::arbitrary<double>(),
+      std::move(genord))
+    );
+
+  auto objective = *rc::genSizedObjective(ncols, 
+                                                std::move(genvt), 
+                                                rc::gen::nonZero<double>());
+
+  Solver h;
+  h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
+  h.linear_program().set_objective(std::move(objective));
+  h.linear_program().add_constraints(std::move(constraints));
+  return h;
 }
 
 }  // namespace rc
@@ -199,55 +216,57 @@ struct RawDataLinearProgram {
   std::vector<double> values;
   std::vector<int> start_indices;
   std::vector<int> column_indices;
-  std::vector<double> rhs;
-  std::vector<Ordering> ord;
+  std::vector<double> lb;
+  std::vector<double> ub;
   std::vector<double> objective;
   std::vector<VarType> var_type;
 };
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
+template <class Solver>
 inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
                                              const std::size_t ncols,
                                              rc::Gen<Ordering> ogen,
                                              rc::Gen<VarType> vgen) {
   using namespace lpint;
 
-  const auto lp = *rc::genLinearProgram(nrows, ncols, ogen, vgen);
+  const auto lp = rc::genLinearProgramSolver<Solver>(nrows, ncols, ogen, vgen);
 
-  std::vector<double> values, rhs;
+  std::vector<double> values, lb, ub;
   std::vector<int> start_indices, col_indices;
-  std::vector<Ordering> ord;
 
-  for (const auto &constraint : lp.constraints()) {
+  for (const auto &constraint : lp.linear_program().constraints()) {
     const auto &row = constraint.row;
     values.insert(values.end(), row.values().begin(), row.values().end());
     start_indices.push_back(values.size() - row.values().size());
     col_indices.insert(col_indices.end(), row.nonzero_indices().begin(),
                        row.nonzero_indices().end());
-    rhs.push_back(constraint.value);
-    ord.push_back(constraint.ordering);
+    lb.push_back(constraint.lower_bound);
+    ub.push_back(constraint.upper_bound);
   }
 
-  std::vector<double> objective = lp.objective().values;
-  std::vector<VarType> var_type = lp.objective().variable_types;
+  const auto& obj = lp.linear_program().objective();
+  std::vector<double> objective = obj.values;
+  std::vector<VarType> var_type = obj.variable_types;
 
-  return RawDataLinearProgram{lp.optimization_type(),
+  return RawDataLinearProgram{lp.linear_program().optimization_type(),
                               values,
                               start_indices,
                               col_indices,
-                              rhs,
-                              ord,
+                              lb,
+                              ub,
                               objective,
                               var_type};
 }
 
-inline std::unique_ptr<lpint::LinearProgram> gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
-                                                                 double ub = lpint::LPINT_INFINITY) {
+template <class Solver>
+inline Solver gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
+                                  double ub = lpint::LPINT_INFINITY) {
   std::vector<Constraint<double>> constrs;
   for (std::size_t i = 0; i < nrows; i++) {
     auto constr = *rc::genConstraintWithOrdering(rc::genRow(ncols, rc::gen::positive<double>(), true), 
-                                                 ub == LPINT_INFINITY? rc::gen::positive<double>() : rc::gen::just(ub), 
+                                                 rc::gen::positive<double>(),
                                                  rc::gen::just(Ordering::LEQ));
     constrs.push_back(std::move(constr));
   }
@@ -258,9 +277,9 @@ inline std::unique_ptr<lpint::LinearProgram> gen_simple_valid_lp(std::size_t nro
                                     rc::gen::just(VarType::Real), 
                                     rc::gen::positive<double>());
 
-  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
-  lp->add_constraints(std::move(constrs));
-  lp->set_objective(std::move(obj));
+  Solver lp;
+  lp.linear_program().set_objective(std::move(obj));
+  lp.linear_program().add_constraints(std::move(constrs));
   return lp;
 }
 

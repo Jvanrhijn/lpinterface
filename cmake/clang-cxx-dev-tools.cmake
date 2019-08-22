@@ -8,11 +8,19 @@ file(GLOB_RECURSE
 
 find_package(GUROBI)
 
+# TODO: find a prettier way to do this
+# probably just make a function
 if (NOT GUROBI_FOUND)
   get_filename_component(gurobi_cc src/gurobi/lpinterface_gurobi.cc ABSOLUTE)
+  get_filename_component(gurobi_handle_cc src/gurobi/lphandle_gurobi.cc ABSOLUTE)
   get_filename_component(gurobi_hpp include/lpinterface/gurobi/lpinterface_gurobi.hpp ABSOLUTE)
+  get_filename_component(gurobi_handle_hpp include/lpinterface/gurobi/lphandle_gurobi.hpp ABSOLUTE)
+  get_filename_component(gurobi_util_hpp include/lpinterface/gurobi/lputil_gurobi.hpp ABSOLUTE)
   list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_cc}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_handle_cc}")
   list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_hpp}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_handle_hpp}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_util_hpp}")
 endif()
 
 # Adding clang-format target if executable is found

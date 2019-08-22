@@ -32,12 +32,12 @@ class LinearProgramSolver {
   /**
    * @brief Get immutable access to the underlying Linear Program object.
    */
-  virtual const LinearProgramInterface& linear_program() const = 0;
+  virtual const ILinearProgramHandle& linear_program() const = 0;
 
   /**
    * @brief Get mutable access to the underlying Linear Program object
    */
-  virtual LinearProgramInterface& linear_program() = 0;
+  virtual ILinearProgramHandle& linear_program() = 0;
 
   /**
    * @brief Set an integer-valued parameter in the internal LP solver.
@@ -56,13 +56,6 @@ class LinearProgramSolver {
    * @param value The value to which to set the parameter.
    */
   virtual void set_parameter(const Param param, const double value) = 0;
-
-  /**
-   * @brief Update the linear program in the internal LP solver.
-   * Use this method after changing configuration of the LinearProgram
-   * object contained in this object.
-   */
-  virtual void update_program() = 0;
 
   /**
    * @brief Solve the primal linear program.

@@ -50,39 +50,32 @@ inline std::ostream& operator<<(std::ostream& os, const OptimizationType ot) {
  * The interface provides methods to modify the LP internally, as well
  * access the LP structure.
  */
-class LinearProgramInterface {
+class ILinearProgramHandle {
  public:
-  LinearProgramInterface() = default;
-  LinearProgramInterface(const LinearProgramInterface&) = default;
-  LinearProgramInterface(LinearProgramInterface&&) = default;
-  LinearProgramInterface& operator=(const LinearProgramInterface&) = default;
-  LinearProgramInterface& operator=(LinearProgramInterface&&) = default;
+  ILinearProgramHandle() = default;
+  ILinearProgramHandle(const ILinearProgramHandle&) = default;
+  ILinearProgramHandle(ILinearProgramHandle&&) = default;
+  ILinearProgramHandle& operator=(const ILinearProgramHandle&) = default;
+  ILinearProgramHandle& operator=(ILinearProgramHandle&&) = default;
 
-  virtual ~LinearProgramInterface() = default;
+  virtual ~ILinearProgramHandle() = default;
 
   /**
    * @brief Get the number of variables in the LP.
    */
   virtual std::size_t num_vars() const = 0;
 
-  /**
-   * @brief Get a const reference to the vector of constraints.
-   */
-  virtual const std::vector<Constraint<double>>& constraints() const = 0;
+  virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
-   * @brief Get a reference to the vector of constraints.
-   */
-  virtual std::vector<Constraint<double>>& constraints() = 0;
-
-  /**
-   * @brief Add a set of constraints to the LP formulation.
+   * @brief Add a set of constraints to the LP formulation. This
+   * can only be called after calling set_objective().
    */
   virtual void add_constraints(
       std::vector<Constraint<double>>&& constraints) = 0;
 
   /**
-   * @brief Retrieve the optimization type of this LinearProgramInterface.
+   * @brief Retrieve the objective sense of this ILinearProgramHandle.
    * The Optimization type can be either Type::Minimize or
    * Type::Maximize, which correspond to the LP formulations
    * min c^T * x and max c^T * x, respectively.
@@ -90,27 +83,34 @@ class LinearProgramInterface {
   virtual OptimizationType optimization_type() const = 0;
 
   /**
-   * @brief Set the objective function to be used.
+   * @brief Set the objective function to be used. This method
+   * must be called before calling add_constraints().
    */
-  virtual void set_objective(const Objective<double>& objective) = 0;
+  virtual void set_objective(Objective<double>&& objective) = 0;
 
   /**
-   * @brief Get a const reference to the objective function.
+   * @brief Retrieve the constraints of the internal LP.
+   * This method requests the constraints from the internal LP
+   * solver backend, copies them, and returns them in a vector.
+   * Since the constraints have to be copied from the backend,
+   * this can be quite an expensive operation, and so should
+   * not be called in a loop.
+   * 
+   * @return std::vector<Constraint<double>> 
    */
-  virtual const Objective<double>& objective() const = 0;
+  virtual std::vector<Constraint<double>> constraints() const = 0;
 
   /**
-   * @brief Get a reference to the objective function.
+   * @brief Retrieve the objective function of the internal LP.
+   * This method requests the objective function values from
+   * the LP backend, copies them, and returns them. Since the
+   * objective values have to be copied from the backend, this
+   * can be quite an expensive operation, and so should not be
+   * called in a loop.
+   * 
+   * @return Objective<double> 
    */
-  virtual Objective<double>& objective() = 0;
-
-  /**
-   * @brief Check whether the LP is initialized.
-   *
-   * @return true The LP data is ready to be flushed to a solver backend.
-   * @return false The LP data cannot be safely flushed to a backend.
-   */
-  virtual bool is_initialized() const = 0;
+  virtual Objective<double> objective() const = 0;
 };
 
 }  // namespace lpint

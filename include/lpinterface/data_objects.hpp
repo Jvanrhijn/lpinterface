@@ -76,6 +76,8 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
+  explicit MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
+
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
     if (values_.size() != nonzero_indices_.size()) {
@@ -162,6 +164,18 @@ class MatrixEntry {
   }
 };
 
+// TODO: fix this for the case that left and right are non-equal permutations
+// of each other, e.g. left == Entry {[1, 2] [0, 1]}, right == Entry {[2, 1],
+// [0, 1]}. This example currently incorrectly evaluates as equal.
+template <class T>
+bool operator==(const MatrixEntry<T>& left, const MatrixEntry<T>& right) {
+  return std::is_permutation(left.nonzero_indices().begin(),
+                             left.nonzero_indices().end(),
+                             right.nonzero_indices().begin()) &&
+         std::is_permutation(left.values().begin(), left.values().end(),
+                             right.values().begin());
+}
+
 template <typename T>
 class Column : public MatrixEntry<T> {
  public:
@@ -169,15 +183,8 @@ class Column : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  explicit Column(const std::size_t size) : MatrixEntry<T>(size) {}
   Column() = default;
-  Column(Column<T>&&) = default;
-  Column(const Column<T>&) = delete;
-
-  Column<T>& operator=(Column<T>&&) = default;
-  Column<T>& operator=(const Column<T>&) = delete;
-
-  ~Column() = default;
-
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   explicit Column(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
@@ -190,14 +197,8 @@ class Row : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
+  explicit Row(const std::size_t size) : MatrixEntry<T>(size) {}
   Row() = default;
-
-  Row(const Row<T>&) = delete;
-  Row(Row<T>&&) = default;
-  Row<T>& operator=(Row<T>&&) = default;
-  Row<T>& operator=(const Row<T>&) = delete;
-  ~Row() = default;
-
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
   explicit Row(MatrixEntry<T>&& m) : MatrixEntry<T>(std::move(m)) {}
@@ -217,17 +218,25 @@ template <typename T>
 struct Constraint {
   static_assert(std::is_arithmetic<T>::value,
                 "T must be arithmetic in order to be ordered");
-
-  Constraint() : row(), ordering(), value() {}
-  Constraint(Row<T>&& r, Ordering ord, T val)
-      : row(std::move(r)), ordering(ord), value(val) {}
+  Constraint() : row(), lower_bound(), upper_bound() {}
+  Constraint(Row<T>&& r, T lb, T ub)
+      : row(std::move(r)), lower_bound(lb), upper_bound(ub) {}
 
   Row<T> row;
   //! Ordering type of this constraint, see Ordering for possible variants.
-  Ordering ordering;
-  //! Value of right-hand-side vector of constraints.
-  T value;
+  // Ordering ordering;
+  //! Lower bound of constraint equation.
+  T lower_bound;
+  //! Upper bound of constraint equation.
+  T upper_bound;
 };
+
+template <class T>
+bool operator==(const Constraint<T>& left, const Constraint<T>& right) {
+  return std::abs(left.upper_bound - right.upper_bound) < DOUBLE_TOLERANCE &&
+         std::abs(left.lower_bound - right.lower_bound) < DOUBLE_TOLERANCE &&
+         left.row == right.row;
+}
 
 /**
  * @brief Struct representing the objective vector.
@@ -258,6 +267,12 @@ struct Objective {
   //! variable the linear program optimizes.
   std::vector<VarType> variable_types;
 };
+
+template <class T>
+bool operator==(const Objective<T>& left, const Objective<T>& right) {
+  return left.variable_types == right.variable_types &&
+         left.values == right.values;
+}
 
 /**
  * @brief Struct representing the solution of a linear program.
@@ -301,7 +316,8 @@ inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Constraint<T>& constraint) {
-  os << constraint.row << " " << constraint.ordering << " " << constraint.value;
+  os << constraint.lower_bound << " <= " << constraint.row
+     << " <= " << constraint.upper_bound;
   return os;
 }
 
