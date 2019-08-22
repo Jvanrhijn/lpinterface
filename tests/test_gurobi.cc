@@ -30,7 +30,7 @@ inline void restore_stdout(int *saved_stdout, int *new_stdout) {
   delete new_stdout;
 }
 
-inline int configure_gurobi(const LinearProgramHandleGurobi& lp, GRBenv** env, GRBmodel** model) {
+inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
@@ -130,8 +130,7 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
 
 RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto lp = gen_simple_valid_lp<LinearProgramHandleGurobi>(nrows, ncols);
-  GurobiSolver grb(std::move(lp));
+  auto grb = gen_simple_valid_lp<GurobiSolver>(nrows, ncols);
   grb.set_parameter(Param::Verbosity, 0);
   grb.set_parameter(Param::TimeLimit, 0.0);
   const auto status = grb.solve_primal();
@@ -151,20 +150,16 @@ RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
-  auto lp = rc::genLinearProgramHandle<LinearProgramHandleGurobi>(
+  auto grb = rc::genLinearProgramSolver<GurobiSolver>(
       nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
       rc::gen::arbitrary<VarType>());
 
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
 
-  auto lp_backup = lp;
-
-  GurobiSolver grb(std::move(lp));
-
   int error;
   try {
-    error = configure_gurobi(lp_backup, &env, &model);
+    error = configure_gurobi(grb.linear_program(), &env, &model);
     GRBsetdblparam(env, GRB_DBL_PAR_TIMELIMIT, TIME_LIMIT);
     grb.set_parameter(Param::TimeLimit, TIME_LIMIT);
     grb.set_parameter(Param::Verbosity, 0);
@@ -172,7 +167,6 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     RC_ASSERT(e.code() == error);
     return;
   }
-
 
   // solve the lp
   Status status;
@@ -241,7 +235,7 @@ TEST(Gurobi, FullProblem) {
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
-  auto lp_data = generate_lp_data<LinearProgramHandleGurobi>(
+  auto lp_data = generate_lp_data<GurobiSolver>(
       10, 10, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ),
       rc::gen::arbitrary<VarType>());
 

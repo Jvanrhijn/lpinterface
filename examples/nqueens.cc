@@ -51,8 +51,14 @@ int main(int argc, char *argv[]) {
     BOARD_SIZE = std::atoi(argv[1]);
   }
 
+  // create solver
+  GurobiSolver gurobi(OptimizationType::Maximize);
+
+  gurobi.set_parameter(Param::Verbosity, 0);
+
   // setup N-queens problem
-  auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+  auto& lp = gurobi.linear_program();
+  lp.set_objective_sense(OptimizationType::Maximize);
 
   // Objective: maximize number of queens on the board
   // variable types will be binary, so the objective is
@@ -61,7 +67,7 @@ int main(int argc, char *argv[]) {
   //
   // where x = vec(X), with X(i, j) binary encoding
   // whether position (i, j) is occupied
-  lp->set_objective(Objective<double>{
+  lp.set_objective(Objective<double>{
       std::vector<double>(BOARD_SIZE * BOARD_SIZE, 1.0),
       std::vector<VarType>(BOARD_SIZE * BOARD_SIZE, VarType::Binary)});
 
@@ -137,14 +143,8 @@ int main(int argc, char *argv[]) {
   }
 
   // add rows and constraints to LP
-  // lp->add_rows(std::move(rows));
-  lp->add_constraints(std::move(constraints));
-
-  // create solver
-  GurobiSolver gurobi(std::move(lp));
-
-  // flush data to backend
-  gurobi.update_program();
+  // lp.add_rows(std::move(rows));
+  lp.add_constraints(std::move(constraints));
 
   // solve program
   auto status = gurobi.solve_primal();

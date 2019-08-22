@@ -12,23 +12,8 @@ SoplexSolver::SoplexSolver(OptimizationType optim_type)
   }
 }
 
-// SoplexSolver::SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp)
-//    : linear_program_(std::move(lp)) {
-//  if (!soplex_.setIntParam(
-//          translate_int_parameter(Param::ObjectiveSense),
-//          linear_program_->optimization_type() == OptimizationType::Maximize
-//              ? SoPlex::OBJSENSE_MAXIMIZE
-//              : SoPlex::OBJSENSE_MINIMIZE)) {
-//    throw FailedToSetParameterException();
-//  }
-//  if (!soplex_.setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
-//    throw FailedToSetParameterException();
-//  }
-//  // TODO: figure out whether this is indeed what SoPlex::REPRESENTATION means
-//  // soplex_.setIntParam(SoPlex::REPRESENTATION, lp->matrix().type() ==
-//  // SparseMatrixType::RowWise?
-//  //  SoPlex::REPRESENTATION_ROW : SoPlex::REPRESENTATION_COLUMN);
-//}
+SoplexSolver::SoplexSolver()
+  : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_) {}
 
 void SoplexSolver::set_parameter(const Param param, const int value) {
   if (!soplex_->setIntParam(translate_int_parameter(param), value)) {
@@ -41,8 +26,6 @@ void SoplexSolver::set_parameter(const Param param, const double value) {
     throw FailedToSetParameterException();
   }
 }
-
-void SoplexSolver::update_program() {}
 
 Status SoplexSolver::solve_primal() {
   const auto status = translate_status(soplex_->optimize());

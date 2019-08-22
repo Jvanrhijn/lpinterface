@@ -51,9 +51,29 @@ int main(int argc, char* argv[]) {
   }
 
   try {
+    // Create solver object.
+    SolverWrapper wrapper;
+
+    if (argv[1] == std::string("gurobi")) {
+      wrapper.insert_solver(std::make_shared<GurobiSolver>());
+    } else if (argv[1] == std::string("soplex")) {
+      wrapper.insert_solver(std::make_shared<SoplexSolver>());
+    } else {
+      std::cerr << "Unsupported solver backend." << std::endl;
+    }
+
+    wrapper.solver()->set_parameter(Param::Verbosity, 0);
+
+    auto& lp = wrapper.solver()->linear_program();
+
     // Create a linear program object; this will hold all
     // data defining a linear program.
-    auto lp = std::make_unique<LinearProgram>(OptimizationType::Maximize);
+    lp.set_objective_sense(OptimizationType::Maximize);
+
+    // Set the objective vector. The objective consists of the
+    // coefficients of the elements of x in the expression
+    // c^T x, i.e. the elements of c.
+    lp.set_objective(Objective<double>({1.0, 1.0, 2.0}));
 
     // The constraint matrix is set up in CSR format.
     // Each Constraint consists of a matrix row, an
@@ -61,24 +81,7 @@ int main(int argc, char* argv[]) {
     std::vector<Constraint<double>> constraints;
     constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
     constraints.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
-    lp->add_constraints(std::move(constraints));
-
-    // Set the objective vector. The objective consists of the
-    // coefficients of the elements of x in the expression
-    // c^T x, i.e. the elements of c.
-    lp->set_objective(Objective<double>({1.0, 1.0, 2.0}));
-
-    // Create solver object.
-    SolverWrapper wrapper;
-
-    if (argv[1] == std::string("gurobi")) {
-      wrapper.insert_solver(std::make_shared<GurobiSolver>(std::move(lp)));
-    } else if (argv[1] == std::string("soplex")) {
-      wrapper.insert_solver(std::make_shared<SoplexSolver>(std::move(lp)));
-    } else {
-      std::cerr << "Unsupported solver backend." << std::endl;
-      exit(1);
-    }
+    lp.add_constraints(std::move(constraints));
 
     /*
         Alternatively, one can directly flush the data to the LP solver
@@ -107,27 +110,13 @@ int main(int argc, char* argv[]) {
             );
           }
     */
-    // Flush LP data to internal solver.
-    // This process keeps the internal LP object intact,
-    // so a copy of the coefficient matrix is kept.
-    // This may become prohibitively expensive if the
-    // coefficient matrix is very large. In such cases,
-    // one can use the methods FlushRawData<T>::add_rows()
-    // or FlushRawData<T>::add_columns() to directly
-    // flush data to the internal solver backend.
-    wrapper.solver()->update_program();
 
     // Solve the primal LP problem:
     Status status = wrapper.solver()->solve_primal();
 
     if (status != Status::Optimal) {
-      std::cout << "Optimal solution NOT found" << std::endl;
-      if (status == Status::SuboptimalSolution) {
-        std::cout << "Suboptimal solution found" << std::endl;
-      } else {
-        std::cout << "Hello\n";
-        exit(1);
-      }
+      std::cerr << "Optimal solution NOT found" << std::endl;
+      exit(1);
     }
 
     // Retrieve the solution from the solver object.

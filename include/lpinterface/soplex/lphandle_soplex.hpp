@@ -15,7 +15,6 @@ class SoplexSolver;
 
 class LinearProgramHandleSoplex : public ILinearProgramHandle {
  public:
-  LinearProgramHandleSoplex() : soplex_(std::make_shared<soplex::SoPlex>()) {}
   LinearProgramHandleSoplex(std::shared_ptr<soplex::SoPlex> soplex)
       : soplex_(soplex) {}
 

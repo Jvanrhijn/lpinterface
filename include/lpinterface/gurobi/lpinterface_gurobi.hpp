@@ -18,18 +18,16 @@ namespace lpint {
 
 class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  GurobiSolver() : gurobi_env_(nullptr), gurobi_model_(nullptr), lp_handle_() {}
+  GurobiSolver();
   explicit GurobiSolver(OptimizationType optim_type);
-  explicit GurobiSolver(LinearProgramHandleGurobi&& lp_handle)
-      : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})),
-        gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})),
-        lp_handle_(std::move(lp_handle)) {}
+  //explicit GurobiSolver(LinearProgramHandleGurobi&& lp_handle)
+  //    : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})),
+  //      gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})),
+  //      lp_handle_(std::move(lp_handle)) {}
 
   void set_parameter(const Param param, const int value) override;
 
   void set_parameter(const Param param, const double value) override;
-
-  void update_program() override;
 
   Status solve_primal() override;
 

@@ -15,7 +15,7 @@ using namespace testing;
 constexpr const std::size_t nrows = 100;
 constexpr const std::size_t ncols = 100;
 
-inline soplex::SoPlex configure_soplex(const LinearProgramHandleSoplex& lp) {
+inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
   using namespace soplex;
 
   // intialize soplex
@@ -44,22 +44,18 @@ inline soplex::SoPlex configure_soplex(const LinearProgramHandleSoplex& lp) {
 
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto lp = gen_simple_valid_lp<LinearProgramHandleSoplex>(1, ncols);
-  SoplexSolver soplex(std::move(lp));
+  auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
   soplex.set_parameter(::Param::Verbosity, 0);
   soplex.set_parameter(Param::TimeLimit, 0.0);
-  soplex.update_program();
   const auto status = soplex.solve_primal();
   RC_ASSERT(status == Status::TimeOut);
 }
 
 RC_GTEST_PROP(Soplex, IterationLimit, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto lp = gen_simple_valid_lp<LinearProgramHandleSoplex>(1, ncols);
-  SoplexSolver soplex(std::move(lp));
+  auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
   soplex.set_parameter(::Param::Verbosity, 0);
   soplex.set_parameter(Param::IterationLimit, 0);
-  soplex.update_program();
   const auto status = soplex.solve_primal();
   RC_ASSERT(status == Status::IterationLimit);
 }
@@ -69,13 +65,12 @@ RC_GTEST_PROP(Soplex, IterationLimit, ()) {
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
-  auto lp = rc::genLinearProgramHandle<LinearProgramHandleSoplex>(
+  auto solver = rc::genLinearProgramSolver<SoplexSolver>(
       nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
       rc::gen::just(VarType::Real));
 
-  auto soplex = configure_soplex(lp);
+  auto soplex = configure_soplex(solver.linear_program());
 
-  SoplexSolver solver(lp);
   solver.set_parameter(::Param::Verbosity, 0);
 
   Status status = solver.solve_primal();

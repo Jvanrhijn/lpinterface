@@ -7,6 +7,11 @@
 
 namespace lpint {
 
+GurobiSolver::GurobiSolver()
+  : gurobi_env_(detail::create_gurobi_env(), &GRBfreeenv),
+    gurobi_model_(detail::create_gurobi_model(gurobi_env_.get()), &GRBfreemodel),
+    lp_handle_(gurobi_model_, gurobi_env_) {}
+
 GurobiSolver::GurobiSolver(OptimizationType opt_type)
     : gurobi_env_(detail::create_gurobi_env(), &GRBfreeenv),
       gurobi_model_(detail::create_gurobi_model(gurobi_env_.get()),
@@ -30,8 +35,6 @@ void GurobiSolver::set_parameter(const Param param, const double value) {
                                   GRBgetenv(gurobi_model_.get()),
                                   translate_parameter(param), value);
 }
-
-void GurobiSolver::update_program() {}
 
 Status GurobiSolver::solve_primal() {
   detail::gurobi_function_checked(GRBoptimize, gurobi_model_.get());

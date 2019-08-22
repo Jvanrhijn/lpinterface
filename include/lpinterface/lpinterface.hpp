@@ -58,13 +58,6 @@ class LinearProgramSolver {
   virtual void set_parameter(const Param param, const double value) = 0;
 
   /**
-   * @brief Update the linear program in the internal LP solver.
-   * Use this method after changing configuration of the LinearProgram
-   * object contained in this object.
-   */
-  virtual void update_program() = 0;
-
-  /**
    * @brief Solve the primal linear program.
    */
   virtual Status solve_primal() = 0;

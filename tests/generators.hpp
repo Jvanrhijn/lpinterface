@@ -177,8 +177,8 @@ struct Arbitrary<lpint::OptimizationType> {
 //}
 //
 
-template <class Handle>
-inline Handle genLinearProgramHandle(
+template <class Solver>
+inline Solver genLinearProgramSolver(
     const std::size_t max_nrows, const std::size_t max_ncols,
     Gen<lpint::Ordering> genord, Gen<lpint::VarType> genvt) {
   using namespace lpint;
@@ -200,10 +200,10 @@ inline Handle genLinearProgramHandle(
                                                 std::move(genvt), 
                                                 rc::gen::nonZero<double>());
 
-  Handle h;
-  h.set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
-  h.set_objective(std::move(objective));
-  h.add_constraints(std::move(constraints));
+  Solver h;
+  h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
+  h.linear_program().set_objective(std::move(objective));
+  h.linear_program().add_constraints(std::move(constraints));
   return h;
 }
 
@@ -224,19 +224,19 @@ struct RawDataLinearProgram {
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
-template <class Handle>
+template <class Solver>
 inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
                                              const std::size_t ncols,
                                              rc::Gen<Ordering> ogen,
                                              rc::Gen<VarType> vgen) {
   using namespace lpint;
 
-  const auto lp = rc::genLinearProgramHandle<Handle>(nrows, ncols, ogen, vgen);
+  const auto lp = rc::genLinearProgramSolver<Solver>(nrows, ncols, ogen, vgen);
 
   std::vector<double> values, lb, ub;
   std::vector<int> start_indices, col_indices;
 
-  for (const auto &constraint : lp.constraints()) {
+  for (const auto &constraint : lp.linear_program().constraints()) {
     const auto &row = constraint.row;
     values.insert(values.end(), row.values().begin(), row.values().end());
     start_indices.push_back(values.size() - row.values().size());
@@ -246,10 +246,11 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
     ub.push_back(constraint.upper_bound);
   }
 
-  std::vector<double> objective = lp.objective().values;
-  std::vector<VarType> var_type = lp.objective().variable_types;
+  const auto& obj = lp.linear_program().objective();
+  std::vector<double> objective = obj.values;
+  std::vector<VarType> var_type = obj.variable_types;
 
-  return RawDataLinearProgram{lp.optimization_type(),
+  return RawDataLinearProgram{lp.linear_program().optimization_type(),
                               values,
                               start_indices,
                               col_indices,
@@ -259,8 +260,8 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
                               var_type};
 }
 
-template <class Handle>
-inline Handle gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
+template <class Solver>
+inline Solver gen_simple_valid_lp(std::size_t nrows, std::size_t ncols, 
                                   double ub = lpint::LPINT_INFINITY) {
   std::vector<Constraint<double>> constrs;
   for (std::size_t i = 0; i < nrows; i++) {
@@ -276,9 +277,9 @@ inline Handle gen_simple_valid_lp(std::size_t nrows, std::size_t ncols,
                                     rc::gen::just(VarType::Real), 
                                     rc::gen::positive<double>());
 
-  Handle lp;
-  lp.set_objective(std::move(obj));
-  lp.add_constraints(std::move(constrs));
+  Solver lp;
+  lp.linear_program().set_objective(std::move(obj));
+  lp.linear_program().add_constraints(std::move(constrs));
   return lp;
 }
 

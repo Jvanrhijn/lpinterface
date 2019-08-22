@@ -19,17 +19,15 @@ namespace lpint {
 
 class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  SoplexSolver() = default;
-  explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
-      : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
-        lp_handle_(lp_handle) {}
+  //explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
+  //    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
+  //      lp_handle_(lp_handle) {}
+  SoplexSolver();
   explicit SoplexSolver(OptimizationType optim_type);
 
   void set_parameter(const Param param, const int value) override;
 
   void set_parameter(const Param param, const double value) override;
-
-  void update_program() override;
 
   Status solve_primal() override;
 
