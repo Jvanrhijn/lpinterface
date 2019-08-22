@@ -76,7 +76,7 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
-  MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
+  explicit MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
@@ -183,7 +183,7 @@ class Column : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
-  Column(const std::size_t size) : MatrixEntry<T>(size) {}
+  explicit Column(const std::size_t size) : MatrixEntry<T>(size) {}
   Column() = default;
   Column(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
@@ -197,7 +197,7 @@ class Row : public MatrixEntry<T> {
   using SizeType = typename MatrixEntry<T>::SizeType;
 
  public:
-  Row(const std::size_t size) : MatrixEntry<T>(size) {}
+  explicit Row(const std::size_t size) : MatrixEntry<T>(size) {}
   Row() = default;
   Row(const std::vector<T>& values, const std::vector<Index>& indices)
       : MatrixEntry<T>(values, indices) {}
@@ -269,7 +269,7 @@ struct Objective {
 };
 
 template <class T>
-bool operator==(const Objective<T>& left, const Objective<T> right) {
+bool operator==(const Objective<T>& left, const Objective<T>& right) {
   return left.variable_types == right.variable_types &&
          left.values == right.values;
 }
