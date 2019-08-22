@@ -12,7 +12,8 @@ const double* begin(const soplex::DVector& v) {
 }
 
 const double* end(const soplex::DVector& v) {
-    return v.get_const_ptr() + v.dim();
+    const auto u = v.get_const_ptr();
+    return &u[v.dim()];
 }
 
 }
