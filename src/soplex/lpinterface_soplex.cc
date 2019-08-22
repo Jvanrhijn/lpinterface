@@ -1,4 +1,5 @@
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
+#include "lpinterface/soplex/lputil_soplex.hpp"
 
 namespace lpint {
 
@@ -37,13 +38,10 @@ Status SoplexSolver::solve_primal() {
   soplex_->getDualReal(dual);
 
   solution_.primal.resize(static_cast<std::size_t>(prim.dim()));
-  for (std::size_t i = 0; i < static_cast<std::size_t>(prim.dim()); i++) {
-    solution_.primal[i] = prim[i];
-  }
+  std::copy(detail::begin(prim), detail::end(prim), solution_.primal.begin());
   solution_.dual.resize(static_cast<std::size_t>(dual.dim()));
-  for (std::size_t i = 0; i < static_cast<std::size_t>(dual.dim()); i++) {
-    solution_.dual[i] = dual[i];
-  }
+  std::copy(detail::begin(dual), detail::end(dual), solution_.dual.begin());
+
   solution_.objective_value = soplex_->objValueReal();
 
   return status;
