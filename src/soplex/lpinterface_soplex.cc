@@ -13,7 +13,7 @@ SoplexSolver::SoplexSolver(OptimizationType optim_type)
 }
 
 SoplexSolver::SoplexSolver()
-  : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_) {}
+    : soplex_(std::make_shared<SoPlex>()), lp_handle_(soplex_) {}
 
 void SoplexSolver::set_parameter(const Param param, const int value) {
   if (!soplex_->setIntParam(translate_int_parameter(param), value)) {

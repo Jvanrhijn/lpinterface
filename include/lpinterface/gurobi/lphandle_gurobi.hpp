@@ -18,10 +18,6 @@ class GurobiSolver;
 
 class LinearProgramHandleGurobi : public ILinearProgramHandle {
  public:
-  //LinearProgramHandleGurobi()
-  //    : grb_env_(detail::create_gurobi_env(), &GRBfreeenv),
-  //      grb_model_(detail::create_gurobi_model(grb_env_.get()), &GRBfreemodel) {
-  //}
   LinearProgramHandleGurobi(std::shared_ptr<GRBmodel> grbmodel,
                             std::shared_ptr<GRBenv> grbenv)
       : grb_env_(grbenv), grb_model_(grbmodel) {}

@@ -19,7 +19,7 @@ namespace lpint {
 
 class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  //explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
+  // explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
   //    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
   //      lp_handle_(lp_handle) {}
   SoplexSolver();

@@ -35,8 +35,8 @@ void gurobi_function_checked(F f, GRBenv* g, Args... args) {
   }
 }
 
-}
+}  // namespace detail
 
-}
+}  // namespace lpint
 
-#endif // LPINTERFACE_LPUTIL_GUROBI_H
+#endif  // LPINTERFACE_LPUTIL_GUROBI_H
