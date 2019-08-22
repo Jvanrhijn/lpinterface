@@ -13,22 +13,8 @@
 using namespace lpint;
 using namespace testing;
 
-constexpr const std::size_t nrows = 10;
-constexpr const std::size_t ncols = 10;
-
-inline void redirect_stdout(int *saved_stdout, int *new_stdout) {
-  *saved_stdout = dup(1);
-  close(1);
-  *new_stdout = open("/dev/null", O_WRONLY);
-}
-
-inline void restore_stdout(int *saved_stdout, int *new_stdout) {
-  close(*new_stdout);
-  close(*saved_stdout);
-  close(*saved_stdout);
-  delete saved_stdout;
-  delete new_stdout;
-}
+constexpr const std::size_t nrows = 50;
+constexpr const std::size_t ncols = 50;
 
 inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmodel** model) {
   int saved_stdout = dup(1);
@@ -130,7 +116,7 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
 
 RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
-  auto grb = gen_simple_valid_lp<GurobiSolver>(nrows, ncols);
+  auto grb = gen_simple_valid_lp<GurobiSolver>(1, ncols);
   grb.set_parameter(Param::Verbosity, 0);
   grb.set_parameter(Param::TimeLimit, 0.0);
   const auto status = grb.solve_primal();
