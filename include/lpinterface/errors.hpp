@@ -5,6 +5,39 @@
 #include <iostream>
 #include <sstream>
 
+#include "bitmask.hpp"
+
+namespace {
+
+// shamelessly stolen from stackoverflow
+class Formatter {
+ public:
+  Formatter() {}
+  ~Formatter() {}
+  Formatter(Formatter &&) = delete;
+  Formatter &operator=(Formatter &&) = delete;
+
+  template <typename Type>
+  Formatter &operator<<(const Type &value) {
+    stream_ << value;
+    return *this;
+  }
+
+  std::string str() const { return stream_.str(); }
+  operator std::string() const { return stream_.str(); }
+
+  enum ConvertToString { to_str };
+  std::string operator>>(ConvertToString) { return stream_.str(); }
+
+ private:
+  std::stringstream stream_;
+
+  Formatter(const Formatter &);
+  Formatter &operator=(Formatter &);
+};
+
+}  // namespace
+
 namespace lpint {
 
 /**
@@ -135,59 +168,59 @@ class MismatchedDimensionsException : public LpException {
 /// Enum class representing LP solution status.
 enum class Status : int {
   //! No Linear Program has been loaded.
-  NotLoaded,
+  NotLoaded = 0x0001,
   //! Linear program loaded, but no solution information available.
-  NoInformation,
+  NoInformation = 0x0002,
   //! Model was solved to optimality, solution available.
-  Optimal,
+  Optimal = 0x0004,
   //! Model was proven to be infeasible.
-  Infeasible,
+  Infeasible = 0x0008,
   //! Model was proven to be either infeasible or unbounded.
-  InfeasibleOrUnbounded,
+  InfeasibleOrUnbounded = 0x0010,
   //! Model was proven to be unbounded.
-  Unbounded,
+  Unbounded = 0x0020,
   //! Optimal objective for model was proven to be worse than the value
   //! specified in the Cutoff parameter.
-  Cutoff,
+  Cutoff = 0x0040,
   //! Number of iterations exceeded user-specified iteration limit.
-  IterationLimit,
+  IterationLimit = 0x0080,
   //! Total number of branch-and-cut nodes explored exceeded user-specified node
   //! limit.
-  NodeLimit,
+  NodeLimit = 0x0100,
   //! Time limit reached.
-  TimeOut,
+  TimeOut = 0x0200,
   //! Solutions found exceeded solution limit.
-  SolutionLimit,
+  SolutionLimit = 0x0400,
   //! Optimization interrupted by user.
-  Interrupted,
+  Interrupted = 0x0800,
   //! Optimizer ran into unrecoverable numerical difficulties.
-  NumericFailure,
+  NumericFailure = 0x1000,
   //! Could not satisfy tolerances; sub-optimal solution is available.
-  SuboptimalSolution,
+  SuboptimalSolution = 0x2000,
   //! Optimization is currently in progress.
-  InProgress,
+  InProgress = 0x4000,
   //! User-specified objective limit has been reached.
-  UserObjectiveLimit,
+  UserObjectiveLimit = 0x8000,
   //! No ratiotester loaded (SoPlex).
-  NoRatioTester,
+  NoRatioTester = 0x10000,
   //! No pricer loaded (SoPlex).
-  NoPricer,
+  NoPricer = 0x20000,
   //! No solver loaded.
-  NoSolver,
+  NoSolver = 0x40000,
   //! Solving process aborted to exit decomposition simplex (SoPlex).
-  ExitDecomposition,
+  ExitDecomposition = 0x80000,
   //! Solving process aborted due to commence decomposition simplex (SoPlex).
-  Decomposition,
+  Decomposition = 0x100000,
   //! Solving process aborted due to presence of cycling.
-  Cycling,
+  Cycling = 0x200000,
   //! Problem solved to optimality, but unscaled solution contains violations.
-  OptimalUnscaledViolations,
+  OptimalUnscaledViolations = 0x400000,
   //! Equivalent to SoPlex NOT_INIT status.
-  NotInitialized,
+  NotInitialized = 0x800000,
   //! Solving process aborted as objective limit has been reached.
-  ObjectiveLimit,
+  ObjectiveLimit = 0x1000000,
   //! LP has a usable basis (SoPlex).
-  Regular,
+  Regular = 0x2000000,
 };
 
 // LCOV_EXCL_START
@@ -198,5 +231,10 @@ inline std::ostream &operator<<(std::ostream &os, const Status &status) {
 // LCOV_EXCL_STOP
 
 }  // namespace lpint
+
+template <>
+struct bitmask::EnableBitmaskOperators<lpint::Status> {
+  static constexpr bool enable = true;
+};
 
 #endif  // LPINTERFACE_ERRORS_H
