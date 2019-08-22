@@ -10,26 +10,30 @@ namespace detail {
 
 inline GRBenv* create_gurobi_env() {
   GRBenv* env;
-  GRBloadenv(&env, "");
+  if (int err = GRBloadenv(&env, "")) {
+    throw GurobiException(err, GRBgeterrormsg(env));
+  }
   return env;
 }
 
 inline GRBmodel* create_gurobi_model(GRBenv* env) {
   GRBmodel* model;
-  GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr, nullptr,
-              nullptr);
+  if (int err = GRBnewmodel(env, &model, nullptr, 0, nullptr, nullptr, nullptr,
+                            nullptr, nullptr)) {
+    throw GurobiException(err, GRBgeterrormsg(env));
+  }
   return model;
 }
 
 template <class F, class... Args>
-void gurobi_function_checked(F f, GRBmodel* g, Args... args) {
+inline void gurobi_function_checked(F f, GRBmodel* g, Args&&... args) {
   if (int error = f(g, std::forward<Args>(args)...)) {
     throw GurobiException(error, GRBgeterrormsg(GRBgetenv(g)));
   }
 }
 
 template <class F, class... Args>
-void gurobi_function_checked(F f, GRBenv* g, Args... args) {
+inline void gurobi_function_checked(F f, GRBenv* g, Args&&... args) {
   if (int error = f(g, std::forward<Args>(args)...)) {
     throw GurobiException(error, GRBgeterrormsg(g));
   }
