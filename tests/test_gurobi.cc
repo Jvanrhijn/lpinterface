@@ -173,6 +173,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     return;
   }
 
+
   // solve the lp
   Status status;
   try {

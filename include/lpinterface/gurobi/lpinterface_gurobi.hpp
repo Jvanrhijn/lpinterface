@@ -25,12 +25,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
         gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})),
         lp_handle_(std::move(lp_handle)) {}
 
-  ~GurobiSolver() = default;
-  GurobiSolver(const GurobiSolver&) = delete;
-  GurobiSolver(GurobiSolver&&) = default;
-  GurobiSolver& operator=(const GurobiSolver& other) = delete;
-  GurobiSolver& operator=(GurobiSolver&&) = default;
-
   void set_parameter(const Param param, const int value) override;
 
   void set_parameter(const Param param, const double value) override;

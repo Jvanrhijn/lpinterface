@@ -24,7 +24,6 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
       : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
         lp_handle_(lp_handle) {}
   explicit SoplexSolver(OptimizationType optim_type);
-  // explicit SoplexSolver(std::unique_ptr<LinearProgramInterface>&& lp);
 
   void set_parameter(const Param param, const int value) override;
 

@@ -14,7 +14,7 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type)
       lp_handle_(gurobi_model_, gurobi_env_) {
   lp_handle_.set_objective_sense(opt_type);
   // set optimization type
-  GRBsetintattr(
+  detail::gurobi_function_checked(GRBsetintattr,
       gurobi_model_.get(), "modelsense",
       opt_type == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
@@ -34,10 +34,7 @@ void GurobiSolver::set_parameter(const Param param, const double value) {
 void GurobiSolver::update_program() {}
 
 Status GurobiSolver::solve_primal() {
-  auto error = GRBoptimize(gurobi_model_.get());
-  if (error) {
-    throw GurobiException(error, GRBgeterrormsg(gurobi_env_.get()));
-  }
+  detail::gurobi_function_checked(GRBoptimize, gurobi_model_.get());
   Status status;
   do {
     status = solution_status();
@@ -47,20 +44,13 @@ Status GurobiSolver::solve_primal() {
     return status;
   }
 
-  error = GRBgetdblattr(gurobi_model_.get(), GRB_DBL_ATTR_OBJVAL,
+  detail::gurobi_function_checked(GRBgetdblattr, gurobi_model_.get(), GRB_DBL_ATTR_OBJVAL,
                         &solution_.objective_value);
-  if (error) {
-    throw GurobiException(error, GRBgeterrormsg(gurobi_env_.get()));
-  }
+  auto num_vars = lp_handle_.num_vars();
+  solution_.primal.resize(num_vars);
 
-  auto num_vars = static_cast<int>(lp_handle_.num_vars());
-  solution_.primal.resize(static_cast<std::size_t>(num_vars));
-
-  error = GRBgetdblattrarray(gurobi_model_.get(), GRB_DBL_ATTR_X, 0, num_vars,
+  detail::gurobi_function_checked(GRBgetdblattrarray, gurobi_model_.get(), GRB_DBL_ATTR_X, 0, static_cast<int>(num_vars),
                              solution_.primal.data());
-  if (error) {
-    throw GurobiException(error, GRBgeterrormsg(gurobi_env_.get()));
-  }
   return status;
 }
 
@@ -68,11 +58,7 @@ Status GurobiSolver::solve_dual() { throw UnsupportedFeatureException(); }
 
 Status GurobiSolver::solution_status() const {
   int status;
-  const auto error =
-      GRBgetintattr(gurobi_model_.get(), GRB_INT_ATTR_STATUS, &status);
-  if (error) {
-    throw GurobiException(error, GRBgeterrormsg(gurobi_env_.get()));
-  }
+  detail::gurobi_function_checked(GRBgetintattr, gurobi_model_.get(), GRB_INT_ATTR_STATUS, &status);
   return convert_gurobi_status(status);
 }
 
@@ -98,26 +84,19 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
                             std::vector<int>&& col_indices,
                             std::vector<double>&& lb,
                             std::vector<double>&& ub) {
-  const auto error = GRBaddrangeconstrs(
+  detail::gurobi_function_checked(GRBaddrangeconstrs,
       gurobi_model_.get(), start_indices.size(), values.size(),
       start_indices.data(), col_indices.data(), values.data(), lb.data(),
       ub.data(), nullptr);
-  if (error) {
-    throw GurobiException(error);
-  }
 }
 void GurobiSolver::add_variables(std::vector<double>&& objective_values,
                                  std::vector<VarType>&& var_types) {
-  const auto error = GRBaddvars(
+  detail::gurobi_function_checked(GRBaddvars,
       gurobi_model_.get(), objective_values.size(), 0, nullptr, nullptr,
       nullptr, objective_values.data(), nullptr, nullptr,
       LinearProgramHandleGurobi::convert_variable_type(var_types).data(),
       nullptr);
-  if (error) {
-    throw GurobiException(error);
-  }
-  lp_handle_.set_num_vars(detail::Badge<GurobiSolver>{},
-                          objective_values.size());
+  lp_handle_.set_num_vars({}, objective_values.size());
 }
 
 }  // namespace lpint
