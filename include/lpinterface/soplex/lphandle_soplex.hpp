@@ -21,6 +21,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   void add_constraints(std::vector<Constraint<double>>&& constraints) override;
 
+  void remove_constraint(std::size_t i) override;
+
   std::size_t num_vars() const override;
 
   std::size_t num_constraints() const override;

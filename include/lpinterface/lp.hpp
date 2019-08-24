@@ -80,6 +80,13 @@ class ILinearProgramHandle {
       std::vector<Constraint<double>>&& constraints) = 0;
 
   /**
+   * @brief Remove a constraint from the LP.
+   * 
+   * @param i Index of the constraint to remove.
+   */
+  virtual void remove_constraint(std::size_t i) = 0;
+
+  /**
    * @brief Retrieve the objective sense of this ILinearProgramHandle.
    * The Optimization type can be either Type::Minimize or
    * Type::Maximize, which correspond to the LP formulations
