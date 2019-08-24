@@ -9,6 +9,7 @@
 #include "generators.hpp"
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
+#include "testutil.hpp"
   
 using namespace lpint;
 using namespace testing;
@@ -85,13 +86,9 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
         ncols, 
         rc::gen::nonZero<double>()), 
       rc::gen::arbitrary<double>()));
-  std::vector<Constraint<double>> constraints_backup;
-  for (const auto& constr : constraints) {
-    double lb = constr.lower_bound;
-    double ub = constr.upper_bound;
-    Row<double> row(constr.row.values(), constr.row.nonzero_indices());
-    constraints_backup.emplace_back(std::move(row), lb, ub);
-  }
+  std::vector<Constraint<double>> constraints_backup(nconstr);
+  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
+    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
   GurobiSolver grb(OptimizationType::Maximize);
   // first need to create variables or gurobi will throw
   auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<VarType>(), rc::gen::arbitrary<double>());

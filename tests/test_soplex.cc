@@ -8,6 +8,7 @@
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 
 #include "generators.hpp"
+#include "testutil.hpp"
 
 using namespace lpint;
 using namespace testing;
@@ -67,13 +68,9 @@ RC_GTEST_PROP(SoPlex, AddAndRetrieveConstraints, ()) {
         ncols, 
         rc::gen::nonZero<double>()), 
       rc::gen::arbitrary<double>()));
-  std::vector<Constraint<double>> constraints_backup;
-  for (const auto& constr : constraints) {
-    double lb = constr.lower_bound;
-    double ub = constr.upper_bound;
-    Row<double> row(constr.row.values(), constr.row.nonzero_indices());
-    constraints_backup.emplace_back(std::move(row), lb, ub);
-  }
+  std::vector<Constraint<double>> constraints_backup(nconstr);
+  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
+    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
   SoplexSolver spl(OptimizationType::Maximize);
   // first need to create variables or gurobi will throw
   auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
@@ -82,7 +79,6 @@ RC_GTEST_PROP(SoPlex, AddAndRetrieveConstraints, ()) {
   auto retrieved_constraints = spl.linear_program().constraints();
   RC_ASSERT(constraints_backup == retrieved_constraints);
 }
-
 
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
