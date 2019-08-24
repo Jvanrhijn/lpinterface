@@ -65,6 +65,11 @@ class ILinearProgramHandle {
    */
   virtual std::size_t num_vars() const = 0;
 
+  /**
+   * @brief Get the number of cosntraints in the LP.
+   */
+  virtual std::size_t num_constraints() const = 0;
+
   virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**

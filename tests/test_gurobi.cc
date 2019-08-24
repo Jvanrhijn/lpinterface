@@ -114,6 +114,22 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
   RC_ASSERT(obj_backup == grb.linear_program().objective());
 }
 
+RC_GTEST_PROP(Gurobi, NumConstraints, ()) {
+  auto grb = rc::genLinearProgramSolver<GurobiSolver>(nrows, ncols, 
+                                                         rc::gen::just(VarType::Real));
+  grb.set_parameter(Param::Verbosity, 0);
+  RC_ASSERT(grb.linear_program().num_constraints() 
+      == grb.linear_program().constraints().size());
+}
+
+RC_GTEST_PROP(Gurobi, NumVars, ()) {
+  auto grb = rc::genLinearProgramSolver<GurobiSolver>(nrows, ncols, 
+                                                      rc::gen::just(VarType::Real));
+  grb.set_parameter(Param::Verbosity, 0);
+  RC_ASSERT(grb.linear_program().num_vars() 
+      == grb.linear_program().objective().values.size());
+}
+
 RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
   auto grb = gen_simple_valid_lp<GurobiSolver>(1, ncols);
@@ -192,6 +208,14 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, solution.size(),
                                solution.data());
     RC_ASSERT(solution == grb.get_solution().primal);
+
+    auto nconstr = grb.linear_program().constraints().size();
+    std::vector<double> dual(nconstr);
+    int err = GRBgetdblattrarray(model, GRB_DBL_ATTR_PI, 0, dual.size(), 
+                                dual.data());
+    if (err != 10005) {
+      RC_ASSERT(dual == grb.get_solution().dual);
+    }
 
     double objval;
     GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
@@ -315,6 +339,7 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
     RC_ASSERT(solution == grb.get_solution().primal);
 
     double objval;
+
     GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
     RC_ASSERT(std::abs(objval - grb.get_solution().objective_value) < 1e-15);
   }
