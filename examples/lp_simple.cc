@@ -126,6 +126,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Objective value: " << solution.objective_value << std::endl;
     std::cout << "Solution: ";
     print_vector(solution.primal);
+    std::cout << "\nDual solution: ";
+    print_vector(solution.dual);
 
   } catch (const LpException& e) {
     std::cout << e.what() << std::endl;

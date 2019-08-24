@@ -4,6 +4,10 @@ namespace lpint {
 
 std::size_t LinearProgramHandleGurobi::num_vars() const { return num_vars_; }
 
+std::size_t LinearProgramHandleGurobi::num_constraints() const {
+  return num_constraints_;
+}
+
 void LinearProgramHandleGurobi::set_objective_sense(
     const OptimizationType objsense) {
   detail::gurobi_function_checked(
@@ -23,6 +27,7 @@ void LinearProgramHandleGurobi::add_constraints(
     // gurobi mixes them up with the range variables
     lower_bounds.push_back(constraint.lower_bound);
     upper_bounds.push_back(constraint.upper_bound);
+    num_constraints_++;
   }
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }

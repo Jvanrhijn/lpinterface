@@ -25,6 +25,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   std::size_t num_vars() const override;
 
+  std::size_t num_constraints() const override;
+
   void set_objective_sense(const OptimizationType objsense) override;
 
   void add_constraints(std::vector<Constraint<double>>&& constraints) override;
@@ -56,6 +58,7 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   std::vector<double> lower_bounds;
 
   std::size_t num_vars_ = 0;
+  std::size_t num_constraints_ = 0;
 };
 
 std::vector<char> LinearProgramHandleGurobi::convert_variable_type(

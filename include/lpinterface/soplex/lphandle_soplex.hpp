@@ -23,6 +23,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   std::size_t num_vars() const override;
 
+  std::size_t num_constraints() const override;
+
   void set_objective_sense(const OptimizationType objsense) override;
 
   void set_objective(Objective<double>&& objective) override;

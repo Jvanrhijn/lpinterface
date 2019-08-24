@@ -57,12 +57,26 @@ Status GurobiSolver::solve_primal() {
   detail::gurobi_function_checked(GRBgetdblattr, gurobi_model_.get(),
                                   GRB_DBL_ATTR_OBJVAL,
                                   &solution_.objective_value);
+
   auto num_vars = lp_handle_.num_vars();
   solution_.primal.resize(num_vars);
-
   detail::gurobi_function_checked(GRBgetdblattrarray, gurobi_model_.get(),
                                   GRB_DBL_ATTR_X, 0, static_cast<int>(num_vars),
                                   solution_.primal.data());
+
+  // TODO: this is pretty hacky, find a better way
+  // maybe drop support for MIPs entirely
+  try {
+    auto num_constraints = lp_handle_.num_constraints();
+    solution_.dual.resize(num_constraints);
+    detail::gurobi_function_checked(GRBgetdblattrarray, gurobi_model_.get(),
+                                    GRB_DBL_ATTR_PI, 0, static_cast<int>(num_constraints),
+                                    solution_.dual.data());
+  }  catch (const GurobiException& e) {
+    if (e.code() != 10005) {
+      throw e;
+    }
+  }
   return status;
 }
 

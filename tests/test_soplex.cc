@@ -42,6 +42,22 @@ inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
   return soplex;
 }
 
+RC_GTEST_PROP(SoPlex, NumConstraints, ()) {
+  auto soplex = rc::genLinearProgramSolver<SoplexSolver>(nrows, ncols, 
+                                                         rc::gen::just(VarType::Real));
+  soplex.set_parameter(Param::Verbosity, 0);
+  RC_ASSERT(soplex.linear_program().num_constraints() 
+      == soplex.linear_program().constraints().size());
+}
+
+RC_GTEST_PROP(SoPlex, NumVars, ()) {
+  auto soplex = rc::genLinearProgramSolver<SoplexSolver>(nrows, ncols, 
+                                                         rc::gen::just(VarType::Real));
+  soplex.set_parameter(Param::Verbosity, 0);
+  RC_ASSERT(soplex.linear_program().num_vars() 
+      == soplex.linear_program().objective().values.size());
+}
+
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
   auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);

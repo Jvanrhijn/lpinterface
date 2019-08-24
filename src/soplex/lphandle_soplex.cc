@@ -42,6 +42,10 @@ std::size_t LinearProgramHandleSoplex::num_vars() const {
   return static_cast<std::size_t>(soplex_->numColsReal());
 }
 
+std::size_t LinearProgramHandleSoplex::num_constraints() const {
+  return static_cast<std::size_t>(soplex_->numRowsReal());
+}
+
 std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
   const auto nrows = static_cast<std::size_t>(soplex_->numRowsReal());
   std::vector<Constraint<double>> constraints;
