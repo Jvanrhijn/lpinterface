@@ -58,6 +58,32 @@ RC_GTEST_PROP(SoPlex, NumVars, ()) {
       == soplex.linear_program().objective().values.size());
 }
 
+RC_GTEST_PROP(SoPlex, AddAndRetrieveConstraints, ()) {
+  auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
+  auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
+    nconstr, 
+    rc::genConstraint(
+      rc::genRow(
+        ncols, 
+        rc::gen::nonZero<double>()), 
+      rc::gen::arbitrary<double>()));
+  std::vector<Constraint<double>> constraints_backup;
+  for (const auto& constr : constraints) {
+    double lb = constr.lower_bound;
+    double ub = constr.upper_bound;
+    Row<double> row(constr.row.values(), constr.row.nonzero_indices());
+    constraints_backup.emplace_back(std::move(row), lb, ub);
+  }
+  SoplexSolver spl(OptimizationType::Maximize);
+  // first need to create variables or gurobi will throw
+  auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
+  spl.linear_program().set_objective(std::move(obj));
+  spl.linear_program().add_constraints(std::move(constraints));
+  auto retrieved_constraints = spl.linear_program().constraints();
+  RC_ASSERT(constraints_backup == retrieved_constraints);
+}
+
+
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
   auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
