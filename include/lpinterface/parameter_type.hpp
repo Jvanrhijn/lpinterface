@@ -13,25 +13,25 @@ namespace lpint {
  */
 enum class Param {
   //! How many threads the solver should use.
-  Threads = 0x0001,
+  Threads = 1 << 0,
   //! Whether to minimize or maximize the objective.
-  ObjectiveSense = 0x0002,
+  ObjectiveSense = 1 << 2,
   //! At what value the objective should be cut off.
-  Cutoff = 0x0004,
+  Cutoff = 1 << 3,
   //! Infinity threshold.
-  Infinity = 0x0008,
+  Infinity = 1 << 4,
   //! Time limit alotted to solution process.
-  TimeLimit = 0x010,
+  TimeLimit = 1 << 5,
   //! Lower limit of the objective function.
-  ObjectiveLowerLimit = 0x020,
+  ObjectiveLowerLimit = 1 << 6,
   //! Upper limit of the objective function.
-  ObjectiveUpperLimit = 0x040,
+  ObjectiveUpperLimit = 1 << 7,
   //! Verbosity level. Lower is less verbose, minimum 0.
-  Verbosity = 0x080,
+  Verbosity = 1 << 8,
   //! Whether to solve the primal (0) or dual (1) LP.
-  PrimalOrDual = 0x100,
+  PrimalOrDual = 1 << 9,
   //! Maximum number of iterations for simplex algorithm.
-  IterationLimit = 0x200,
+  IterationLimit = 1 << 10,
 };
 
 }  // namespace lpint

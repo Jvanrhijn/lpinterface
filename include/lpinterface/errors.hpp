@@ -168,59 +168,59 @@ class MismatchedDimensionsException : public LpException {
 /// Enum class representing LP solution status.
 enum class Status : int {
   //! No Linear Program has been loaded.
-  NotLoaded = 0x0001,
+  NotLoaded = 1<< 1,
   //! Linear program loaded, but no solution information available.
-  NoInformation = 0x0002,
+  NoInformation = 1 << 2,
   //! Model was solved to optimality, solution available.
-  Optimal = 0x0004,
+  Optimal = 1 << 3,
   //! Model was proven to be infeasible.
-  Infeasible = 0x0008,
+  Infeasible = 1 << 4,
   //! Model was proven to be either infeasible or unbounded.
-  InfeasibleOrUnbounded = 0x0010,
+  InfeasibleOrUnbounded = 1 << 5,
   //! Model was proven to be unbounded.
-  Unbounded = 0x0020,
+  Unbounded = 1 << 6,
   //! Optimal objective for model was proven to be worse than the value
   //! specified in the Cutoff parameter.
-  Cutoff = 0x0040,
+  Cutoff = 1 << 7,
   //! Number of iterations exceeded user-specified iteration limit.
-  IterationLimit = 0x0080,
+  IterationLimit = 1 << 8,
   //! Total number of branch-and-cut nodes explored exceeded user-specified node
   //! limit.
-  NodeLimit = 0x0100,
+  NodeLimit = 1 << 9,
   //! Time limit reached.
-  TimeOut = 0x0200,
+  TimeOut = 1 << 10,
   //! Solutions found exceeded solution limit.
-  SolutionLimit = 0x0400,
+  SolutionLimit = 1 << 11,
   //! Optimization interrupted by user.
-  Interrupted = 0x0800,
+  Interrupted = 1 << 12,
   //! Optimizer ran into unrecoverable numerical difficulties.
-  NumericFailure = 0x1000,
+  NumericFailure = 1 << 13,
   //! Could not satisfy tolerances; sub-optimal solution is available.
-  SuboptimalSolution = 0x2000,
+  SuboptimalSolution = 1 << 14,
   //! Optimization is currently in progress.
-  InProgress = 0x4000,
+  InProgress = 1 << 15,
   //! User-specified objective limit has been reached.
-  UserObjectiveLimit = 0x8000,
+  UserObjectiveLimit = 1 << 16,
   //! No ratiotester loaded (SoPlex).
-  NoRatioTester = 0x10000,
+  NoRatioTester = 1 << 17,
   //! No pricer loaded (SoPlex).
-  NoPricer = 0x20000,
+  NoPricer = 1 << 18,
   //! No solver loaded.
-  NoSolver = 0x40000,
+  NoSolver = 1 << 19,
   //! Solving process aborted to exit decomposition simplex (SoPlex).
-  ExitDecomposition = 0x80000,
+  ExitDecomposition = 1 << 20,
   //! Solving process aborted due to commence decomposition simplex (SoPlex).
-  Decomposition = 0x100000,
+  Decomposition = 1 << 21,
   //! Solving process aborted due to presence of cycling.
-  Cycling = 0x200000,
+  Cycling = 1 << 22,
   //! Problem solved to optimality, but unscaled solution contains violations.
-  OptimalUnscaledViolations = 0x400000,
+  OptimalUnscaledViolations = 1 << 23,
   //! Equivalent to SoPlex NOT_INIT status.
-  NotInitialized = 0x800000,
+  NotInitialized = 1 << 24,
   //! Solving process aborted as objective limit has been reached.
-  ObjectiveLimit = 0x1000000,
+  ObjectiveLimit = 1 << 25,
   //! LP has a usable basis (SoPlex).
-  Regular = 0x2000000,
+  Regular = 1 << 26,
 };
 
 // LCOV_EXCL_START
