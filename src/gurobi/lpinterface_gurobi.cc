@@ -25,16 +25,22 @@ GurobiSolver::GurobiSolver(OptimizationType opt_type)
       opt_type == OptimizationType::Maximize ? GRB_MAXIMIZE : GRB_MINIMIZE);
 }
 
+bool GurobiSolver::parameter_supported(const Param param) const {
+  return param_dict_.count(param);
+}
+
 void GurobiSolver::set_parameter(const Param param, const int value) {
+  if (!parameter_supported(param)) throw UnsupportedParameterException();
   detail::gurobi_function_checked(GRBsetintparam,
                                   GRBgetenv(gurobi_model_.get()),
-                                  translate_parameter(param), value);
+                                  param_dict_.at(param), value);
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {
+  if (!parameter_supported(param)) throw UnsupportedParameterException();
   detail::gurobi_function_checked(GRBsetdblparam,
                                   GRBgetenv(gurobi_model_.get()),
-                                  translate_parameter(param), value);
+                                  param_dict_.at(param), value);
 }
 
 Status GurobiSolver::solve_primal() {
@@ -105,5 +111,13 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
       nullptr);
   lp_handle_.set_num_vars({}, objective_values.size());
 }
+
+const std::unordered_map<Param, const char*> GurobiSolver::param_dict_ = {
+  { Param::Verbosity, GRB_INT_PAR_OUTPUTFLAG },
+  { Param::Threads, GRB_INT_PAR_THREADS },
+  { Param::Cutoff, GRB_DBL_PAR_CUTOFF },
+  { Param::TimeLimit, GRB_DBL_PAR_TIMELIMIT },
+  { Param::IterationLimit, GRB_DBL_PAR_ITERATIONLIMIT },
+};
 
 }  // namespace lpint

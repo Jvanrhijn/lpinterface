@@ -5,8 +5,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "bitmask.hpp"
-
 namespace {
 
 // shamelessly stolen from stackoverflow
@@ -168,59 +166,59 @@ class MismatchedDimensionsException : public LpException {
 /// Enum class representing LP solution status.
 enum class Status : int {
   //! No Linear Program has been loaded.
-  NotLoaded = 1<< 1,
+  NotLoaded,
   //! Linear program loaded, but no solution information available.
-  NoInformation = 1 << 2,
+  NoInformation,
   //! Model was solved to optimality, solution available.
-  Optimal = 1 << 3,
+  Optimal,
   //! Model was proven to be infeasible.
-  Infeasible = 1 << 4,
+  Infeasible,
   //! Model was proven to be either infeasible or unbounded.
-  InfeasibleOrUnbounded = 1 << 5,
+  InfeasibleOrUnbounded,
   //! Model was proven to be unbounded.
-  Unbounded = 1 << 6,
+  Unbounded,
   //! Optimal objective for model was proven to be worse than the value
   //! specified in the Cutoff parameter.
-  Cutoff = 1 << 7,
+  Cutoff,
   //! Number of iterations exceeded user-specified iteration limit.
-  IterationLimit = 1 << 8,
+  IterationLimit,
   //! Total number of branch-and-cut nodes explored exceeded user-specified node
   //! limit.
-  NodeLimit = 1 << 9,
+  NodeLimit,
   //! Time limit reached.
-  TimeOut = 1 << 10,
+  TimeOut,
   //! Solutions found exceeded solution limit.
-  SolutionLimit = 1 << 11,
+  SolutionLimit,
   //! Optimization interrupted by user.
-  Interrupted = 1 << 12,
+  Interrupted,
   //! Optimizer ran into unrecoverable numerical difficulties.
-  NumericFailure = 1 << 13,
+  NumericFailure,
   //! Could not satisfy tolerances; sub-optimal solution is available.
-  SuboptimalSolution = 1 << 14,
+  SuboptimalSolution,
   //! Optimization is currently in progress.
-  InProgress = 1 << 15,
+  InProgress,
   //! User-specified objective limit has been reached.
-  UserObjectiveLimit = 1 << 16,
+  UserObjectiveLimit,
   //! No ratiotester loaded (SoPlex).
-  NoRatioTester = 1 << 17,
+  NoRatioTester,
   //! No pricer loaded (SoPlex).
-  NoPricer = 1 << 18,
+  NoPricer,
   //! No solver loaded.
-  NoSolver = 1 << 19,
+  NoSolver,
   //! Solving process aborted to exit decomposition simplex (SoPlex).
-  ExitDecomposition = 1 << 20,
+  ExitDecomposition,
   //! Solving process aborted due to commence decomposition simplex (SoPlex).
-  Decomposition = 1 << 21,
+  Decomposition,
   //! Solving process aborted due to presence of cycling.
-  Cycling = 1 << 22,
+  Cycling,
   //! Problem solved to optimality, but unscaled solution contains violations.
-  OptimalUnscaledViolations = 1 << 23,
+  OptimalUnscaledViolations,
   //! Equivalent to SoPlex NOT_INIT status.
-  NotInitialized = 1 << 24,
+  NotInitialized,
   //! Solving process aborted as objective limit has been reached.
-  ObjectiveLimit = 1 << 25,
+  ObjectiveLimit,
   //! LP has a usable basis (SoPlex).
-  Regular = 1 << 26,
+  Regular,
 };
 
 // LCOV_EXCL_START
@@ -231,10 +229,5 @@ inline std::ostream &operator<<(std::ostream &os, const Status &status) {
 // LCOV_EXCL_STOP
 
 }  // namespace lpint
-
-template <>
-struct bitmask::EnableBitmaskOperators<lpint::Status> {
-  static constexpr bool enable = true;
-};
 
 #endif  // LPINTERFACE_ERRORS_H

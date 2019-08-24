@@ -8,7 +8,7 @@ using namespace soplex;
 SoplexSolver::SoplexSolver(OptimizationType optim_type)
     : soplex_(std::make_shared<SoPlex>()), lp_handle_({}, soplex_) {
   lp_handle_.set_objective_sense(optim_type);
-  if (!soplex_->setIntParam(translate_int_parameter(Param::Verbosity), 0)) {
+  if (!soplex_->setIntParam(static_cast<SoPlex::IntParam>(param_dict_.at(Param::Verbosity)), 0)) {
     throw FailedToSetParameterException();
   }
 }
@@ -16,14 +16,22 @@ SoplexSolver::SoplexSolver(OptimizationType optim_type)
 SoplexSolver::SoplexSolver()
     : soplex_(std::make_shared<SoPlex>()), lp_handle_({}, soplex_) {}
 
+bool SoplexSolver::parameter_supported(const Param param) const {
+  return param_dict_.count(param);
+}
+
 void SoplexSolver::set_parameter(const Param param, const int value) {
-  if (!soplex_->setIntParam(translate_int_parameter(param), value)) {
+  if (!parameter_supported(param)) throw UnsupportedParameterException();
+  const auto convert_param = static_cast<SoPlex::IntParam>(param_dict_.at(param));
+  if (!soplex_->setIntParam(convert_param, value)) {
     throw FailedToSetParameterException();
   }
 }
 
 void SoplexSolver::set_parameter(const Param param, const double value) {
-  if (!soplex_->setRealParam(translate_real_parameter(param), value)) {
+  if (!parameter_supported(param)) throw UnsupportedParameterException();
+  const auto convert_param = static_cast<SoPlex::RealParam>(param_dict_.at(param));
+  if (!soplex_->setRealParam(convert_param, value)) {
     throw FailedToSetParameterException();
   }
 }
@@ -115,5 +123,16 @@ void SoplexSolver::add_variables(std::vector<double>&& objective_values,
     soplex_->addColReal(LPCol(objective_values[i], dummycol, infinity, 0.0));
   }
 }
+
+const std::unordered_map<Param, int> SoplexSolver::param_dict_ = {
+    { Param::ObjectiveSense, soplex::SoPlex::OBJSENSE },
+    { Param::Verbosity, soplex::SoPlex::VERBOSITY },
+    { Param::PrimalOrDual, soplex::SoPlex::ALGORITHM },
+    { Param::IterationLimit, soplex::SoPlex::ITERLIMIT },
+    { Param::Infinity, soplex::SoPlex::INFTY },
+    { Param::TimeLimit, soplex::SoPlex::TIMELIMIT },
+    { Param::ObjectiveLowerLimit, soplex::SoPlex::OBJLIMIT_LOWER },
+    { Param::ObjectiveUpperLimit, soplex::SoPlex::OBJLIMIT_UPPER },
+};
 
 }  // namespace lpint

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <unordered_map>
 
 #include "soplex.h"
 
@@ -19,11 +20,11 @@ namespace lpint {
 
 class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
-  // explicit SoplexSolver(LinearProgramHandleSoplex lp_handle)
-  //    : soplex_(lp_handle.soplex(detail::Badge<SoplexSolver>{})),
-  //      lp_handle_(lp_handle) {}
   SoplexSolver();
+
   explicit SoplexSolver(OptimizationType optim_type);
+
+  bool parameter_supported(const Param param) const override;
 
   void set_parameter(const Param param, const int value) override;
 
@@ -64,17 +65,8 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   Solution<double> solution_;
 
-#if __cplusplus >= 201402L
-  constexpr
-#endif
-      static soplex::SoPlex::IntParam
-      translate_int_parameter(const Param param);
+  static const std::unordered_map<Param, int> param_dict_;
 
-#if __cplusplus >= 201402L
-  constexpr
-#endif
-      static soplex::SoPlex::RealParam
-      translate_real_parameter(const Param param);
 };
 
 #if __cplusplus >= 201402L
@@ -127,48 +119,6 @@ constexpr
       return Status::OptimalUnscaledViolations;
     default:
       throw UnknownStatusException(status);
-  }
-}
-
-// TODO: extend
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline soplex::SoPlex::IntParam
-    SoplexSolver::translate_int_parameter(const Param param) {
-  using namespace soplex;
-  switch (param) {
-    case (Param::ObjectiveSense):
-      return SoPlex::OBJSENSE;
-    case (Param::Verbosity):
-      return SoPlex::VERBOSITY;
-    case (Param::PrimalOrDual):
-      return SoPlex::ALGORITHM;
-    case (Param::IterationLimit):
-      return SoPlex::ITERLIMIT;
-    default:
-      throw UnsupportedParameterException();
-  }
-}
-
-// TODO: extend
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline soplex::SoPlex::RealParam
-    SoplexSolver::translate_real_parameter(const Param param) {
-  using namespace soplex;
-  switch (param) {
-    case (Param::Infinity):
-      return SoPlex::INFTY;
-    case (Param::TimeLimit):
-      return SoPlex::TIMELIMIT;
-    case (Param::ObjectiveLowerLimit):
-      return SoPlex::OBJLIMIT_LOWER;
-    case (Param::ObjectiveUpperLimit):
-      return SoPlex::OBJLIMIT_UPPER;
-    default:
-      throw UnsupportedParameterException();
   }
 }
 

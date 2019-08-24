@@ -133,6 +133,14 @@ RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
 //  RC_ASSERT(status == Status::IterationLimit);
 //}
 
+RC_GTEST_PROP(Gurobi, SupportedParams, ()) {
+  GurobiSolver grb;
+  RC_ASSERT(grb.parameter_supported(Param::Threads));
+  RC_ASSERT(grb.parameter_supported(Param::TimeLimit));
+  RC_ASSERT(grb.parameter_supported(Param::Verbosity));
+  RC_ASSERT(grb.parameter_supported(Param::IterationLimit));
+}
+
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 

@@ -35,9 +35,18 @@ class LinearProgramSolver {
   virtual const ILinearProgramHandle& linear_program() const = 0;
 
   /**
-   * @brief Get mutable access to the underlying Linear Program object
+   * @brief Get mutable access to the underlying Linear Program object.
    */
   virtual ILinearProgramHandle& linear_program() = 0;
+
+  /**
+   * @brief Check whether the solver backend supports the given parameter.
+   * 
+   * @param param The parameter to check support for.
+   * @return true The solver supports the given parameter.
+   * @return false The solver does not support the given parameter.
+   */
+  virtual bool parameter_supported(const Param param) const = 0;
 
   /**
    * @brief Set an integer-valued parameter in the internal LP solver.

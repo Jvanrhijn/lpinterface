@@ -2,6 +2,7 @@
 #define LPINTERFACE_LPINTERFACE_GUROBI_H
 
 #include <memory>
+#include <unordered_map>
 
 #include "gurobi_c.h"
 
@@ -20,10 +21,8 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
  public:
   GurobiSolver();
   explicit GurobiSolver(OptimizationType optim_type);
-  // explicit GurobiSolver(LinearProgramHandleGurobi&& lp_handle)
-  //    : gurobi_env_(lp_handle.gurobi_env(detail::Badge<GurobiSolver>{})),
-  //      gurobi_model_(lp_handle.gurobi_model(detail::Badge<GurobiSolver>{})),
-  //      lp_handle_(std::move(lp_handle)) {}
+
+  bool parameter_supported(const Param param) const override;
 
   void set_parameter(const Param param, const int value) override;
 
@@ -66,12 +65,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
       static Status
       convert_gurobi_status(int status);
 
- private:
-#if __cplusplus >= 201402L
-  constexpr
-#endif
-      static const char*
-      translate_parameter(const Param param);
+  static const std::unordered_map<Param, const char*> param_dict_;
 
   //! The gurobi environment object
   std::shared_ptr<GRBenv> gurobi_env_;
@@ -141,28 +135,6 @@ constexpr
       return Status::UserObjectiveLimit;
     default:
       throw UnknownStatusException(status);
-  }
-}
-
-// TODO: extend
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline const char*
-    GurobiSolver::translate_parameter(const Param param) {
-  switch (param) {
-    case (Param::Verbosity):
-      return "outputflag";
-    case (Param::Threads):
-      return "threads";
-    case (Param::Cutoff):
-      return "Cutoff";
-    case (Param::TimeLimit):
-      return "TimeLimit";
-    case (Param::IterationLimit):
-      return "IterationLimit";
-    default:
-      throw UnsupportedParameterException();
   }
 }
 

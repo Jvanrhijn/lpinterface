@@ -1,8 +1,6 @@
 #ifndef LPINTERFACE_PARAMETER_TYPE_H
 #define LPINTERFACE_PARAMETER_TYPE_H
 
-#include "bitmask.hpp"
-
 namespace lpint {
 
 /**
@@ -13,32 +11,27 @@ namespace lpint {
  */
 enum class Param {
   //! How many threads the solver should use.
-  Threads = 1 << 0,
+  Threads,
   //! Whether to minimize or maximize the objective.
-  ObjectiveSense = 1 << 2,
+  ObjectiveSense,
   //! At what value the objective should be cut off.
-  Cutoff = 1 << 3,
+  Cutoff,
   //! Infinity threshold.
-  Infinity = 1 << 4,
+  Infinity,
   //! Time limit alotted to solution process.
-  TimeLimit = 1 << 5,
+  TimeLimit,
   //! Lower limit of the objective function.
-  ObjectiveLowerLimit = 1 << 6,
+  ObjectiveLowerLimit,
   //! Upper limit of the objective function.
-  ObjectiveUpperLimit = 1 << 7,
+  ObjectiveUpperLimit,
   //! Verbosity level. Lower is less verbose, minimum 0.
-  Verbosity = 1 << 8,
+  Verbosity,
   //! Whether to solve the primal (0) or dual (1) LP.
-  PrimalOrDual = 1 << 9,
+  PrimalOrDual,
   //! Maximum number of iterations for simplex algorithm.
-  IterationLimit = 1 << 10,
+  IterationLimit,
 };
 
 }  // namespace lpint
-
-template <>
-struct bitmask::EnableBitmaskOperators<lpint::Param> {
-  static constexpr bool enable = true;
-};
 
 #endif  // LPINTERFACE_PARAMETER_TYPE_H

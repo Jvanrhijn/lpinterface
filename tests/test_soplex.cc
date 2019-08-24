@@ -60,6 +60,18 @@ RC_GTEST_PROP(Soplex, IterationLimit, ()) {
   RC_ASSERT(status == Status::IterationLimit);
 }
 
+RC_GTEST_PROP(Soplex, SupportedParams, ()) {
+  SoplexSolver soplex;
+  RC_ASSERT(!soplex.parameter_supported(Param::Threads));
+  RC_ASSERT(soplex.parameter_supported(Param::TimeLimit));
+  RC_ASSERT(soplex.parameter_supported(Param::Verbosity));
+  RC_ASSERT(soplex.parameter_supported(Param::IterationLimit));
+  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveSense));
+  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveLowerLimit));
+  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveUpperLimit));
+  RC_ASSERT(soplex.parameter_supported(Param::Infinity));
+}
+
 // property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
