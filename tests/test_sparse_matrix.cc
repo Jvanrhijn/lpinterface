@@ -6,12 +6,15 @@
 
 using namespace lpint;
 
+constexpr std::size_t max_nrows = 50;
+constexpr std::size_t max_ncols = 50;
+
 using Index = typename MatrixEntry<double>::Index;
 using SizeType = typename MatrixEntry<double>::SizeType;
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise, ()) {
-  auto nrows = *rc::gen::nonZero<uint8_t>();
-  auto ncols = *rc::gen::inRange<uint8_t>(2, std::numeric_limits<uint8_t>::max());
+  auto nrows = *rc::gen::inRange(1ul, max_nrows);
+  auto ncols = *rc::gen::inRange<std::size_t>(2, max_ncols);
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
   sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(
       nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
@@ -28,8 +31,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseRowWise, ()) {
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise, ()) {
-  auto nrows = *rc::gen::nonZero<uint8_t>();
-  auto ncols = *rc::gen::inRange<uint8_t>(2, std::numeric_limits<uint8_t>::max());
+  auto nrows = *rc::gen::inRange(1ul, max_nrows);
+  auto ncols = *rc::gen::inRange<std::size_t>(2, max_ncols);
   SparseMatrix<double> sp(SparseMatrixType::ColumnWise);
   auto cols = *rc::gen::container<std::vector<Column<double>>>(
       ncols, rc::genRow(ncols, rc::gen::nonZero<double>()));
@@ -47,8 +50,8 @@ RC_GTEST_PROP(SparseMatrix, SparseMatrixIndexesLikeDenseColumnWise, ()) {
 }
 
 RC_GTEST_PROP(SparseMatrix, SparseMatrixIsIterable, ()) {
-  auto nrows = *rc::gen::nonZero<uint8_t>();
-  auto ncols = *rc::gen::inRange<uint8_t>(2, std::numeric_limits<uint8_t>::max());
+  auto nrows = *rc::gen::inRange(1ul, max_nrows);
+  auto ncols = *rc::gen::inRange<std::size_t>(2, max_ncols);
   SparseMatrix<double> sp(SparseMatrixType::RowWise);
   sp.add_rows(*rc::gen::container<std::vector<Row<double>>>(
       nrows, rc::genRow(ncols, rc::gen::nonZero<double>())));
