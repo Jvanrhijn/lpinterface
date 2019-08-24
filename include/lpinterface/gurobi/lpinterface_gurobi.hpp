@@ -56,12 +56,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
 #if __cplusplus >= 201402L
   constexpr
 #endif
-      static char
-      convert_ordering(const Ordering ord);
-
-#if __cplusplus >= 201402L
-  constexpr
-#endif
       static Status
       convert_gurobi_status(int status);
 
@@ -79,23 +73,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   //! The solution vector
   Solution<double> solution_;
 };
-
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline char
-    convert_ordering(const Ordering ord) {
-  switch (ord) {
-    case Ordering::LEQ:
-      return GRB_LESS_EQUAL;
-    case Ordering::GEQ:
-      return GRB_GREATER_EQUAL;
-    case Ordering::EQ:
-      return GRB_EQUAL;
-    default:
-      throw UnsupportedConstraintException();
-  }
-}
 
 #if __cplusplus >= 201402L
 constexpr

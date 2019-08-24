@@ -78,7 +78,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto solver = rc::genLinearProgramSolver<SoplexSolver>(
-      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ),
+      nrows, ncols, 
       rc::gen::just(VarType::Real));
 
   auto soplex = configure_soplex(solver.linear_program());

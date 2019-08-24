@@ -12,20 +12,6 @@
 
 namespace lpint {
 
-/// Enum representing orderings of values.
-enum class Ordering {
-  //! Supported by:
-  LT,
-  //! Supported by:
-  GT,
-  //! Supported by: Gurobi.
-  EQ,
-  //! Supported by: Gurobi, SoPlex.
-  LEQ,
-  //! Supported by: Gurobi, SoPlex.
-  GEQ,
-};
-
 /// Enum representing possible variable types for an LP.
 enum class VarType {
   //! Supported by: Gurobi.
@@ -223,8 +209,6 @@ struct Constraint {
       : row(std::move(r)), lower_bound(lb), upper_bound(ub) {}
 
   Row<T> row;
-  //! Ordering type of this constraint, see Ordering for possible variants.
-  // Ordering ordering;
   //! Lower bound of constraint equation.
   T lower_bound;
   //! Upper bound of constraint equation.
@@ -290,29 +274,6 @@ struct Solution {
 };
 
 // LCOV_EXCL_START
-inline std::ostream& operator<<(std::ostream& os, const Ordering& ord) {
-  switch (ord) {
-    case Ordering::EQ:
-      os << "EQ";
-      break;
-    case Ordering::GEQ:
-      os << "GEQ";
-      break;
-    case Ordering::GT:
-      os << "GT";
-      break;
-    case Ordering::LEQ:
-      os << "LEQ";
-      break;
-    case Ordering::LT:
-      os << "LT";
-      break;
-    default:
-      throw UnsupportedConstraintException();
-  }
-  return os;
-}
-
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os,
                                 const Constraint<T>& constraint) {

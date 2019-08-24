@@ -80,11 +80,11 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
   auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
   auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
     nconstr, 
-    rc::genConstraintWithOrdering(
+    rc::genConstraint(
       rc::genRow(
         ncols, 
         rc::gen::nonZero<double>()), 
-      rc::gen::arbitrary<double>(), rc::gen::arbitrary<Ordering>()));
+      rc::gen::arbitrary<double>()));
   std::vector<Constraint<double>> constraints_backup;
   for (const auto& constr : constraints) {
     double lb = constr.lower_bound;
@@ -145,7 +145,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
   auto grb = rc::genLinearProgramSolver<GurobiSolver>(
-      nrows, ncols, rc::gen::element(Ordering::LEQ, Ordering::GEQ, Ordering::EQ),
+      nrows, ncols, 
       rc::gen::arbitrary<VarType>());
 
   GRBenv* env = nullptr;
@@ -230,7 +230,7 @@ TEST(Gurobi, FullProblem) {
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   auto lp_data = generate_lp_data<GurobiSolver>(
-      10, 10, rc::gen::element(Ordering::EQ, Ordering::LEQ, Ordering::GEQ),
+      10, 10,
       rc::gen::arbitrary<VarType>());
 
   // configure bare Gurobi
