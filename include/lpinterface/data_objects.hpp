@@ -62,7 +62,8 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
-  explicit MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
+  explicit MatrixEntry(const std::size_t size)
+      : values_(size), nonzero_indices_(size) {}
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {

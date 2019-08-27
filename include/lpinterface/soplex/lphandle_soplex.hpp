@@ -2,8 +2,8 @@
 #define LPINTERFACE_LPHANDLE_SOPLEX_H
 
 #include <memory>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "soplex.h"
 

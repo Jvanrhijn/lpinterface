@@ -25,10 +25,10 @@ void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
   const auto nconstr = num_constraints();
   if (i < nconstr) {
     if (nconstr > 0) {
-      for (auto j = i; j < nconstr-1; j++) {
+      for (auto j = i; j < nconstr - 1; j++) {
         internal_indices_[j]++;
       }
-      internal_indices_[nconstr-1] = i; 
+      internal_indices_[nconstr - 1] = i;
     }
   }
   internal_indices_.resize(nconstr);

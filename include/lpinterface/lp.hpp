@@ -81,7 +81,7 @@ class ILinearProgramHandle {
 
   /**
    * @brief Remove a constraint from the LP.
-   * 
+   *
    * @param i Index of the constraint to remove.
    */
   virtual void remove_constraint(const std::size_t i) = 0;
@@ -107,8 +107,8 @@ class ILinearProgramHandle {
    * Since the constraints have to be copied from the backend,
    * this can be quite an expensive operation, and so should
    * not be called in a loop.
-   * 
-   * @return std::vector<Constraint<double>> 
+   *
+   * @return std::vector<Constraint<double>>
    */
   virtual std::vector<Constraint<double>> constraints() const = 0;
 
@@ -119,8 +119,8 @@ class ILinearProgramHandle {
    * objective values have to be copied from the backend, this
    * can be quite an expensive operation, and so should not be
    * called in a loop.
-   * 
-   * @return Objective<double> 
+   *
+   * @return Objective<double>
    */
   virtual Objective<double> objective() const = 0;
 };

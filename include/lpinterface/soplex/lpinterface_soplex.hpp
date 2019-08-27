@@ -63,10 +63,12 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   static const std::unordered_map<Param, int> param_dict_;
 
-  static const std::unordered_map<soplex::SPxSolver::Status, Status> status_dict_; 
+  static const std::unordered_map<soplex::SPxSolver::Status, Status>
+      status_dict_;
 };
 
-inline Status SoplexSolver::translate_status(const soplex::SPxSolver::Status status) {
+inline Status SoplexSolver::translate_status(
+    const soplex::SPxSolver::Status status) {
   if (status == soplex::SPxSolver::Status::ERROR) {
     throw SoplexException();
   } else {
