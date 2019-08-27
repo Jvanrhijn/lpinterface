@@ -84,7 +84,7 @@ class ILinearProgramHandle {
    * 
    * @param i Index of the constraint to remove.
    */
-  virtual void remove_constraint(std::size_t i) = 0;
+  virtual void remove_constraint(const std::size_t i) = 0;
 
   /**
    * @brief Retrieve the objective sense of this ILinearProgramHandle.

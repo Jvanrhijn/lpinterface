@@ -80,6 +80,37 @@ RC_GTEST_PROP(SoPlex, AddAndRetrieveConstraints, ()) {
   RC_ASSERT(constraints_backup == retrieved_constraints);
 }
 
+RC_GTEST_PROP(SoPlex, AddAndRemoveConstraints, ()) {
+  // generate and backup constraints
+  auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
+  auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
+    nconstr, 
+    rc::genConstraint(
+      rc::genRow(
+        ncols, 
+        rc::gen::nonZero<double>()), 
+      rc::gen::arbitrary<double>()));
+  std::vector<Constraint<double>> constraints_backup(nconstr);
+  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
+    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
+  
+  // generate index of constraint to remove
+  const auto remove_idx = *rc::gen::inRange(0ul, nconstr).as("Removal index");
+  // remove constraint from backup
+  constraints_backup.erase(constraints_backup.begin() 
+    + static_cast<decltype(constraints_backup)::difference_type>(remove_idx));
+
+  SoplexSolver spl(OptimizationType::Maximize);
+  // generate variables to avoid error
+  auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
+  spl.linear_program().set_objective(std::move(obj));
+  spl.linear_program().add_constraints(std::move(constraints));
+
+  spl.linear_program().remove_constraint(remove_idx);
+
+  RC_ASSERT(constraints_backup == spl.linear_program().constraints());
+}
+
 RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
   // generate a linear program that is not unbounded or infeasible
   auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);

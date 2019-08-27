@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "soplex.h"
 
@@ -42,10 +43,14 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   }
 
  private:
+  using ConstraintIndex = std::size_t;
+  using InternalIndex = std::size_t;
+
+  std::vector<InternalIndex> internal_indices_;
+
   std::shared_ptr<soplex::SoPlex> soplex_;
 
   OptimizationType sense_ = OptimizationType::Maximize;
-  int callcount = 0;
 };
 
 }  // namespace lpint
