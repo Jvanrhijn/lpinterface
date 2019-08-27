@@ -135,4 +135,27 @@ const std::unordered_map<Param, int> SoplexSolver::param_dict_ = {
     { Param::ObjectiveUpperLimit, soplex::SoPlex::OBJLIMIT_UPPER },
 };
 
+const std::unordered_map<SPxSolver::Status, Status> SoplexSolver::status_dict_ = {
+{ soplex::SPxSolver::Status::NO_RATIOTESTER, Status::NoRatioTester },
+{ soplex::SPxSolver::Status::NO_PRICER, Status::NoPricer },
+{ soplex::SPxSolver::Status::NO_SOLVER, Status::NoSolver },
+{ soplex::SPxSolver::Status::NOT_INIT, Status::NotInitialized },
+{ soplex::SPxSolver::Status::ABORT_EXDECOMP, Status::ExitDecomposition },
+{ soplex::SPxSolver::Status::ABORT_DECOMP, Status::Decomposition },
+{ soplex::SPxSolver::Status::ABORT_CYCLING, Status::Cycling },
+{ soplex::SPxSolver::Status::ABORT_TIME, Status::TimeOut },
+{ soplex::SPxSolver::Status::ABORT_ITER, Status::IterationLimit },
+{ soplex::SPxSolver::Status::ABORT_VALUE, Status::ObjectiveLimit },
+{ soplex::SPxSolver::Status::SINGULAR, Status::NumericFailure },
+{ soplex::SPxSolver::Status::NO_PROBLEM, Status::NotLoaded },
+{ soplex::SPxSolver::Status::REGULAR, Status::Regular },
+{ soplex::SPxSolver::Status::RUNNING, Status::InProgress },
+{ soplex::SPxSolver::Status::UNKNOWN, Status::NotLoaded },
+{ soplex::SPxSolver::Status::OPTIMAL, Status::Optimal },
+{ soplex::SPxSolver::Status::UNBOUNDED, Status::Unbounded },
+{ soplex::SPxSolver::Status::INFEASIBLE, Status::Infeasible },
+{ soplex::SPxSolver::Status::INForUNBD, Status::InfeasibleOrUnbounded },
+{ soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS, Status::OptimalUnscaledViolations },
+};
+
 }  // namespace lpint
