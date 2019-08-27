@@ -42,7 +42,7 @@ if(CLANG_TIDY)
     clang-tidy
     COMMAND clang-tidy
     ${ALL_CXX_SOURCE_FILES}
-    -checks='cppcoreguidelines-*'
+    -checks='cppcoreguidelines-*,clang-diagnostic-weak-vtables'
     -warnings-as-errors=*
     --
     -I../include/

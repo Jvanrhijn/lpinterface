@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-diagnostic-c++98-compat*,-clang-diagnostic-unused-macros'
+Checks:          'clang-diagnostic-*,cppcoreguidelines-*,clang-analyzer-*,-clang-diagnostic-c++98-compat*,-clang-diagnostic-unused-macros'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
