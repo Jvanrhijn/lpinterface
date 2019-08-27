@@ -1,4 +1,5 @@
 #include "lpinterface/soplex/lphandle_soplex.hpp"
+#include "../../examples/common.hpp"
 
 namespace lpint {
 
@@ -23,15 +24,15 @@ void LinearProgramHandleSoplex::add_constraints(
 void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
   soplex_->removeRowReal(internal_indices_.at(i));
   const auto nconstr = num_constraints();
-  if (i < nconstr) {
-    if (nconstr > 0) {
-      for (auto j = i; j < nconstr - 1; j++) {
-        internal_indices_[j]++;
-      }
-      internal_indices_[nconstr - 1] = i;
+  if (i < nconstr && nconstr > 0) {
+    internal_indices_[nconstr - 1] = i;
+    for (auto j = i; j < nconstr-1; j++) {
+      internal_indices_[j]++;
     }
   }
   internal_indices_.resize(nconstr);
+  print_vector(internal_indices_);
+  std::cout <<"\n";
 }
 
 void LinearProgramHandleSoplex::set_objective(Objective<double>&& objective) {
