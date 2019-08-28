@@ -43,10 +43,19 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   }
 
  private:
-  using ConstraintIndex = std::size_t;
+  //static std::size_t transform_index(std::size_t removed, std::size_t i, std::size_t length) {
+  //  if (i < removed) {
+  //    return i;
+  //  } else if (i == length - 2) {
+  //    return removed;
+  //  } else {
+  //    return i + 1;
+  //  }
+  //}
+
   using InternalIndex = std::size_t;
 
-  std::vector<InternalIndex> internal_indices_;
+  //std::vector<InternalIndex> internal_indices_;
 
   std::shared_ptr<soplex::SoPlex> soplex_;
 

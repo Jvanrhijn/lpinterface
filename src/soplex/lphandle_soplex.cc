@@ -7,8 +7,8 @@ using namespace soplex;
 
 void LinearProgramHandleSoplex::add_constraints(
     std::vector<Constraint<double>>&& constraints) {
-  auto nconstr = num_constraints();
-  internal_indices_.resize(internal_indices_.size() + constraints.size());
+  //auto nconstr = num_constraints();
+  //internal_indices_.resize(internal_indices_.size() + constraints.size());
   for (auto& constraint : constraints) {
     DSVector ds_row(constraint.row.num_nonzero());
     ds_row.add(constraint.row.num_nonzero(),
@@ -16,23 +16,20 @@ void LinearProgramHandleSoplex::add_constraints(
                constraint.row.values().data());
     soplex_->addRowReal(
         LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
-    internal_indices_[nconstr] = nconstr;
-    nconstr++;
+    //internal_indices_[nconstr] = nconstr;
+    //nconstr++;
   }
 }
 
 void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
-  soplex_->removeRowReal(internal_indices_.at(i));
-  const auto nconstr = num_constraints();
-  if (i < nconstr && nconstr > 0) {
-    internal_indices_[nconstr - 1] = i;
-    for (auto j = i; j < nconstr-1; j++) {
-      internal_indices_[j]++;
-    }
-  }
-  internal_indices_.resize(nconstr);
-  print_vector(internal_indices_);
-  std::cout <<"\n";
+  soplex_->removeRowReal(i);
+
+  //for (std::size_t j = 0; j < internal_indices_.size(); j++) {
+  //  auto idx = transform_index(i, j, internal_indices_.size());
+  //  internal_indices_.at(j) = idx;
+  //}
+
+  //internal_indices_.resize(num_constraints());
 }
 
 void LinearProgramHandleSoplex::set_objective(Objective<double>&& objective) {
@@ -69,7 +66,7 @@ std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
   const auto nrows = static_cast<std::size_t>(soplex_->numRowsReal());
   std::vector<Constraint<double>> constraints(num_constraints());
   for (std::size_t i = 0; i < nrows; i++) {
-    auto idx = internal_indices_.at(i);
+    auto idx = i;
     auto lb = soplex_->lhsReal(idx);
     auto ub = soplex_->rhsReal(idx);
 
