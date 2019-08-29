@@ -1,5 +1,4 @@
 #include "lpinterface/soplex/lphandle_soplex.hpp"
-#include "../../examples/common.hpp"
 
 namespace lpint {
 
@@ -7,8 +6,6 @@ using namespace soplex;
 
 void LinearProgramHandleSoplex::add_constraints(
     std::vector<Constraint<double>>&& constraints) {
-  //auto nconstr = num_constraints();
-  //internal_indices_.resize(internal_indices_.size() + constraints.size());
   for (auto& constraint : constraints) {
     DSVector ds_row(constraint.row.num_nonzero());
     ds_row.add(constraint.row.num_nonzero(),
@@ -16,20 +13,11 @@ void LinearProgramHandleSoplex::add_constraints(
                constraint.row.values().data());
     soplex_->addRowReal(
         LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
-    //internal_indices_[nconstr] = nconstr;
-    //nconstr++;
   }
 }
 
 void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
   soplex_->removeRowReal(i);
-
-  //for (std::size_t j = 0; j < internal_indices_.size(); j++) {
-  //  auto idx = transform_index(i, j, internal_indices_.size());
-  //  internal_indices_.at(j) = idx;
-  //}
-
-  //internal_indices_.resize(num_constraints());
 }
 
 void LinearProgramHandleSoplex::set_objective(Objective<double>&& objective) {

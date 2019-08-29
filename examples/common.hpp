@@ -1,10 +1,10 @@
 #ifndef LPINTERFACE_COMMON_H
-#define ifndef LPINTERFACE_COMMON_H
+#define LPINTERFACE_COMMON_H
 
 #include <cstddef>
 #include <vector>
 
-std::size_t vectorize_indices(const std::size_t i, const std::size_t j,
+inline std::size_t vectorize_indices(const std::size_t i, const std::size_t j,
                               const std::size_t stride) {
   return j + i * stride;
 }
