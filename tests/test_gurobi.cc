@@ -78,70 +78,12 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
 }
 
 
-RC_GTEST_PROP(Gurobi, AddAndRetrieveConstraints, ()) {
-  auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
-  auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
-    nconstr, 
-    rc::genConstraint(
-      rc::genRow(
-        ncols, 
-        rc::gen::nonZero<double>()), 
-      rc::gen::arbitrary<double>()));
-  std::vector<Constraint<double>> constraints_backup(nconstr);
-  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
-    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
-  GurobiSolver grb(OptimizationType::Maximize);
-  // first need to create variables or gurobi will throw
-  auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<VarType>(), rc::gen::arbitrary<double>());
-  grb.linear_program().set_objective(std::move(obj));
-  grb.linear_program().add_constraints(std::move(constraints));
-  auto retrieved_constraints = grb.linear_program().constraints();
-  RC_ASSERT(constraints_backup == retrieved_constraints);
+TEST(Gurobi, AddAndRetrieveConstraints) {
+  test_add_retrieve_constraints<GurobiSolver>(ncols);
 }
 
-RC_GTEST_PROP(Gurobi, AddAndRemoveConstraints, ()) {
-  // generate and backup constraints
-  auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
-  auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
-    nconstr, 
-    rc::genConstraint(
-      rc::genRow(
-        ncols, 
-        rc::gen::nonZero<double>()), 
-      rc::gen::arbitrary<double>()));
-  std::vector<Constraint<double>> constraints_backup(nconstr);
-  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
-    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
-
-  const auto nconstr_to_remove = 1;//*rc::gen::inRange(1ul, nconstr+1).as("Num constraints to remove");
-  
-  GurobiSolver spl(OptimizationType::Maximize);
-  // generate variables to avoid error
-  auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<VarType>(), rc::gen::arbitrary<double>());
-  spl.linear_program().set_objective(std::move(obj));
-  spl.linear_program().add_constraints(std::move(constraints));
-
-  for (std::size_t i = 0; i < nconstr_to_remove; i++) {
-    // generate index of constraint to remove
-    auto nconstr_left = spl.linear_program().num_constraints();
-    const auto remove_idx = *rc::gen::inRange(0ul, nconstr_left).as("Removal index");
-
-    // remove constraint from backup
-    constraints_backup.erase(constraints_backup.begin() 
-      + static_cast<decltype(constraints_backup)::difference_type>(remove_idx));
-
-    spl.linear_program().remove_constraint(remove_idx);
-
-    auto constr_left = spl.linear_program().constraints();
-
-    for (const auto& constr : constr_left) {
-      RC_ASSERT(std::find(constraints_backup.begin(), constraints_backup.end(), constr) != constraints_backup.end());
-    }
-
-    RC_ASSERT(constr_left.size() == constraints_backup.size());
-
-  }
-  
+TEST(Gurobi, AddAndRemoveConstraints) {
+  test_add_remove_constraints<GurobiSolver>(ncols);
 }
 
 RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
@@ -157,29 +99,16 @@ RC_GTEST_PROP(Gurobi, AddAndRetrieveObjective, ()) {
   RC_ASSERT(obj_backup == grb.linear_program().objective());
 }
 
-RC_GTEST_PROP(Gurobi, NumConstraints, ()) {
-  auto grb = rc::genLinearProgramSolver<GurobiSolver>(nrows, ncols, 
-                                                         rc::gen::just(VarType::Real));
-  grb.set_parameter(Param::Verbosity, 0);
-  RC_ASSERT(grb.linear_program().num_constraints() 
-      == grb.linear_program().constraints().size());
+TEST(Gurobi, NumConstraints) {
+  test_num_constraints<GurobiSolver>(nrows, ncols);
 }
 
-RC_GTEST_PROP(Gurobi, NumVars, ()) {
-  auto grb = rc::genLinearProgramSolver<GurobiSolver>(nrows, ncols, 
-                                                      rc::gen::just(VarType::Real));
-  grb.set_parameter(Param::Verbosity, 0);
-  RC_ASSERT(grb.linear_program().num_vars() 
-      == grb.linear_program().objective().values.size());
+TEST(Gurobi, NumVars) {
+  test_num_vars<GurobiSolver>(nrows, ncols);
 }
 
-RC_GTEST_PROP(Gurobi, TimeOutWhenTimeLimitZero, ()) {
-  // generate a linear program that is not unbounded or infeasible
-  auto grb = gen_simple_valid_lp<GurobiSolver>(1, ncols);
-  grb.set_parameter(Param::Verbosity, 0);
-  grb.set_parameter(Param::TimeLimit, 0.0);
-  const auto status = grb.solve_primal();
-  RC_ASSERT(status == Status::TimeOut);
+TEST(Gurobi, TimeOutWhenTimeLimitZero) {
+  test_timelimit<GurobiSolver>(ncols);
 }
 
 //RC_GTEST_PROP(Gurobi, IterationLimit, ()) {
@@ -370,33 +299,5 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
 }
 
 TEST(Gurobi, FullProblemRawData) {
-  // Create the Gurobi solver
-  GurobiSolver grb(OptimizationType::Maximize);
-
-  {
-    std::vector<double> values = {1, 2, 3, 1, 1};
-    std::vector<int> start_indices = {0, 3};
-    std::vector<int> col_indices = {0, 1, 2, 0, 1};
-    std::vector<double> lb = {0, 1.0};
-    std::vector<double> ub = {4.0, LPINT_INFINITY};
-    std::vector<double> objective = {1.0, 1.0, 2.0};
-    std::vector<VarType> var_type = {VarType::Binary, VarType::Binary,
-                                     VarType::Binary};
-
-    grb.add_variables(std::move(objective), std::move(var_type));
-    grb.add_rows(std::move(values), std::move(start_indices),
-                 std::move(col_indices), std::move(lb), std::move(ub));
-  }
-
-  grb.set_parameter(Param::Verbosity, 0);
-
-  // Solve the primal LP problem
-  auto status = grb.solve_primal();
-  ASSERT_EQ(status, Status::Optimal);
-
-  //// check solution value
-  auto solution = grb.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
-  ASSERT_EQ(solution.objective_value, 3.0);
+  test_raw_data_full_problem<GurobiSolver>();
 }
