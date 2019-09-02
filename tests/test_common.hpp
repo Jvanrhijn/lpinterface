@@ -139,7 +139,7 @@ void test_num_constraints(std::size_t nrows, std::size_t ncols) {
 
 template <class Solver>
 void test_num_vars(std::size_t nrows, std::size_t ncols) {
-  templated_prop<SoplexSolver>("Number of variables properly retrieved", [=]() {
+  templated_prop<Solver>("Number of variables properly retrieved", [=]() {
     auto solver = rc::genLinearProgramSolver<Solver>(nrows, ncols, 
                                                            rc::gen::just(VarType::Real));
     solver.set_parameter(Param::Verbosity, 0);
