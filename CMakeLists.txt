@@ -35,6 +35,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # include dirs
 include_directories(lib)
 include_directories(include)
+include_directories(include/util)
 
 # clang-format and clang-tidy
 include(cmake/clang-cxx-dev-tools.cmake)

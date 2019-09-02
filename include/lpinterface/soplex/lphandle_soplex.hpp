@@ -2,6 +2,7 @@
 #define LPINTERFACE_LPHANDLE_SOPLEX_H
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "soplex.h"
@@ -20,6 +21,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
       : soplex_(soplex) {}
 
   void add_constraints(std::vector<Constraint<double>>&& constraints) override;
+
+  void remove_constraint(std::size_t i) override;
 
   std::size_t num_vars() const override;
 
@@ -40,10 +43,24 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   }
 
  private:
+  // static std::size_t transform_index(std::size_t removed, std::size_t i,
+  // std::size_t length) {
+  //  if (i < removed) {
+  //    return i;
+  //  } else if (i == length - 2) {
+  //    return removed;
+  //  } else {
+  //    return i + 1;
+  //  }
+  //}
+
+  using InternalIndex = std::size_t;
+
+  // std::vector<InternalIndex> internal_indices_;
+
   std::shared_ptr<soplex::SoPlex> soplex_;
 
   OptimizationType sense_ = OptimizationType::Maximize;
-  int callcount = 0;
 };
 
 }  // namespace lpint

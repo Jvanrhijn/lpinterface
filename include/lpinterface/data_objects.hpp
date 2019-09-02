@@ -62,7 +62,8 @@ class MatrixEntry {
   MatrixEntry<T>& operator=(const MatrixEntry<T>&) = delete;
   MatrixEntry<T>& operator=(MatrixEntry<T>&&) = default;
 
-  explicit MatrixEntry(const std::size_t size) : values_(size), nonzero_indices_(size) {}
+  explicit MatrixEntry(const std::size_t size)
+      : values_(size), nonzero_indices_(size) {}
 
   MatrixEntry(const std::vector<T>& values, const std::vector<Index>& indices)
       : values_(values), nonzero_indices_(indices) {
@@ -238,7 +239,8 @@ struct Objective {
   // Gurobi assumes continuous variables by default.
   // This might be different in other solvers, so
   // we'll have to carefully check when adding support.
-  explicit Objective(std::vector<T>&& vals) : values(std::move(vals)) {}
+  explicit Objective(std::vector<T>&& vals)
+      : values(std::move(vals)), variable_types(values.size(), VarType::Real) {}
   Objective(std::vector<T>&& vals, std::vector<VarType>&& var_types)
       : values(std::move(vals)), variable_types(std::move(var_types)) {
     if (values.size() != variable_types.size()) {

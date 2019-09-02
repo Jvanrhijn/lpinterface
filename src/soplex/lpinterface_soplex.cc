@@ -8,7 +8,8 @@ using namespace soplex;
 SoplexSolver::SoplexSolver(OptimizationType optim_type)
     : soplex_(std::make_shared<SoPlex>()), lp_handle_({}, soplex_) {
   lp_handle_.set_objective_sense(optim_type);
-  if (!soplex_->setIntParam(static_cast<SoPlex::IntParam>(param_dict_.at(Param::Verbosity)), 0)) {
+  if (!soplex_->setIntParam(
+          static_cast<SoPlex::IntParam>(param_dict_.at(Param::Verbosity)), 0)) {
     throw FailedToSetParameterException();
   }
 }
@@ -22,7 +23,8 @@ bool SoplexSolver::parameter_supported(const Param param) const {
 
 void SoplexSolver::set_parameter(const Param param, const int value) {
   if (!parameter_supported(param)) throw UnsupportedParameterException();
-  const auto convert_param = static_cast<SoPlex::IntParam>(param_dict_.at(param));
+  const auto convert_param =
+      static_cast<SoPlex::IntParam>(param_dict_.at(param));
   if (!soplex_->setIntParam(convert_param, value)) {
     throw FailedToSetParameterException();
   }
@@ -30,7 +32,8 @@ void SoplexSolver::set_parameter(const Param param, const int value) {
 
 void SoplexSolver::set_parameter(const Param param, const double value) {
   if (!parameter_supported(param)) throw UnsupportedParameterException();
-  const auto convert_param = static_cast<SoPlex::RealParam>(param_dict_.at(param));
+  const auto convert_param =
+      static_cast<SoPlex::RealParam>(param_dict_.at(param));
   if (!soplex_->setRealParam(convert_param, value)) {
     throw FailedToSetParameterException();
   }
@@ -67,7 +70,12 @@ const ILinearProgramHandle& SoplexSolver::linear_program() const {
 
 ILinearProgramHandle& SoplexSolver::linear_program() { return lp_handle_; }
 
-const Solution<double>& SoplexSolver::get_solution() const { return solution_; }
+const Solution<double>& SoplexSolver::get_solution() const {
+  if (solution_status() != Status::Optimal) {
+    throw ModelNotSolvedException();
+  }
+  return solution_;
+}
 
 void SoplexSolver::add_columns(
     __attribute__((unused)) std::vector<double>&& values,
@@ -125,14 +133,39 @@ void SoplexSolver::add_variables(std::vector<double>&& objective_values,
 }
 
 const std::unordered_map<Param, int> SoplexSolver::param_dict_ = {
-    { Param::ObjectiveSense, soplex::SoPlex::OBJSENSE },
-    { Param::Verbosity, soplex::SoPlex::VERBOSITY },
-    { Param::PrimalOrDual, soplex::SoPlex::ALGORITHM },
-    { Param::IterationLimit, soplex::SoPlex::ITERLIMIT },
-    { Param::Infinity, soplex::SoPlex::INFTY },
-    { Param::TimeLimit, soplex::SoPlex::TIMELIMIT },
-    { Param::ObjectiveLowerLimit, soplex::SoPlex::OBJLIMIT_LOWER },
-    { Param::ObjectiveUpperLimit, soplex::SoPlex::OBJLIMIT_UPPER },
+    {Param::ObjectiveSense, soplex::SoPlex::OBJSENSE},
+    {Param::Verbosity, soplex::SoPlex::VERBOSITY},
+    {Param::PrimalOrDual, soplex::SoPlex::ALGORITHM},
+    {Param::IterationLimit, soplex::SoPlex::ITERLIMIT},
+    {Param::Infinity, soplex::SoPlex::INFTY},
+    {Param::TimeLimit, soplex::SoPlex::TIMELIMIT},
+    {Param::ObjectiveLowerLimit, soplex::SoPlex::OBJLIMIT_LOWER},
+    {Param::ObjectiveUpperLimit, soplex::SoPlex::OBJLIMIT_UPPER},
+};
+
+const std::unordered_map<SPxSolver::Status, Status> SoplexSolver::status_dict_ =
+    {
+        {soplex::SPxSolver::Status::NO_RATIOTESTER, Status::NoRatioTester},
+        {soplex::SPxSolver::Status::NO_PRICER, Status::NoPricer},
+        {soplex::SPxSolver::Status::NO_SOLVER, Status::NoSolver},
+        {soplex::SPxSolver::Status::NOT_INIT, Status::NotInitialized},
+        {soplex::SPxSolver::Status::ABORT_EXDECOMP, Status::ExitDecomposition},
+        {soplex::SPxSolver::Status::ABORT_DECOMP, Status::Decomposition},
+        {soplex::SPxSolver::Status::ABORT_CYCLING, Status::Cycling},
+        {soplex::SPxSolver::Status::ABORT_TIME, Status::TimeOut},
+        {soplex::SPxSolver::Status::ABORT_ITER, Status::IterationLimit},
+        {soplex::SPxSolver::Status::ABORT_VALUE, Status::ObjectiveLimit},
+        {soplex::SPxSolver::Status::SINGULAR, Status::NumericFailure},
+        {soplex::SPxSolver::Status::NO_PROBLEM, Status::NotLoaded},
+        {soplex::SPxSolver::Status::REGULAR, Status::Regular},
+        {soplex::SPxSolver::Status::RUNNING, Status::InProgress},
+        {soplex::SPxSolver::Status::UNKNOWN, Status::NotLoaded},
+        {soplex::SPxSolver::Status::OPTIMAL, Status::Optimal},
+        {soplex::SPxSolver::Status::UNBOUNDED, Status::Unbounded},
+        {soplex::SPxSolver::Status::INFEASIBLE, Status::Infeasible},
+        {soplex::SPxSolver::Status::INForUNBD, Status::InfeasibleOrUnbounded},
+        {soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS,
+         Status::OptimalUnscaledViolations},
 };
 
 }  // namespace lpint

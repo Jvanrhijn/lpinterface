@@ -69,11 +69,12 @@ Status GurobiSolver::solve_primal() {
   try {
     auto num_constraints = lp_handle_.num_constraints();
     solution_.dual.resize(num_constraints);
-    detail::gurobi_function_checked(GRBgetdblattrarray, gurobi_model_.get(),
-                                    GRB_DBL_ATTR_PI, 0, static_cast<int>(num_constraints),
-                                    solution_.dual.data());
-  }  catch (const GurobiException& e) {
-    if (e.code() != 10005) {
+    detail::gurobi_function_checked(
+        GRBgetdblattrarray, gurobi_model_.get(), GRB_DBL_ATTR_PI, 0,
+        static_cast<int>(num_constraints), solution_.dual.data());
+  } catch (const GurobiException& e) {
+    constexpr int expected_error = 10005;
+    if (e.code() != expected_error) {
       throw e;
     }
   }
@@ -127,11 +128,11 @@ void GurobiSolver::add_variables(std::vector<double>&& objective_values,
 }
 
 const std::unordered_map<Param, const char*> GurobiSolver::param_dict_ = {
-  { Param::Verbosity, GRB_INT_PAR_OUTPUTFLAG },
-  { Param::Threads, GRB_INT_PAR_THREADS },
-  { Param::Cutoff, GRB_DBL_PAR_CUTOFF },
-  { Param::TimeLimit, GRB_DBL_PAR_TIMELIMIT },
-  { Param::IterationLimit, GRB_DBL_PAR_ITERATIONLIMIT },
+    {Param::Verbosity, GRB_INT_PAR_OUTPUTFLAG},
+    {Param::Threads, GRB_INT_PAR_THREADS},
+    {Param::Cutoff, GRB_DBL_PAR_CUTOFF},
+    {Param::TimeLimit, GRB_DBL_PAR_TIMELIMIT},
+    {Param::IterationLimit, GRB_DBL_PAR_ITERATIONLIMIT},
 };
 
 }  // namespace lpint

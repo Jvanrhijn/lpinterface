@@ -9,6 +9,7 @@
 
 #include "generators.hpp"
 #include "testutil.hpp"
+#include "test_common.hpp"
 
 using namespace lpint;
 using namespace testing;
@@ -43,76 +44,67 @@ inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
   return soplex;
 }
 
-RC_GTEST_PROP(SoPlex, NumConstraints, ()) {
-  auto soplex = rc::genLinearProgramSolver<SoplexSolver>(nrows, ncols, 
-                                                         rc::gen::just(VarType::Real));
-  soplex.set_parameter(Param::Verbosity, 0);
-  RC_ASSERT(soplex.linear_program().num_constraints() 
-      == soplex.linear_program().constraints().size());
+TEST(SoPlex, NumConstraints) {
+  test_num_constraints<SoplexSolver>(nrows, ncols);
 }
 
-RC_GTEST_PROP(SoPlex, NumVars, ()) {
-  auto soplex = rc::genLinearProgramSolver<SoplexSolver>(nrows, ncols, 
-                                                         rc::gen::just(VarType::Real));
-  soplex.set_parameter(Param::Verbosity, 0);
-  RC_ASSERT(soplex.linear_program().num_vars() 
-      == soplex.linear_program().objective().values.size());
+TEST(SoPlex, NumVars) {
+  test_num_vars<SoplexSolver>(nrows, ncols);
 }
 
-RC_GTEST_PROP(SoPlex, AddAndRetrieveConstraints, ()) {
-  auto nconstr = *rc::gen::inRange<std::size_t>(1, ncols);
-  auto constraints= *rc::gen::container<std::vector<Constraint<double>>>(
-    nconstr, 
-    rc::genConstraint(
-      rc::genRow(
-        ncols, 
-        rc::gen::nonZero<double>()), 
-      rc::gen::arbitrary<double>()));
-  std::vector<Constraint<double>> constraints_backup(nconstr);
-  std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
-    [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
-  SoplexSolver spl(OptimizationType::Maximize);
-  // first need to create variables or gurobi will throw
-  auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
-  spl.linear_program().set_objective(std::move(obj));
-  spl.linear_program().add_constraints(std::move(constraints));
-  auto retrieved_constraints = spl.linear_program().constraints();
-  RC_ASSERT(constraints_backup == retrieved_constraints);
+TEST(SoPlex, AddAndRetrieveObjective) {
+  test_add_retrieve_objective<SoplexSolver>(ncols, rc::gen::just(VarType::Real));
 }
 
-RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
-  // generate a linear program that is not unbounded or infeasible
-  auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
-  soplex.set_parameter(::Param::Verbosity, 0);
-  soplex.set_parameter(Param::TimeLimit, 0.0);
-  const auto status = soplex.solve_primal();
-  RC_ASSERT(status == Status::TimeOut);
+TEST(SoPlex, AddAndRetrieveConstraints) {
+  test_add_retrieve_constraints<SoplexSolver>(ncols);
 }
 
-RC_GTEST_PROP(Soplex, IterationLimit, ()) {
-  // generate a linear program that is not unbounded or infeasible
-  auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
-  soplex.set_parameter(::Param::Verbosity, 0);
-  soplex.set_parameter(Param::IterationLimit, 0);
-  const auto status = soplex.solve_primal();
-  RC_ASSERT(status == Status::IterationLimit);
+TEST(SoPlex, AddAndRemoveConstraints) {
+  test_add_remove_constraints<SoplexSolver>(ncols);
 }
 
-RC_GTEST_PROP(Soplex, SupportedParams, ()) {
-  SoplexSolver soplex;
-  RC_ASSERT(!soplex.parameter_supported(Param::Threads));
-  RC_ASSERT(soplex.parameter_supported(Param::TimeLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::Verbosity));
-  RC_ASSERT(soplex.parameter_supported(Param::IterationLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveSense));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveLowerLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveUpperLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::Infinity));
+TEST(SoPlex, TimeOutWhenTimeLimitZero) {
+  test_timelimit<SoplexSolver>(ncols);
+}
+
+TEST(SoPlex, IterationLimit) {
+  test_iterlimit<SoplexSolver>(ncols);
+}
+
+TEST(SoPlex, UnsupportedVariableType) {
+  test_unsupported_vartype<SoplexSolver>(ncols, 
+    rc::gen::element(VarType::Binary, VarType::Integer, 
+                     VarType::SemiInteger, VarType::SemiReal));
+}
+
+TEST(SoPlex, UnsolvedModelThrowsOnAccess) {
+  test_model_not_solved_acces_throw<SoplexSolver>();
+}
+
+TEST(SoPlex, SupportedParams) {
+  test_supported_params<SoplexSolver>(
+    {
+      Param::TimeLimit, Param::Verbosity, Param::IterationLimit, Param::ObjectiveSense,
+      Param::ObjectiveLowerLimit, Param::ObjectiveUpperLimit, Param::Infinity
+    },
+    {
+      Param::Threads
+    }
+  );
+}
+
+TEST(SoPlex, FullProblem) {
+  test_full_problem<SoplexSolver>();
+}
+
+TEST(Soplex, FullProblemRawData) {
+  test_raw_data_full_problem<SoplexSolver>();
 }
 
 // property: any LP should result in the same
 // answer as SoPlex gives us
-RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
+RC_GTEST_PROP(SoPlex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto solver = rc::genLinearProgramSolver<SoplexSolver>(
@@ -147,76 +139,3 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   }
 }
 
-TEST(Soplex, FullProblem) {
-  SoplexSolver spl(OptimizationType::Maximize);
-
-  spl.linear_program().set_objective_sense(OptimizationType::Maximize);
-
-  spl.linear_program().set_objective(Objective<double>({1, 1, 2}));
-
-  std::vector<Constraint<double>> constr;
-  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
-  constr.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
-
-  spl.linear_program().add_constraints(std::move(constr));
-
-  // // Solve the primal LP problem
-  auto status = spl.solve_primal();
-  ASSERT_EQ(status, Status::Optimal);
-
-  //// // check solution value
-  auto solution = spl.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
-  ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
-}
-
-//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
-//  using namespace soplex;
-//
-//  const auto sense =
-//      *rc::gen::arbitrary<OptimizationType>().as("Objective sense");
-//
-//  std::vector<double> values, objective, rhs;
-//  std::vector<int> start_indices, col_indices;
-//  std::vector<VarType> var_type;
-//  std::vector<Ordering> ord;
-//
-//  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type)
-//  = generate_lp_data(100, 10);
-//
-//  SoPlex soplex;
-//
-//  soplex.
-//
-//}
-
-TEST(Soplex, FullProblemRawData) {
-  // Create the Gurobi solver
-  SoplexSolver spl(OptimizationType::Maximize);
-
-  {
-    std::vector<double> values = {1, 2, 3, 1, 1};
-    std::vector<int> start_indices = {0, 3};
-    std::vector<int> col_indices = {0, 1, 2, 0, 1};
-    std::vector<double> lb = {-LPINT_INFINITY, 1.0};
-    std::vector<double> ub = {4.0, LPINT_INFINITY};
-    std::vector<double> objective = {1.0, 1.0, 2.0};
-    std::vector<VarType> var_type = {VarType::Real, VarType::Real,
-                                     VarType::Real};
-
-    spl.add_variables(std::move(objective), std::move(var_type));
-    spl.add_rows(std::move(values), std::move(start_indices),
-                 std::move(col_indices), std::move(lb), std::move(ub));
-  }
-
-  // Solve the primal LP problem
-  auto status = spl.solve_primal();
-  ASSERT_EQ(status, Status::Optimal);
-
-  //// check solution value
-  auto solution = spl.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
-  ASSERT_EQ(solution.objective_value, 4.0);
-}

@@ -41,7 +41,7 @@ class LinearProgramSolver {
 
   /**
    * @brief Check whether the solver backend supports the given parameter.
-   * 
+   *
    * @param param The parameter to check support for.
    * @return true The solver supports the given parameter.
    * @return false The solver does not support the given parameter.

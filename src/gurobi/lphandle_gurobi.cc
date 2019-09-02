@@ -32,6 +32,12 @@ void LinearProgramHandleGurobi::add_constraints(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
+void LinearProgramHandleGurobi::remove_constraint(std::size_t i) {
+  int to_del = static_cast<int>(i);
+  detail::gurobi_function_checked(GRBdelconstrs, grb_model_.get(), 1, &to_del);
+  detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
+}
+
 void LinearProgramHandleGurobi::set_objective(Objective<double>&& objective) {
   num_vars_ = objective.values.size();
   detail::gurobi_function_checked(

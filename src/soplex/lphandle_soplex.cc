@@ -1,4 +1,5 @@
 #include "lpinterface/soplex/lphandle_soplex.hpp"
+#include "util/container.hpp"
 
 namespace lpint {
 
@@ -16,8 +17,17 @@ void LinearProgramHandleSoplex::add_constraints(
   }
 }
 
+void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
+  soplex_->removeRowReal(i);
+}
+
 void LinearProgramHandleSoplex::set_objective(Objective<double>&& objective) {
   DSVector dummy(0);
+  if (detail::contains_any_of<VarType>({VarType::SemiInteger, VarType::SemiReal,
+                                        VarType::Integer, VarType::Binary},
+                                       objective.variable_types)) {
+    throw UnsupportedVariableTypeException();
+  }
   for (const auto& coefficient : objective.values) {
     soplex_->addColReal(LPCol(coefficient, dummy, infinity, 0.0));
   }
@@ -48,20 +58,20 @@ std::size_t LinearProgramHandleSoplex::num_constraints() const {
 
 std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
   const auto nrows = static_cast<std::size_t>(soplex_->numRowsReal());
-  std::vector<Constraint<double>> constraints;
+  std::vector<Constraint<double>> constraints(num_constraints());
   for (std::size_t i = 0; i < nrows; i++) {
-    auto lb = soplex_->lhsReal(i);
-    auto ub = soplex_->rhsReal(i);
+    auto idx = i;
+    auto lb = soplex_->lhsReal(idx);
+    auto ub = soplex_->rhsReal(idx);
 
     Row<double> row;
-    const auto sv = soplex_->rowVectorRealInternal(i);
+    const auto sv = soplex_->rowVectorRealInternal(idx);
     for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
       const auto element = sv.element(j);
       row.nonzero_indices().push_back(element.idx);
       row.values().push_back(element.val);
     }
-
-    constraints.emplace_back(std::move(row), lb, ub);
+    constraints[i] = Constraint<double>(std::move(row), lb, ub);
   }
   return constraints;
 }

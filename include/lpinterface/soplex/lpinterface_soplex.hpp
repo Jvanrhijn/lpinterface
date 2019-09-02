@@ -52,11 +52,7 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   void add_variables(std::vector<double>&& objective_values,
                      std::vector<VarType>&& var_types) override;
 
-#if __cplusplus >= 201402L
-  constexpr
-#endif
-      static Status
-      translate_status(const soplex::SPxSolver::Status status);
+  static Status translate_status(const soplex::SPxSolver::Status status);
 
  private:
   std::shared_ptr<soplex::SoPlex> soplex_;
@@ -67,58 +63,17 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   static const std::unordered_map<Param, int> param_dict_;
 
+  static const std::unordered_map<soplex::SPxSolver::Status, Status>
+      status_dict_;
 };
 
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline Status
-    SoplexSolver::translate_status(const soplex::SPxSolver::Status status) {
-  switch (status) {
-    case soplex::SPxSolver::Status::ERROR:
-      throw SoplexException();
-    case soplex::SPxSolver::Status::NO_RATIOTESTER:
-      return Status::NoRatioTester;
-    case soplex::SPxSolver::Status::NO_PRICER:
-      return Status::NoPricer;
-    case soplex::SPxSolver::Status::NO_SOLVER:
-      return Status::NoSolver;
-    case soplex::SPxSolver::Status::NOT_INIT:
-      return Status::NotInitialized;
-    case soplex::SPxSolver::Status::ABORT_EXDECOMP:
-      return Status::ExitDecomposition;
-    case soplex::SPxSolver::Status::ABORT_DECOMP:
-      return Status::Decomposition;
-    case soplex::SPxSolver::Status::ABORT_CYCLING:
-      return Status::Cycling;
-    case soplex::SPxSolver::Status::ABORT_TIME:
-      return Status::TimeOut;
-    case soplex::SPxSolver::Status::ABORT_ITER:
-      return Status::IterationLimit;
-    case soplex::SPxSolver::Status::ABORT_VALUE:
-      return Status::ObjectiveLimit;
-    case soplex::SPxSolver::Status::SINGULAR:
-      return Status::NumericFailure;
-    case soplex::SPxSolver::Status::NO_PROBLEM:
-      return Status::NotLoaded;
-    case soplex::SPxSolver::Status::REGULAR:
-      return Status::Regular;
-    case soplex::SPxSolver::Status::RUNNING:
-      return Status::InProgress;
-    case soplex::SPxSolver::Status::UNKNOWN:
-      return Status::NotLoaded;
-    case soplex::SPxSolver::Status::OPTIMAL:
-      return Status::Optimal;
-    case soplex::SPxSolver::Status::UNBOUNDED:
-      return Status::Unbounded;
-    case soplex::SPxSolver::Status::INFEASIBLE:
-      return Status::Infeasible;
-    case soplex::SPxSolver::Status::INForUNBD:
-      return Status::InfeasibleOrUnbounded;
-    case soplex::SPxSolver::Status::OPTIMAL_UNSCALED_VIOLATIONS:
-      return Status::OptimalUnscaledViolations;
-    default:
-      throw UnknownStatusException(status);
+inline Status SoplexSolver::translate_status(
+    const soplex::SPxSolver::Status status) {
+  if (status == soplex::SPxSolver::Status::ERROR) {
+    throw SoplexException();
+  } else {
+    return status_dict_.count(status) ? status_dict_.at(status)
+                                      : throw UnknownStatusException(status);
   }
 }
 
