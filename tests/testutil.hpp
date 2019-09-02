@@ -13,6 +13,12 @@ inline Constraint<T> copy_constraint(const Constraint<T>& constr) {
   return Constraint<T>(std::move(row), lb, ub);
 }
 
+template <class MetaFunction, class... Ts>
+inline void for_each_type() {
+  auto dummy = {(MetaFunction::template exec<Ts>(), 0)...};
+  static_cast<void>(dummy);
+}
+
 } // namespace lpint
 
 #endif // LPINTERFACE_TEST_UTIL_H
