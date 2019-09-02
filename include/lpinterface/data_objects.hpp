@@ -239,7 +239,7 @@ struct Objective {
   // Gurobi assumes continuous variables by default.
   // This might be different in other solvers, so
   // we'll have to carefully check when adding support.
-  explicit Objective(std::vector<T>&& vals) : values(std::move(vals)) {}
+  explicit Objective(std::vector<T>&& vals) : values(std::move(vals)), variable_types(values.size(), VarType::Real) {}
   Objective(std::vector<T>&& vals, std::vector<VarType>&& var_types)
       : values(std::move(vals)), variable_types(std::move(var_types)) {
     if (values.size() != variable_types.size()) {
