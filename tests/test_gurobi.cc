@@ -10,6 +10,7 @@
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "testutil.hpp"
+#include "test_common.hpp"
   
 using namespace lpint;
 using namespace testing;
@@ -269,29 +270,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
 }
 
 TEST(Gurobi, FullProblem) {
-  GurobiSolver grb(OptimizationType::Maximize);
-
-  Objective<double> obj{{1.0, 1.0, 2.0},
-                        {VarType::Binary, VarType::Binary, VarType::Binary}};
-  grb.linear_program().set_objective(std::move(obj));
-
-  std::vector<Constraint<double>> constr;
-  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
-  constr.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
-
-  grb.linear_program().add_constraints(std::move(constr));
-
-  grb.set_parameter(Param::Verbosity, 0);
-
-  // Solve the primal LP problem
-  auto status = grb.solve_primal();
-  ASSERT_EQ(status, Status::Optimal);
-
-  // check solution value
-  auto solution = grb.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{1.0, 0.0, 1.0}));
-  ASSERT_EQ(solution.objective_value, 3.0);
+  test_full_problem<GurobiSolver>();
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {

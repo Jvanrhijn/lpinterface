@@ -9,6 +9,7 @@
 
 #include "generators.hpp"
 #include "testutil.hpp"
+#include "test_common.hpp"
 
 using namespace lpint;
 using namespace testing;
@@ -125,13 +126,8 @@ RC_GTEST_PROP(SoPlex, AddAndRemoveConstraints, ()) {
   
 }
 
-RC_GTEST_PROP(Soplex, TimeOutWhenTimeLimitZero, ()) {
-  // generate a linear program that is not unbounded or infeasible
-  auto soplex = gen_simple_valid_lp<SoplexSolver>(1, ncols);
-  soplex.set_parameter(::Param::Verbosity, 0);
-  soplex.set_parameter(Param::TimeLimit, 0.0);
-  const auto status = soplex.solve_primal();
-  RC_ASSERT(status == Status::TimeOut);
+TEST(Soplex, TimeOutWhenTimeLimitZero) {
+  test_timelimit<SoplexSolver>(ncols);
 }
 
 RC_GTEST_PROP(Soplex, IterationLimit, ()) {
@@ -193,27 +189,7 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 }
 
 TEST(Soplex, FullProblem) {
-  SoplexSolver spl(OptimizationType::Maximize);
-
-  spl.linear_program().set_objective_sense(OptimizationType::Maximize);
-
-  spl.linear_program().set_objective(Objective<double>({1, 1, 2}));
-
-  std::vector<Constraint<double>> constr;
-  constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
-  constr.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
-
-  spl.linear_program().add_constraints(std::move(constr));
-
-  // // Solve the primal LP problem
-  auto status = spl.solve_primal();
-  ASSERT_EQ(status, Status::Optimal);
-
-  //// // check solution value
-  auto solution = spl.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
-  ASSERT_NEAR(solution.objective_value, 4.0, 1e-15);
+  test_full_problem<SoplexSolver>();
 }
 
 //RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
