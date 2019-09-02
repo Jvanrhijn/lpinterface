@@ -73,7 +73,8 @@ Status GurobiSolver::solve_primal() {
                                     GRB_DBL_ATTR_PI, 0, static_cast<int>(num_constraints),
                                     solution_.dual.data());
   }  catch (const GurobiException& e) {
-    if (e.code() != 10005) {
+    constexpr int expected_error = 10005;
+    if (e.code() != expected_error) {
       throw e;
     }
   }
