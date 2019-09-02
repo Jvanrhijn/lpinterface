@@ -70,11 +70,11 @@ const ILinearProgramHandle& SoplexSolver::linear_program() const {
 
 ILinearProgramHandle& SoplexSolver::linear_program() { return lp_handle_; }
 
-const Solution<double>& SoplexSolver::get_solution() const { 
+const Solution<double>& SoplexSolver::get_solution() const {
   if (solution_status() != Status::Optimal) {
     throw ModelNotSolvedException();
   }
-  return solution_; 
+  return solution_;
 }
 
 void SoplexSolver::add_columns(
