@@ -112,6 +112,11 @@ TEST(Gurobi, TimeOutWhenTimeLimitZero) {
 //  RC_ASSERT(status == Status::IterationLimit);
 //}
 
+
+TEST(Gurobi, FullProblemRawData) {
+  test_raw_data_full_problem<GurobiSolver>();
+}
+
 TEST(Gurobi, SupportedParams) {
   test_supported_params<GurobiSolver>(
     {
@@ -119,6 +124,11 @@ TEST(Gurobi, SupportedParams) {
     }, {}
   );
 }
+
+TEST(Gurobi, FullProblem) {
+  test_full_problem<GurobiSolver>();
+}
+
 
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
@@ -187,10 +197,6 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
 
   GRBfreemodel(model);
   GRBfreeenv(env);
-}
-
-TEST(Gurobi, FullProblem) {
-  test_full_problem<GurobiSolver>();
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
@@ -287,8 +293,4 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
 
   GRBfreemodel(model);
   GRBfreeenv(env);
-}
-
-TEST(Gurobi, FullProblemRawData) {
-  test_raw_data_full_problem<GurobiSolver>();
 }

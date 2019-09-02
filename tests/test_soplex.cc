@@ -84,6 +84,14 @@ TEST(Soplex, SupportedParams) {
   );
 }
 
+TEST(Soplex, FullProblem) {
+  test_full_problem<SoplexSolver>();
+}
+
+TEST(Soplex, FullProblemRawData) {
+  test_raw_data_full_problem<SoplexSolver>();
+}
+
 // property: any LP should result in the same
 // answer as SoPlex gives us
 RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
@@ -121,10 +129,3 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
   }
 }
 
-TEST(Soplex, FullProblem) {
-  test_full_problem<SoplexSolver>();
-}
-
-TEST(Soplex, FullProblemRawData) {
-  test_raw_data_full_problem<SoplexSolver>();
-}
