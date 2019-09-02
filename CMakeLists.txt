@@ -49,7 +49,7 @@ if (GUROBI_FOUND)
   message(STATUS "Found Gurobi: TRUE")
   include_directories(${GUROBI_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
-  list(APPEND LIBS gurobi81)
+  list(APPEND LIBS ${GUROBI_LIBRARY})
   list(APPEND lpinterface_files 
         src/gurobi/lpinterface_gurobi.cc
         src/gurobi/lphandle_gurobi.cc)

@@ -22,9 +22,10 @@ find_path(GUROBI_INCLUDE_DIR
           )
 
 find_library( GUROBI_LIBRARY 
-              NAMES gurobi
-		    gurobi45
-		    gurobi46
+              NAMES 
+                gurobi
+		            gurobi45
+		            gurobi46
                 gurobi50 
                 gurobi51
                 gurobi52
@@ -32,24 +33,23 @@ find_library( GUROBI_LIBRARY
                 gurobi56
                 gurobi60
                 gurobi65
+                gurobi70
+                gurobi75
+                gurobi80
                 gurobi81
               PATHS "$GUROBI_HOME/lib" 
-                    "/Library/gurobi502/mac64/lib"
-                    "C:\\libs\\gurobi502\\lib"
               )
 
 find_library( GUROBI_CXX_LIBRARY 
               NAMES gurobi_c++
               PATHS "$ENV{GUROBI_HOME}/lib" 
-                    "/Library/gurobi502/mac64/lib"
-                    "C:\\libs\\gurobi502\\lib"
               )
 
 set(GUROBI_INCLUDE_DIRS "${GUROBI_INCLUDE_DIR}" )
 set(GUROBI_LIBRARIES "${GUROBI_LIBRARY};${GUROBI_CXX_LIBRARY}" )
 
-# use c++ headers as default
-# set(GUROBI_COMPILER_FLAGS "-DIL_STD" CACHE STRING "Gurobi Compiler Flags")
+# uncomment to use c++ headers as default
+# set(gurobi_compiler_flags "-dil_std" cache string "gurobi compiler flags")
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LIBCPLEX_FOUND to TRUE
