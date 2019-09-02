@@ -52,6 +52,10 @@ TEST(SoPlex, NumVars) {
   test_num_vars<SoplexSolver>(nrows, ncols);
 }
 
+TEST(SoPlex, AddAndRetrieveObjective) {
+  //test_add_retrieve_objective<SoplexSolver>(ncols, rc::gen::just(VarType::Real));
+}
+
 TEST(SoPlex, AddAndRetrieveConstraints) {
   test_add_retrieve_constraints<SoplexSolver>(ncols);
 }

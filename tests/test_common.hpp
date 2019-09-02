@@ -149,6 +149,22 @@ void test_num_vars(std::size_t nrows, std::size_t ncols) {
 }
 
 template <class Solver>
+void test_add_retrieve_objective(std::size_t ncols, rc::Gen<VarType> vargen) {
+  templated_prop<Solver>("Test adding and retrieving objective", [=]() {
+    auto count = *rc::gen::inRange<std::size_t>(0, ncols);
+    auto obj = *rc::genSizedObjective(ncols, vargen, rc::gen::arbitrary<double>());
+
+    std::vector<double> vals = obj.values;
+    std::vector<VarType> vts = obj.variable_types;
+    Objective<double> obj_backup(std::move(vals), std::move(vts));
+
+    Solver solver(*rc::gen::arbitrary<OptimizationType>());
+    solver.linear_program().set_objective(std::move(obj));
+    RC_ASSERT(obj_backup == solver.linear_program().objective());
+  });
+}
+
+template <class Solver>
 void test_raw_data_full_problem() {
   Solver solver(OptimizationType::Maximize);
 
