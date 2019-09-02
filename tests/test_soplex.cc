@@ -72,16 +72,16 @@ TEST(Soplex, IterationLimit) {
   test_iterlimit<SoplexSolver>(ncols);
 }
 
-RC_GTEST_PROP(Soplex, SupportedParams, ()) {
-  SoplexSolver soplex;
-  RC_ASSERT(!soplex.parameter_supported(Param::Threads));
-  RC_ASSERT(soplex.parameter_supported(Param::TimeLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::Verbosity));
-  RC_ASSERT(soplex.parameter_supported(Param::IterationLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveSense));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveLowerLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::ObjectiveUpperLimit));
-  RC_ASSERT(soplex.parameter_supported(Param::Infinity));
+TEST(Soplex, SupportedParams) {
+  test_supported_params<SoplexSolver>(
+    {
+      Param::TimeLimit, Param::Verbosity, Param::IterationLimit, Param::ObjectiveSense,
+      Param::ObjectiveLowerLimit, Param::ObjectiveUpperLimit, Param::Infinity
+    },
+    {
+      Param::Threads
+    }
+  );
 }
 
 // property: any LP should result in the same
@@ -124,26 +124,6 @@ RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
 TEST(Soplex, FullProblem) {
   test_full_problem<SoplexSolver>();
 }
-
-//RC_GTEST_PROP(Soplex, RawDataSameAsBareSoplex, ()) {
-//  using namespace soplex;
-//
-//  const auto sense =
-//      *rc::gen::arbitrary<OptimizationType>().as("Objective sense");
-//
-//  std::vector<double> values, objective, rhs;
-//  std::vector<int> start_indices, col_indices;
-//  std::vector<VarType> var_type;
-//  std::vector<Ordering> ord;
-//
-//  std::tie(values, start_indices, col_indices, rhs, ord, objective, var_type)
-//  = generate_lp_data(100, 10);
-//
-//  SoPlex soplex;
-//
-//  soplex.
-//
-//}
 
 TEST(Soplex, FullProblemRawData) {
   test_raw_data_full_problem<SoplexSolver>();

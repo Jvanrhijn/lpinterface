@@ -194,4 +194,16 @@ void test_raw_data_full_problem() {
   ASSERT_EQ(solution.objective_value, 4.0);
 }
 
+template <class Solver>
+void test_supported_params(std::initializer_list<Param> supported, 
+                           std::initializer_list<Param> not_supported) {
+  Solver solver;
+  for (const auto& param : supported) {
+    ASSERT_TRUE(solver.parameter_supported(param));
+  }
+  for (const auto& param: not_supported) {
+    ASSERT_TRUE(!solver.parameter_supported(param));
+  }
+}
+
 } // namespace lpint
