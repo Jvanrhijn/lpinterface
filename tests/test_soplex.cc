@@ -64,15 +64,25 @@ TEST(SoPlex, AddAndRemoveConstraints) {
   test_add_remove_constraints<SoplexSolver>(ncols);
 }
 
-TEST(Soplex, TimeOutWhenTimeLimitZero) {
+TEST(SoPlex, TimeOutWhenTimeLimitZero) {
   test_timelimit<SoplexSolver>(ncols);
 }
 
-TEST(Soplex, IterationLimit) {
+TEST(SoPlex, IterationLimit) {
   test_iterlimit<SoplexSolver>(ncols);
 }
 
-TEST(Soplex, SupportedParams) {
+TEST(SoPlex, UnsupportedVariableType) {
+  test_unsupported_vartype<SoplexSolver>(ncols, 
+    rc::gen::element(VarType::Binary, VarType::Integer, 
+                     VarType::SemiInteger, VarType::SemiReal));
+}
+
+TEST(SoPlex, UnsolvedModelThrowsOnAccess) {
+  test_model_not_solved_acces_throw<SoplexSolver>();
+}
+
+TEST(SoPlex, SupportedParams) {
   test_supported_params<SoplexSolver>(
     {
       Param::TimeLimit, Param::Verbosity, Param::IterationLimit, Param::ObjectiveSense,
@@ -84,7 +94,7 @@ TEST(Soplex, SupportedParams) {
   );
 }
 
-TEST(Soplex, FullProblem) {
+TEST(SoPlex, FullProblem) {
   test_full_problem<SoplexSolver>();
 }
 
@@ -94,7 +104,7 @@ TEST(Soplex, FullProblemRawData) {
 
 // property: any LP should result in the same
 // answer as SoPlex gives us
-RC_GTEST_PROP(Soplex, SameResultAsBareSoplex, ()) {
+RC_GTEST_PROP(SoPlex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto solver = rc::genLinearProgramSolver<SoplexSolver>(

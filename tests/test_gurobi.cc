@@ -113,6 +113,10 @@ TEST(Gurobi, TimeOutWhenTimeLimitZero) {
 //}
 
 
+TEST(Gurobi, UnsolvedModelThrowsOnAccess) {
+  test_model_not_solved_acces_throw<GurobiSolver>();
+}
+
 TEST(Gurobi, FullProblemRawData) {
   test_raw_data_full_problem<GurobiSolver>();
 }

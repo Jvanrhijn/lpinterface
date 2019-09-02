@@ -203,7 +203,25 @@ void test_supported_params(std::initializer_list<Param> supported,
   }
   for (const auto& param: not_supported) {
     ASSERT_TRUE(!solver.parameter_supported(param));
+    RC_ASSERT_THROWS_AS(solver.set_parameter(param, 0), 
+                        UnsupportedParameterException);
   }
+}
+
+template <class Solver>
+void test_model_not_solved_acces_throw() {
+  Solver solver;
+  RC_ASSERT_THROWS_AS(solver.get_solution(), ModelNotSolvedException);
+}
+
+template <class Solver>
+void test_unsupported_vartype(std::size_t ncols, rc::Gen<VarType> unsup) {
+  templated_prop<Solver>("Unsupported variable type throws", [=]() {
+    auto obj = *rc::genSizedObjective(ncols, unsup, rc::gen::arbitrary<double>());
+    Solver solver;
+    RC_ASSERT_THROWS_AS(solver.linear_program().set_objective(std::move(obj)), 
+                        UnsupportedVariableTypeException);
+  });
 }
 
 } // namespace lpint

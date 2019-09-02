@@ -105,14 +105,6 @@ class UnsupportedFeatureException : public LpException {
       : LpException("Feature not available for this solver backend") {}
 };
 
-//! Attempt to use an uninitialized LinearProgram object.
-class LinearProgramNotInitializedException : public LpException {
- public:
-  LinearProgramNotInitializedException()
-      : LpException("Attempt to access data of un-initialized linear program") {
-  }
-};
-
 //! Failed to set a parameter value.
 class FailedToSetParameterException : public LpException {
  public:
