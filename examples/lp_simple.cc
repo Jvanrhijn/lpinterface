@@ -16,7 +16,7 @@ and usage will be the same for each solver.
 #include <iostream>
 
 #include "lpinterface.hpp"
-//#include "lpinterface/gurobi/lpinterface_gurobi.hpp"
+#include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 
 #include "common.hpp"
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     SolverWrapper wrapper;
 
     if (argv[1] == std::string("gurobi")) {
-      //wrapper.insert_solver(std::make_shared<GurobiSolver>());
+      wrapper.insert_solver(std::make_shared<GurobiSolver>());
     } else if (argv[1] == std::string("soplex")) {
       wrapper.insert_solver(std::make_shared<SoplexSolver>());
     } else {
