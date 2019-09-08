@@ -130,15 +130,6 @@ struct Arbitrary<lpint::Column<T>> {
 };
 
 template <>
-struct Arbitrary<lpint::SparseMatrixType> {
-  static Gen<lpint::SparseMatrixType> arbitrary() {
-    using namespace lpint;
-    return gen::element(SparseMatrixType::RowWise,
-                        SparseMatrixType::ColumnWise);
-  }
-};
-
-template <>
 struct Arbitrary<lpint::OptimizationType> {
   static Gen<lpint::OptimizationType> arbitrary() {
     return gen::element(lpint::OptimizationType::Maximize,

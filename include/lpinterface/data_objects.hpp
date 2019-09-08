@@ -27,12 +27,6 @@ enum class VarType {
   SemiInteger,
 };
 
-/// Type of sparse matrices supported.
-enum class SparseMatrixType {
-  RowWise,     /// CSR encoding.
-  ColumnWise,  /// CSC encoding.
-};
-
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
 /**
