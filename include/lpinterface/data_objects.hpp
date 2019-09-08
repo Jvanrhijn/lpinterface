@@ -1,6 +1,7 @@
 #ifndef LPINTERFACE_DATA_OBJECTS_H
 #define LPINTERFACE_DATA_OBJECTS_H
 
+#include <cstdlib>
 #include <algorithm>
 #include <cstddef>
 #include <set>
