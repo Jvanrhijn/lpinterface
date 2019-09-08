@@ -44,32 +44,8 @@ inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
   return soplex;
 }
 
-TEST(SoPlex, NumConstraints) {
-  test_num_constraints<SoplexSolver>(nrows, ncols);
-}
-
-TEST(SoPlex, NumVars) {
-  test_num_vars<SoplexSolver>(nrows, ncols);
-}
-
 TEST(SoPlex, AddAndRetrieveObjective) {
   test_add_retrieve_objective<SoplexSolver>(ncols, rc::gen::just(VarType::Real));
-}
-
-TEST(SoPlex, AddAndRetrieveConstraints) {
-  test_add_retrieve_constraints<SoplexSolver>(ncols);
-}
-
-TEST(SoPlex, AddAndRemoveConstraints) {
-  test_add_remove_constraints<SoplexSolver>(ncols);
-}
-
-TEST(SoPlex, TimeOutWhenTimeLimitZero) {
-  test_timelimit<SoplexSolver>(ncols);
-}
-
-TEST(SoPlex, IterationLimit) {
-  test_iterlimit<SoplexSolver>(ncols);
 }
 
 TEST(SoPlex, UnsupportedVariableType) {
@@ -92,14 +68,6 @@ TEST(SoPlex, SupportedParams) {
       Param::Threads
     }
   );
-}
-
-TEST(SoPlex, FullProblem) {
-  test_full_problem<SoplexSolver>();
-}
-
-TEST(Soplex, FullProblemRawData) {
-  test_raw_data_full_problem<SoplexSolver>();
 }
 
 // property: any LP should result in the same

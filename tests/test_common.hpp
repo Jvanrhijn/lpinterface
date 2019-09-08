@@ -34,11 +34,11 @@ template <class Solver>
 void test_full_problem() {
   Solver solver(OptimizationType::Maximize);
 
+  solver.set_parameter(Param::Verbosity, 0);
+
   solver.linear_program().set_objective_sense(OptimizationType::Maximize);
 
   solver.linear_program().set_objective(Objective<double>({1, 1, 2}));
-
-  solver.set_parameter(Param::Verbosity, 0);
 
   std::vector<Constraint<double>> constr;
   constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);

@@ -23,16 +23,21 @@ find_package(Threads REQUIRED)
 
 set(test_files
   test.cc
+  test_solvers.cc
   test_sparse_matrix.cc
   test_data_objects.cc)
 
 list(APPEND LIBS lpinterface)
 
+
 find_package(GUROBI)
 if (GUROBI_FOUND)
- list(APPEND test_files test_gurobi.cc)
- include_directories(${GUROBI_INCLUDE_DIRS})
- list(APPEND LIBS ${GUROBI_LIBRARY})
+  list(APPEND test_files test_gurobi.cc)
+  include_directories(${GUROBI_INCLUDE_DIRS})
+  list(APPEND LIBS ${GUROBI_LIBRARY})
+
+  add_definitions(-DLPINT_GUROBI_SUPPORTED)
+  list(APPEND SUPPORTED_SOLVERS GurobiSolver)
 endif (GUROBI_FOUND)
 
 find_package(SOPLEX)
@@ -40,7 +45,13 @@ if (SOPLEX_FOUND)
   list(APPEND test_files test_soplex.cc)
   include_directories(${SOPLEX_INCLUDE_DIRS})
   list(APPEND LIBS ${SOPLEX_LIBRARIES})
+
+  list(APPEND SUPPORTED_SOLVERS SoplexSolver)
+  add_definitions(-DLPINT_SOPLEX_SUPPORTED)
+  string(REPLACE ";" "," SUPPORTED_SOLVERS "${SUPPORTED_SOLVERS}")
 endif (SOPLEX_FOUND)
+
+add_definitions(-DLPINT_SUPPORTED_SOLVERS=${SUPPORTED_SOLVERS})
 
 add_executable(${UNIT_TESTS} ${test_files})
 

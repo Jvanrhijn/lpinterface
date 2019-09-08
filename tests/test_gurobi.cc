@@ -78,47 +78,12 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
 }
 
 
-TEST(Gurobi, AddAndRetrieveConstraints) {
-  test_add_retrieve_constraints<GurobiSolver>(ncols);
-}
-
-TEST(Gurobi, AddAndRemoveConstraints) {
-  test_add_remove_constraints<GurobiSolver>(ncols);
-}
-
 TEST(Gurobi, AddAndRetrieveObjective) {
   test_add_retrieve_objective<GurobiSolver>(ncols, rc::gen::arbitrary<VarType>());
 }
 
-TEST(Gurobi, NumConstraints) {
-  test_num_constraints<GurobiSolver>(nrows, ncols);
-}
-
-TEST(Gurobi, NumVars) {
-  test_num_vars<GurobiSolver>(nrows, ncols);
-}
-
-TEST(Gurobi, TimeOutWhenTimeLimitZero) {
-  test_timelimit<GurobiSolver>(ncols);
-}
-
-//RC_GTEST_PROP(Gurobi, IterationLimit, ()) {
-//  // generate a linear program that is not unbounded or infeasible,
-//  // and requires more than 0 iterations
-//  auto lp = gen_simple_valid_lp<LinearProgramHandleGurobi>(10, ncols, 2.0);
-//  GurobiSolver grb(std::move(lp));
-//  grb.set_parameter(Param::IterationLimit, 0.0);
-//  const auto status = grb.solve();
-//  RC_ASSERT(status == Status::IterationLimit);
-//}
-
-
 TEST(Gurobi, UnsolvedModelThrowsOnAccess) {
   test_model_not_solved_acces_throw<GurobiSolver>();
-}
-
-TEST(Gurobi, FullProblemRawData) {
-  test_raw_data_full_problem<GurobiSolver>();
 }
 
 TEST(Gurobi, SupportedParams) {
@@ -128,11 +93,6 @@ TEST(Gurobi, SupportedParams) {
     }, {}
   );
 }
-
-TEST(Gurobi, FullProblem) {
-  test_full_problem<GurobiSolver>();
-}
-
 
 RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
