@@ -23,12 +23,6 @@ class LpException : public std::runtime_error {
       : std::runtime_error(std::forward<Args>(args)...) {}
 };
 
-//! Attempt to add rows to a CSC or columns to a CSR matrix.
-class MatrixTypeException : public LpException {
- public:
-  MatrixTypeException() : LpException("Wrong matrix type assumed") {}
-};
-
 //! Attempt to use a feature that is not yet implemented.
 class NotImplementedError : public LpException {
  public:

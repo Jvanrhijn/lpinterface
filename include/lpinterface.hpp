@@ -8,6 +8,5 @@
 #include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/parameter_type.hpp"
-#include "lpinterface/sparse_matrix.hpp"
 
 #endif  // LPINTERFACE_H

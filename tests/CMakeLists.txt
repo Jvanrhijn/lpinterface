@@ -24,7 +24,6 @@ find_package(Threads REQUIRED)
 set(test_files
   test.cc
   test_solvers.cc
-  test_sparse_matrix.cc
   test_data_objects.cc)
 
 list(APPEND LIBS lpinterface)
