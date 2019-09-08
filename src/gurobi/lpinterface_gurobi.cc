@@ -96,7 +96,10 @@ const ILinearProgramHandle& GurobiSolver::linear_program() const {
 
 ILinearProgramHandle& GurobiSolver::linear_program() { return lp_handle_; }
 
-const Solution<double>& GurobiSolver::get_solution() const { return solution_; }
+const Solution<double>& GurobiSolver::get_solution() const {
+  return solution_status() == Status::Optimal ? solution_
+                                              : throw ModelNotSolvedException();
+}
 
 void GurobiSolver::add_columns(
     __attribute__((unused)) std::vector<double>&& values,
