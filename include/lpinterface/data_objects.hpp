@@ -1,7 +1,7 @@
 #ifndef LPINTERFACE_DATA_OBJECTS_H
 #define LPINTERFACE_DATA_OBJECTS_H
 
-#include <cstdlib>
+#include <cmath>
 #include <algorithm>
 #include <cstddef>
 #include <set>
@@ -219,8 +219,8 @@ struct Constraint {
 
 template <class T>
 bool operator==(const Constraint<T>& left, const Constraint<T>& right) {
-  return std::abs(left.upper_bound - right.upper_bound) < DOUBLE_TOLERANCE &&
-         std::abs(left.lower_bound - right.lower_bound) < DOUBLE_TOLERANCE &&
+  return fabs(left.upper_bound - right.upper_bound) < DOUBLE_TOLERANCE &&
+         fabs(left.lower_bound - right.lower_bound) < DOUBLE_TOLERANCE &&
          left.row == right.row;
 }
 
