@@ -143,8 +143,7 @@ int main(int argc, char *argv[]) {
   }
 
   // add rows and constraints to LP
-  // lp.add_rows(std::move(rows));
-  lp.add_constraints(std::move(constraints));
+  lp.add_constraints(constraints);
 
   // solve program
   auto status = gurobi.solve();

@@ -6,7 +6,7 @@ namespace lpint {
 using namespace soplex;
 
 void LinearProgramHandleSoplex::add_constraints(
-    std::vector<Constraint<double>>&& constraints) {
+    const std::vector<Constraint<double>>& constraints) {
   for (auto& constraint : constraints) {
     DSVector ds_row(constraint.row.num_nonzero());
     ds_row.add(constraint.row.num_nonzero(),
@@ -21,7 +21,8 @@ void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
   soplex_->removeRowReal(i);
 }
 
-void LinearProgramHandleSoplex::set_objective(Objective<double>&& objective) {
+void LinearProgramHandleSoplex::set_objective(
+    const Objective<double>& objective) {
   DSVector dummy(0);
   if (detail::contains_any_of<VarType>({VarType::SemiInteger, VarType::SemiReal,
                                         VarType::Integer, VarType::Binary},

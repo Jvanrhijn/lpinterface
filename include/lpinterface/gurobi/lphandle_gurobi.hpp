@@ -29,13 +29,14 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
-  void add_constraints(std::vector<Constraint<double>>&& constraints) override;
+  void add_constraints(
+      const std::vector<Constraint<double>>& constraints) override;
 
   void remove_constraint(std::size_t i) override;
 
   OptimizationType optimization_type() const override;
 
-  void set_objective(Objective<double>&& objective) override;
+  void set_objective(const Objective<double>& objective) override;
 
   std::vector<Constraint<double>> constraints() const override;
 

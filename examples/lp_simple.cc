@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     std::vector<Constraint<double>> constraints;
     constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
     constraints.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
-    lp.add_constraints(std::move(constraints));
+    lp.add_constraints(constraints);
 
     /*
         Alternatively, one can directly flush the data to the LP solver

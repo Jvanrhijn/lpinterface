@@ -20,7 +20,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
                             std::shared_ptr<soplex::SoPlex> soplex)
       : soplex_(soplex) {}
 
-  void add_constraints(std::vector<Constraint<double>>&& constraints) override;
+  void add_constraints(
+      const std::vector<Constraint<double>>& constraints) override;
 
   void remove_constraint(std::size_t i) override;
 
@@ -30,7 +31,7 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
-  void set_objective(Objective<double>&& objective) override;
+  void set_objective(const Objective<double>& objective) override;
 
   OptimizationType optimization_type() const override;
 

@@ -1,8 +1,8 @@
 #ifndef LPINTERFACE_DATA_OBJECTS_H
 #define LPINTERFACE_DATA_OBJECTS_H
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <set>
 #include <type_traits>

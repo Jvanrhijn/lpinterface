@@ -77,7 +77,7 @@ class ILinearProgramHandle {
    * can only be called after calling set_objective().
    */
   virtual void add_constraints(
-      std::vector<Constraint<double>>&& constraints) = 0;
+      const std::vector<Constraint<double>>& constraints) = 0;
 
   /**
    * @brief Remove a constraint from the LP.
@@ -98,7 +98,7 @@ class ILinearProgramHandle {
    * @brief Set the objective function to be used. This method
    * must be called before calling add_constraints().
    */
-  virtual void set_objective(Objective<double>&& objective) = 0;
+  virtual void set_objective(const Objective<double>& objective) = 0;
 
   /**
    * @brief Retrieve the constraints of the internal LP.
