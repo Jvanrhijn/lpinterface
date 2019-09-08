@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 2.9)
 set(UNIT_TESTS unit_tests)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
