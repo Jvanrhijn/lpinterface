@@ -91,7 +91,7 @@ int main() {
   std::vector<Constraint<double>> constraints;
   constraints.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 1.0);
   constraints.emplace_back(Row<double>({4, 5, 6}, {1, 2, 3}), -LPINT_INFINITY, 4.0);
-  lp.add_constraints(std::move(constraints));
+  lp.add_constraints(constraints);
 
   // set solver parameters, see Param documentation for all
   // possible parameter settings.
