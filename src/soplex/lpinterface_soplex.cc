@@ -39,7 +39,7 @@ void SoplexSolver::set_parameter(const Param param, const double value) {
   }
 }
 
-Status SoplexSolver::solve_primal() {
+Status SoplexSolver::solve() {
   const auto status = translate_status(soplex_->optimize());
 
   DVector prim(soplex_->numColsReal());
@@ -57,8 +57,6 @@ Status SoplexSolver::solve_primal() {
 
   return status;
 }
-
-Status SoplexSolver::solve_dual() { return solve_primal(); }
 
 Status SoplexSolver::solution_status() const {
   return translate_status(soplex_->status());

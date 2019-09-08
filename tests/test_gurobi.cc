@@ -108,7 +108,7 @@ TEST(Gurobi, TimeOutWhenTimeLimitZero) {
 //  auto lp = gen_simple_valid_lp<LinearProgramHandleGurobi>(10, ncols, 2.0);
 //  GurobiSolver grb(std::move(lp));
 //  grb.set_parameter(Param::IterationLimit, 0.0);
-//  const auto status = grb.solve_primal();
+//  const auto status = grb.solve();
 //  RC_ASSERT(status == Status::IterationLimit);
 //}
 
@@ -159,7 +159,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   Status status;
   try {
     error = GRBoptimize(model);
-    status = grb.solve_primal();
+    status = grb.solve();
   } catch (const GurobiException& e) {
     std::cout << e.what() << std::endl;
     RC_ASSERT(e.code() == error);
@@ -262,7 +262,7 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   Status status;
   try {
     error = GRBoptimize(model);
-    status = grb.solve_primal();
+    status = grb.solve();
   } catch (const GurobiException& e) {
     std::cout << e.what() << std::endl;
     RC_ASSERT(e.code() == error);

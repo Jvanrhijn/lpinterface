@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
     */
 
     // Solve the primal LP problem:
-    Status status = wrapper.solver()->solve_primal();
+    Status status = wrapper.solver()->solve();
 
     if (status != Status::Optimal) {
       std::cerr << "Optimal solution NOT found" << std::endl;

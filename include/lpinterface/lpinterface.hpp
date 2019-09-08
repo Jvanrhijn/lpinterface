@@ -67,14 +67,9 @@ class LinearProgramSolver {
   virtual void set_parameter(const Param param, const double value) = 0;
 
   /**
-   * @brief Solve the primal linear program.
+   * @brief Solve the linear program.
    */
-  virtual Status solve_primal() = 0;
-
-  /**
-   * @brief Solve the dual linear program.
-   */
-  virtual Status solve_dual() = 0;
+  virtual Status solve() = 0;
 
   /**
    * @brief Query the LP solver for the solution status

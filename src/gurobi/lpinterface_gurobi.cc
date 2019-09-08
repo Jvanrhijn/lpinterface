@@ -43,7 +43,7 @@ void GurobiSolver::set_parameter(const Param param, const double value) {
                                   param_dict_.at(param), value);
 }
 
-Status GurobiSolver::solve_primal() {
+Status GurobiSolver::solve() {
   detail::gurobi_function_checked(GRBoptimize, gurobi_model_.get());
   Status status;
   do {
@@ -80,8 +80,6 @@ Status GurobiSolver::solve_primal() {
   }
   return status;
 }
-
-Status GurobiSolver::solve_dual() { throw UnsupportedFeatureException(); }
 
 Status GurobiSolver::solution_status() const {
   int status;

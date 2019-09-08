@@ -30,9 +30,7 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
 
   void set_parameter(const Param param, const double value) override;
 
-  Status solve_primal() override;
-
-  Status solve_dual() override;
+  Status solve() override;
 
   Status solution_status() const override;
 

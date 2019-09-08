@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
   lp.add_constraints(std::move(constraints));
 
   // solve program
-  auto status = gurobi.solve_primal();
+  auto status = gurobi.solve();
   if (status != Status::Optimal) {
     std::cerr << "Failed to solve N-queens problem\n";
   }

@@ -115,7 +115,7 @@ RC_GTEST_PROP(SoPlex, SameResultAsBareSoplex, ()) {
 
   solver.set_parameter(::Param::Verbosity, 0);
 
-  Status status = solver.solve_primal();
+  Status status = solver.solve();
 
   // now we repeat the computation using SoPlex itself
   const auto status_soplex = SoplexSolver::translate_status(soplex.optimize());

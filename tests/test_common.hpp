@@ -13,7 +13,7 @@ void test_timelimit(std::size_t ncols) {
     auto solver = gen_simple_valid_lp<Solver>(1, ncols);
     solver.set_parameter(lpint::Param::Verbosity, 0);
     solver.set_parameter(lpint::Param::TimeLimit, 0.0);
-    const auto status = solver.solve_primal();
+    const auto status = solver.solve();
     RC_ASSERT(status == lpint::Status::TimeOut);
   });
 }
@@ -25,7 +25,7 @@ void test_iterlimit(std::size_t ncols) {
     auto solver = gen_simple_valid_lp<Solver>(1, ncols);
     solver.set_parameter(Param::Verbosity, 0);
     solver.set_parameter(Param::IterationLimit, 0);
-    const auto status = solver.solve_primal();
+    const auto status = solver.solve();
     RC_ASSERT(status == Status::IterationLimit);
   });
 }
@@ -38,6 +38,8 @@ void test_full_problem() {
 
   solver.linear_program().set_objective(Objective<double>({1, 1, 2}));
 
+  solver().set_parameter(Param::Verbosity, 0);
+
   std::vector<Constraint<double>> constr;
   constr.emplace_back(Row<double>({1, 2, 3}, {0, 1, 2}), -LPINT_INFINITY, 4.0);
   constr.emplace_back(Row<double>({1, 1}, {0, 1}), 1.0, LPINT_INFINITY);
@@ -45,7 +47,7 @@ void test_full_problem() {
   solver.linear_program().add_constraints(std::move(constr));
 
   // // Solve the primal LP problem
-  auto status = solver.solve_primal();
+  auto status = solver.solve();
   ASSERT_EQ(status, Status::Optimal);
 
   //// // check solution value
@@ -184,7 +186,7 @@ void test_raw_data_full_problem() {
   }
 
   // Solve the primal LP problem
-  auto status = solver.solve_primal();
+  auto status = solver.solve();
   ASSERT_EQ(status, Status::Optimal);
 
   //// check solution value
