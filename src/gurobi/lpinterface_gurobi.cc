@@ -31,9 +31,16 @@ bool GurobiSolver::parameter_supported(const Param param) const {
 
 void GurobiSolver::set_parameter(const Param param, const int value) {
   if (!parameter_supported(param)) throw UnsupportedParameterException();
-  detail::gurobi_function_checked(GRBsetintparam,
-                                  GRBgetenv(gurobi_model_.get()),
-                                  param_dict_.at(param), value);
+  // special case for iteration limit, since in gurobi it's a double parameter
+  if (param == Param::IterationLimit) {
+    detail::gurobi_function_checked(GRBsetdblparam,
+                                    GRBgetenv(gurobi_model_.get()),
+                                    param_dict_.at(param), static_cast<double>(value));
+  } else {
+    detail::gurobi_function_checked(GRBsetintparam,
+                                    GRBgetenv(gurobi_model_.get()),
+                                    param_dict_.at(param), value);
+  }
 }
 
 void GurobiSolver::set_parameter(const Param param, const double value) {

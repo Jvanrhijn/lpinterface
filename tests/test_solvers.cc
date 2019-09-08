@@ -17,7 +17,7 @@
 
 using namespace lpint;
 
-constexpr std::size_t ncols = 50;
+constexpr std::size_t ncols = 10;
 constexpr std::size_t nrows = 50;
 
 struct ConstraintProperties {
