@@ -97,16 +97,15 @@ int main(int argc, char* argv[]) {
        std::dynamic_pointer_cast<FlushRawData<double>>(wrapper.solver());
 
             flusher->add_variables(
-                {1.0, 1.0, 2.0},
-                {VarType::Binary, VarType::Binary, VarType::Binary}
+                {1.0, 1.0, 2.0}
             );
 
             flusher->add_rows(
                 {1, 2, 3, 1, 1},
                 {0, 3},
                 {0, 1, 2, 0, 1},
-                {Ordering::LEQ, Ordering::GEQ},
-                {4, 1}
+                {-LPINT_INFINITY, 1.0},
+                {4.0, LPINT_INFINITY}
             );
           }
     */
