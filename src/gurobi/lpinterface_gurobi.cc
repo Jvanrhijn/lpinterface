@@ -33,9 +33,9 @@ void GurobiSolver::set_parameter(const Param param, const int value) {
   if (!parameter_supported(param)) throw UnsupportedParameterException();
   // special case for iteration limit, since in gurobi it's a double parameter
   if (param == Param::IterationLimit) {
-    detail::gurobi_function_checked(GRBsetdblparam,
-                                    GRBgetenv(gurobi_model_.get()),
-                                    param_dict_.at(param), static_cast<double>(value));
+    detail::gurobi_function_checked(
+        GRBsetdblparam, GRBgetenv(gurobi_model_.get()), param_dict_.at(param),
+        static_cast<double>(value));
   } else {
     detail::gurobi_function_checked(GRBsetintparam,
                                     GRBgetenv(gurobi_model_.get()),
@@ -126,10 +126,10 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
                                   values.data(), lb.data(), ub.data(), nullptr);
 }
 void GurobiSolver::add_variables(std::vector<double>&& objective_values) {
-  detail::gurobi_function_checked(
-      GRBaddvars, gurobi_model_.get(), objective_values.size(), 0, nullptr,
-      nullptr, nullptr, objective_values.data(), nullptr, nullptr,
-      nullptr, nullptr);
+  detail::gurobi_function_checked(GRBaddvars, gurobi_model_.get(),
+                                  objective_values.size(), 0, nullptr, nullptr,
+                                  nullptr, objective_values.data(), nullptr,
+                                  nullptr, nullptr, nullptr);
   lp_handle_.set_num_vars({}, objective_values.size());
 }
 

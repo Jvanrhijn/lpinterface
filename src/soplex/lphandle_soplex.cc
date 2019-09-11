@@ -32,7 +32,8 @@ void LinearProgramHandleSoplex::set_objective(
   if (num_vars() != objective.values.size()) {
     throw MismatchedDimensionsException();
   }
-  VectorReal obj(static_cast<int>(objective.values.size()), const_cast<Objective<double>&>(objective).values.data());
+  VectorReal obj(static_cast<int>(objective.values.size()),
+                 const_cast<Objective<double>&>(objective).values.data());
   soplex_->changeObjReal(obj);
 }
 

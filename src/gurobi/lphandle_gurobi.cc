@@ -18,7 +18,9 @@ void LinearProgramHandleGurobi::set_objective_sense(
 
 void LinearProgramHandleGurobi::add_variables(const std::size_t num_vars) {
   num_vars_ += num_vars;
-  detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+  detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0,
+                                  nullptr, nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, nullptr, nullptr);
 }
 
 void LinearProgramHandleGurobi::add_constraints(
@@ -51,8 +53,9 @@ void LinearProgramHandleGurobi::set_objective(
   if (num_vars_ != objective.values.size()) {
     throw MismatchedDimensionsException();
   }
-  detail::gurobi_function_checked(GRBsetdblattrarray, grb_model_.get(), GRB_DBL_ATTR_OBJ, 0, num_vars_, 
-                                  const_cast<Objective<double>&>(objective).values.data());
+  detail::gurobi_function_checked(
+      GRBsetdblattrarray, grb_model_.get(), GRB_DBL_ATTR_OBJ, 0, num_vars_,
+      const_cast<Objective<double>&>(objective).values.data());
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
