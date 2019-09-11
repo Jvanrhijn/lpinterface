@@ -24,11 +24,6 @@ void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
 void LinearProgramHandleSoplex::set_objective(
     const Objective<double>& objective) {
   DSVector dummy(0);
-  if (detail::contains_any_of<VarType>({VarType::SemiInteger, VarType::SemiReal,
-                                        VarType::Integer, VarType::Binary},
-                                       objective.variable_types)) {
-    throw UnsupportedVariableTypeException();
-  }
   for (const auto& coefficient : objective.values) {
     soplex_->addColReal(LPCol(coefficient, dummy, infinity, 0.0));
   }

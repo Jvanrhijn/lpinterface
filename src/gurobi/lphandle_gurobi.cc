@@ -47,7 +47,7 @@ void LinearProgramHandleGurobi::set_objective(
   detail::gurobi_function_checked(
       GRBaddvars, grb_model_.get(), num_vars_, 0, nullptr, nullptr, nullptr,
       const_cast<Objective<double>&>(objective).values.data(), nullptr, nullptr,
-      convert_variable_type(objective.variable_types).data(), nullptr);
+      nullptr, nullptr);
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
@@ -93,33 +93,13 @@ std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
 Objective<double> LinearProgramHandleGurobi::objective() const {
   const auto nvars = num_vars();
   std::vector<double> values;
-  std::vector<VarType> var_types;
   for (std::size_t i = 0; i < nvars; i++) {
     double obj;
-    char vtype;
     detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
                                     GRB_DBL_ATTR_OBJ, i, &obj);
-    detail::gurobi_function_checked(GRBgetcharattrelement, grb_model_.get(),
-                                    GRB_CHAR_ATTR_VTYPE, i, &vtype);
     values.push_back(obj);
-    var_types.push_back([&]() {
-      switch (vtype) {
-        case 'C':
-          return VarType::Real;
-        case 'B':
-          return VarType::Binary;
-        case 'I':
-          return VarType::Integer;
-        case 'S':
-          return VarType::SemiReal;
-        case 'N':
-          return VarType::SemiInteger;
-        default:
-          throw UnsupportedVariableTypeException();
-      }
-    }());
   }
-  return Objective<double>(std::move(values), std::move(var_types));
+  return Objective<double>(std::move(values));
 }
 
 std::shared_ptr<GRBmodel> LinearProgramHandleGurobi::gurobi_model(

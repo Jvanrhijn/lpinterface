@@ -115,13 +115,7 @@ void SoplexSolver::add_rows(std::vector<double>&& values,
                             ub[start_indices.size() - 1]));
 }
 
-void SoplexSolver::add_variables(std::vector<double>&& objective_values,
-                                 std::vector<VarType>&& var_types) {
-  if (std::find_if_not(var_types.begin(), var_types.end(),
-                       [](const VarType vt) { return vt == VarType::Real; }) !=
-      var_types.end()) {
-    throw UnsupportedVariableTypeException();
-  }
+void SoplexSolver::add_variables(std::vector<double>&& objective_values) {
   // TODO: add columns all in one go with SoPlex::addColsReal()
   DSVector dummycol(0);
   const std::size_t nvars = objective_values.size();

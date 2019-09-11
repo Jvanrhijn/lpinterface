@@ -73,7 +73,7 @@ void test_add_retrieve_constraints(std::size_t ncols) {
       [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
     Solver solver(OptimizationType::Maximize);
     // first need to create variables or gurobi will throw
-    auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
+    auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<double>());
     solver.linear_program().set_objective(std::move(obj));
     solver.linear_program().add_constraints(std::move(constraints));
     auto retrieved_constraints = solver.linear_program().constraints();
@@ -101,7 +101,7 @@ void test_add_remove_constraints(std::size_t ncols) {
   
     Solver solver(OptimizationType::Maximize);
     // generate variables to avoid error
-    auto obj = *rc::genSizedObjective(ncols, rc::gen::just(VarType::Real), rc::gen::arbitrary<double>());
+    auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<double>());
     solver.linear_program().set_objective(std::move(obj));
     solver.linear_program().add_constraints(std::move(constraints));
 
@@ -131,8 +131,7 @@ void test_add_remove_constraints(std::size_t ncols) {
 template <class Solver>
 void test_num_constraints(std::size_t nrows, std::size_t ncols) {
   templated_prop<Solver>("Number of constraints properly retrieved", [=]() {
-    auto solver = rc::genLinearProgramSolver<Solver>(nrows, ncols, 
-                                                           rc::gen::just(VarType::Real));
+    auto solver = rc::genLinearProgramSolver<Solver>(nrows, ncols);
     solver.set_parameter(Param::Verbosity, 0);
     RC_ASSERT(solver.linear_program().num_constraints() 
         == solver.linear_program().constraints().size());
@@ -142,8 +141,7 @@ void test_num_constraints(std::size_t nrows, std::size_t ncols) {
 template <class Solver>
 void test_num_vars(std::size_t nrows, std::size_t ncols) {
   templated_prop<Solver>("Number of variables properly retrieved", [=]() {
-    auto solver = rc::genLinearProgramSolver<Solver>(nrows, ncols, 
-                                                           rc::gen::just(VarType::Real));
+    auto solver = rc::genLinearProgramSolver<Solver>(nrows, ncols);
     solver.set_parameter(Param::Verbosity, 0);
     RC_ASSERT(solver.linear_program().num_vars() 
         == solver.linear_program().objective().values.size());
@@ -151,14 +149,13 @@ void test_num_vars(std::size_t nrows, std::size_t ncols) {
 }
 
 template <class Solver>
-void test_add_retrieve_objective(std::size_t ncols, rc::Gen<VarType> vargen) {
+void test_add_retrieve_objective(std::size_t ncols) {
   templated_prop<Solver>("Test adding and retrieving objective", [=]() {
     auto count = *rc::gen::inRange<std::size_t>(0, ncols);
-    auto obj = *rc::genSizedObjective(ncols, vargen, rc::gen::arbitrary<double>());
+    auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<double>());
 
     std::vector<double> vals = obj.values;
-    std::vector<VarType> vts = obj.variable_types;
-    Objective<double> obj_backup(std::move(vals), std::move(vts));
+    Objective<double> obj_backup(std::move(vals));
 
     Solver solver(*rc::gen::arbitrary<OptimizationType>());
     solver.linear_program().set_objective(std::move(obj));
@@ -177,14 +174,11 @@ void test_raw_data_full_problem() {
     std::vector<double> lb = {-LPINT_INFINITY, 1.0};
     std::vector<double> ub = {4.0, LPINT_INFINITY};
     std::vector<double> objective = {1.0, 1.0, 2.0};
-    std::vector<VarType> var_type = {VarType::Real, VarType::Real,
-                                     VarType::Real};
 
-    solver.add_variables(std::move(objective), std::move(var_type));
+    solver.add_variables(std::move(objective));
     solver.add_rows(std::move(values), std::move(start_indices),
                  std::move(col_indices), std::move(lb), std::move(ub));
   }
-
   // Solve the primal LP problem
   auto status = solver.solve();
   ASSERT_EQ(status, Status::Optimal);
@@ -214,16 +208,6 @@ template <class Solver>
 void test_model_not_solved_acces_throw() {
   Solver solver;
   RC_ASSERT_THROWS_AS(solver.get_solution(), ModelNotSolvedException);
-}
-
-template <class Solver>
-void test_unsupported_vartype(std::size_t ncols, rc::Gen<VarType> unsup) {
-  templated_prop<Solver>("Unsupported variable type throws", [=]() {
-    auto obj = *rc::genSizedObjective(ncols, unsup, rc::gen::arbitrary<double>());
-    Solver solver;
-    RC_ASSERT_THROWS_AS(solver.linear_program().set_objective(std::move(obj)), 
-                        UnsupportedVariableTypeException);
-  });
 }
 
 } // namespace lpint

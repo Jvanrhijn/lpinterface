@@ -51,7 +51,7 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
   error = GRBaddvars(
       *model, obj.values.size(), 0, nullptr, nullptr, nullptr,
       obj.values.data(), nullptr, nullptr,
-      LinearProgramHandleGurobi::convert_variable_type(obj.variable_types).data(),
+      nullptr,
       nullptr);
 
   if (error) {
@@ -79,7 +79,7 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
 
 
 TEST(Gurobi, AddAndRetrieveObjective) {
-  test_add_retrieve_objective<GurobiSolver>(ncols, rc::gen::arbitrary<VarType>());
+  test_add_retrieve_objective<GurobiSolver>(ncols);
 }
 
 TEST(Gurobi, UnsolvedModelThrowsOnAccess) {
@@ -98,8 +98,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
   constexpr double TIME_LIMIT = 0.1;
 
   auto grb = rc::genLinearProgramSolver<GurobiSolver>(
-      nrows, ncols, 
-      rc::gen::arbitrary<VarType>());
+      nrows, ncols);
 
   GRBenv* env = nullptr;
   GRBmodel* model = nullptr;
@@ -164,9 +163,7 @@ RC_GTEST_PROP(Gurobi, SameResultAsBareGurobi, ()) {
 }
 
 RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
-  auto lp_data = generate_lp_data<GurobiSolver>(
-      10, 10,
-      rc::gen::arbitrary<VarType>());
+  auto lp_data = generate_lp_data<GurobiSolver>(10, 10);
 
   // configure bare Gurobi
   GRBenv* env;
@@ -190,10 +187,9 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
                 lp_data.sense == OptimizationType::Maximize ? GRB_MAXIMIZE
                                                             : GRB_MINIMIZE);
 
-  auto gurobi_var_type = LinearProgramHandleGurobi::convert_variable_type(lp_data.var_type);
   GRBaddvars(model, lp_data.objective.size(), 0, nullptr, nullptr,
                      nullptr, lp_data.objective.data(), nullptr, nullptr,
-                     gurobi_var_type.data(), nullptr);
+                     nullptr, nullptr);
 
   int error = GRBaddrangeconstrs(model, lp_data.start_indices.size(),
                         lp_data.values.size(), lp_data.start_indices.data(),
@@ -204,7 +200,7 @@ RC_GTEST_PROP(Gurobi, RawDataSameAsBareGurobi, ()) {
   GurobiSolver grb(lp_data.sense);
   grb.set_parameter(Param::Verbosity, 0);
 
-  grb.add_variables(std::move(lp_data.objective), std::move(lp_data.var_type));
+  grb.add_variables(std::move(lp_data.objective));
   grb.add_rows(std::move(lp_data.values), std::move(lp_data.start_indices),
                std::move(lp_data.column_indices), std::move(lp_data.lb),
                std::move(lp_data.ub));

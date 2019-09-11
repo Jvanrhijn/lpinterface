@@ -51,8 +51,7 @@ class FlushRawData {
    * @param objective_values values of objective function vector.
    * @param var_types Type of each variable (real, integer, binary, etc.)
    */
-  virtual void add_variables(std::vector<T>&& objective_values,
-                             std::vector<VarType>&& var_types) = 0;
+  virtual void add_variables(std::vector<T>&& objective_values) = 0;
 };
 
 }  // namespace lpint

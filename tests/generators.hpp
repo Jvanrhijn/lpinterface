@@ -17,21 +17,11 @@ inline Gen<std::vector<T>> genUniqueVector(std::size_t size, Gen<T> gen) {
                        [&](std::vector<T> v) { return v.size() == size; });
 }
 
-template <>
-struct Arbitrary<lpint::VarType> {
-  static Gen<lpint::VarType> arbitrary() {
-    return gen::element(lpint::VarType::Binary, lpint::VarType::Integer,
-                        lpint::VarType::Real, lpint::VarType::SemiInteger,
-                        lpint::VarType::SemiReal);
-  }
-};
-
 template <typename T>
 struct Arbitrary<lpint::Objective<T>> {
   static Gen<lpint::Objective<T>> arbitrary() {
     return gen::build<lpint::Objective<T>>(
-        gen::set(&lpint::Objective<T>::values),
-        gen::set(&lpint::Objective<T>::variable_types));
+        gen::set(&lpint::Objective<T>::values));
   }
 };
 
@@ -50,13 +40,10 @@ inline Gen<lpint::Constraint<T>> genConstraint(
 
 template <typename T>
 inline Gen<lpint::Objective<T>> genSizedObjective(std::size_t size,
-                                                  Gen<lpint::VarType> vtgen,
                                                   Gen<T> valgen) {
   return gen::build<lpint::Objective<T>>(
       gen::set(&lpint::Objective<T>::values,
-               gen::container<std::vector<T>>(size, valgen)),
-      gen::set(&lpint::Objective<T>::variable_types,
-               gen::container<std::vector<lpint::VarType>>(size, vtgen)));
+               gen::container<std::vector<T>>(size, valgen)));
 }
 
 // if fixed == true, count is the number of nonzero elements in the row.
@@ -139,8 +126,7 @@ struct Arbitrary<lpint::OptimizationType> {
 
 template <class Solver>
 inline Solver genLinearProgramSolver(
-    const std::size_t max_nrows, const std::size_t max_ncols,
-    Gen<lpint::VarType> genvt) {
+    const std::size_t max_nrows, const std::size_t max_ncols) {
   using namespace lpint;
 
   const std::size_t nrows =
@@ -155,9 +141,7 @@ inline Solver genLinearProgramSolver(
       rc::gen::arbitrary<double>()
     ));
 
-  auto objective = *rc::genSizedObjective(ncols, 
-                                                std::move(genvt), 
-                                                rc::gen::nonZero<double>());
+  auto objective = *rc::genSizedObjective(ncols, rc::gen::nonZero<double>());
 
   Solver h;
   h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
@@ -178,18 +162,16 @@ struct RawDataLinearProgram {
   std::vector<double> lb;
   std::vector<double> ub;
   std::vector<double> objective;
-  std::vector<VarType> var_type;
 };
 
 // super ugly helper function to generate raw lp data
 // values, start indices, col indices, rhs, ord, objective, variable type
 template <class Solver>
 inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
-                                             const std::size_t ncols,
-                                             rc::Gen<VarType> vgen) {
+                                             const std::size_t ncols) {
   using namespace lpint;
 
-  const auto lp = rc::genLinearProgramSolver<Solver>(nrows, ncols, vgen);
+  const auto lp = rc::genLinearProgramSolver<Solver>(nrows, ncols);
 
   std::vector<double> values, lb, ub;
   std::vector<int> start_indices, col_indices;
@@ -206,7 +188,6 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
 
   const auto& obj = lp.linear_program().objective();
   std::vector<double> objective = obj.values;
-  std::vector<VarType> var_type = obj.variable_types;
 
   return RawDataLinearProgram{lp.linear_program().optimization_type(),
                               values,
@@ -214,8 +195,7 @@ inline RawDataLinearProgram generate_lp_data(const std::size_t nrows,
                               col_indices,
                               lb,
                               ub,
-                              objective,
-                              var_type};
+                              objective};
 }
 
 template <class Solver>
@@ -231,7 +211,6 @@ inline Solver gen_simple_valid_lp(std::size_t nrows, std::size_t ncols,
   const auto count = *std::max_element(nonzero_indices.begin(), nonzero_indices.end()) + 1;
 
   auto obj = *rc::genSizedObjective(static_cast<std::size_t>(count), 
-                                    rc::gen::just(VarType::Real), 
                                     rc::gen::positive<double>());
 
   Solver lp;
