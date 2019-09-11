@@ -29,6 +29,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
+  void add_variables(const std::size_t num_vars) override;
+
   void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
 
@@ -50,9 +52,6 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
     num_vars_ = nvars;
   }
 
-  inline static std::vector<char> convert_variable_type(
-      const std::vector<VarType>& var_types);
-
  private:
   std::shared_ptr<GRBenv> grb_env_;
   std::shared_ptr<GRBmodel> grb_model_;
@@ -63,36 +62,6 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   std::size_t num_vars_ = 0;
   std::size_t num_constraints_ = 0;
 };
-
-std::vector<char> LinearProgramHandleGurobi::convert_variable_type(
-    const std::vector<VarType>& var_types) {
-  const auto num_vars = var_types.size();
-  std::vector<char> value_type(num_vars);
-  for (std::size_t i = 0; i < num_vars; i++) {
-    char vtype;
-    switch (var_types[i]) {
-      case VarType::Binary:
-        vtype = GRB_BINARY;
-        break;
-      case VarType::Integer:
-        vtype = GRB_INTEGER;
-        break;
-      case VarType::Real:
-        vtype = GRB_CONTINUOUS;
-        break;
-      case VarType::SemiReal:
-        vtype = GRB_SEMICONT;
-        break;
-      case VarType::SemiInteger:
-        vtype = GRB_SEMIINT;
-        break;
-      default:
-        throw UnsupportedVariableTypeException();
-    }
-    value_type[i] = vtype;
-  }
-  return value_type;
-}
 
 }  // namespace lpint
 

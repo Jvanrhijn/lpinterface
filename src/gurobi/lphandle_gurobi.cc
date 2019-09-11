@@ -16,6 +16,11 @@ void LinearProgramHandleGurobi::set_objective_sense(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
+void LinearProgramHandleGurobi::add_variables(const std::size_t num_vars) {
+  num_vars_ += num_vars;
+  detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+}
+
 void LinearProgramHandleGurobi::add_constraints(
     const std::vector<Constraint<double>>& constraints) {
   for (const auto& constraint : constraints) {
@@ -43,11 +48,11 @@ void LinearProgramHandleGurobi::remove_constraint(std::size_t i) {
 
 void LinearProgramHandleGurobi::set_objective(
     const Objective<double>& objective) {
-  num_vars_ = objective.values.size();
-  detail::gurobi_function_checked(
-      GRBaddvars, grb_model_.get(), num_vars_, 0, nullptr, nullptr, nullptr,
-      const_cast<Objective<double>&>(objective).values.data(), nullptr, nullptr,
-      convert_variable_type(objective.variable_types).data(), nullptr);
+  if (num_vars_ != objective.values.size()) {
+    throw MismatchedDimensionsException();
+  }
+  detail::gurobi_function_checked(GRBsetdblattrarray, grb_model_.get(), GRB_DBL_ATTR_OBJ, 0, num_vars_, 
+                                  const_cast<Objective<double>&>(objective).values.data());
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
@@ -93,33 +98,13 @@ std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
 Objective<double> LinearProgramHandleGurobi::objective() const {
   const auto nvars = num_vars();
   std::vector<double> values;
-  std::vector<VarType> var_types;
   for (std::size_t i = 0; i < nvars; i++) {
     double obj;
-    char vtype;
     detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
                                     GRB_DBL_ATTR_OBJ, i, &obj);
-    detail::gurobi_function_checked(GRBgetcharattrelement, grb_model_.get(),
-                                    GRB_CHAR_ATTR_VTYPE, i, &vtype);
     values.push_back(obj);
-    var_types.push_back([&]() {
-      switch (vtype) {
-        case 'C':
-          return VarType::Real;
-        case 'B':
-          return VarType::Binary;
-        case 'I':
-          return VarType::Integer;
-        case 'S':
-          return VarType::SemiReal;
-        case 'N':
-          return VarType::SemiInteger;
-        default:
-          throw UnsupportedVariableTypeException();
-      }
-    }());
   }
-  return Objective<double>(std::move(values), std::move(var_types));
+  return Objective<double>(std::move(values));
 }
 
 std::shared_ptr<GRBmodel> LinearProgramHandleGurobi::gurobi_model(

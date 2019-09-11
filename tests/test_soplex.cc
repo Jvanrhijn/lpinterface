@@ -45,13 +45,7 @@ inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
 }
 
 TEST(SoPlex, AddAndRetrieveObjective) {
-  test_add_retrieve_objective<SoplexSolver>(ncols, rc::gen::just(VarType::Real));
-}
-
-TEST(SoPlex, UnsupportedVariableType) {
-  test_unsupported_vartype<SoplexSolver>(ncols, 
-    rc::gen::element(VarType::Binary, VarType::Integer, 
-                     VarType::SemiInteger, VarType::SemiReal));
+  test_add_retrieve_objective<SoplexSolver>(ncols);
 }
 
 TEST(SoPlex, UnsolvedModelThrowsOnAccess) {
@@ -76,8 +70,7 @@ RC_GTEST_PROP(SoPlex, SameResultAsBareSoplex, ()) {
   using namespace soplex;
 
   auto solver = rc::genLinearProgramSolver<SoplexSolver>(
-      nrows, ncols, 
-      rc::gen::just(VarType::Real));
+      nrows, ncols);
 
   auto soplex = configure_soplex(solver.linear_program());
 

@@ -125,13 +125,11 @@ void GurobiSolver::add_rows(std::vector<double>&& values,
                                   start_indices.data(), col_indices.data(),
                                   values.data(), lb.data(), ub.data(), nullptr);
 }
-void GurobiSolver::add_variables(std::vector<double>&& objective_values,
-                                 std::vector<VarType>&& var_types) {
+void GurobiSolver::add_variables(std::vector<double>&& objective_values) {
   detail::gurobi_function_checked(
       GRBaddvars, gurobi_model_.get(), objective_values.size(), 0, nullptr,
       nullptr, nullptr, objective_values.data(), nullptr, nullptr,
-      LinearProgramHandleGurobi::convert_variable_type(var_types).data(),
-      nullptr);
+      nullptr, nullptr);
   lp_handle_.set_num_vars({}, objective_values.size());
 }
 

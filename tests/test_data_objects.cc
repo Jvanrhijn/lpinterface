@@ -10,14 +10,6 @@
 
 using namespace lpint;
 
-RC_GTEST_PROP(DataObjects, ObjectiveThrowsIfDimensionsMismatched,
-              (std::vector<double> vs, std::vector<VarType> vts)) {
-  if (vs.size() != vts.size()) {
-    RC_ASSERT_THROWS_AS(Objective<double>(std::move(vs), std::move(vts)),
-                        MismatchedDimensionsException);
-  }
-}
-
 RC_GTEST_PROP(DataObjects, MatrixEntryThrowsIfDuplicateNonzeros, ()) {
   const auto values = *rc::gen::container<std::vector<double>>(
       *rc::gen::inRange(uint8_t(2), std::numeric_limits<uint8_t>::max()),

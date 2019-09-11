@@ -70,6 +70,9 @@ int main(int argc, char* argv[]) {
     // data defining a linear program.
     lp.set_objective_sense(OptimizationType::Maximize);
 
+    // Add 3 variables to the LP.
+    lp.add_variables(3);
+
     // Set the objective vector. The objective consists of the
     // coefficients of the elements of x in the expression
     // c^T x, i.e. the elements of c.
