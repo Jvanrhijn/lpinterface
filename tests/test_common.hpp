@@ -38,6 +38,7 @@ void test_full_problem() {
 
   solver.linear_program().set_objective_sense(OptimizationType::Maximize);
 
+  solver.linear_program().add_variables(3);
   solver.linear_program().set_objective(Objective<double>({1, 1, 2}));
 
   std::vector<Constraint<double>> constr;
@@ -74,6 +75,7 @@ void test_add_retrieve_constraints(std::size_t ncols) {
     Solver solver(OptimizationType::Maximize);
     // first need to create variables or gurobi will throw
     auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<double>());
+    solver.linear_program().add_variables(obj.values.size());
     solver.linear_program().set_objective(std::move(obj));
     solver.linear_program().add_constraints(std::move(constraints));
     auto retrieved_constraints = solver.linear_program().constraints();
@@ -102,6 +104,7 @@ void test_add_remove_constraints(std::size_t ncols) {
     Solver solver(OptimizationType::Maximize);
     // generate variables to avoid error
     auto obj = *rc::genSizedObjective(ncols, rc::gen::arbitrary<double>());
+    solver.linear_program().add_variables(obj.values.size());
     solver.linear_program().set_objective(std::move(obj));
     solver.linear_program().add_constraints(std::move(constraints));
 
@@ -158,6 +161,7 @@ void test_add_retrieve_objective(std::size_t ncols) {
     Objective<double> obj_backup(std::move(vals));
 
     Solver solver(*rc::gen::arbitrary<OptimizationType>());
+    solver.linear_program().add_variables(obj.values.size());
     solver.linear_program().set_objective(std::move(obj));
     RC_ASSERT(obj_backup == solver.linear_program().objective());
   });

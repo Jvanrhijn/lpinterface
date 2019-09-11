@@ -5,6 +5,12 @@ namespace lpint {
 
 using namespace soplex;
 
+void LinearProgramHandleSoplex::add_variables(const std::size_t nvars) {
+  for (std::size_t i = 0; i < nvars; i++) {
+    soplex_->addColReal(LPCol());
+  }
+}
+
 void LinearProgramHandleSoplex::add_constraints(
     const std::vector<Constraint<double>>& constraints) {
   for (auto& constraint : constraints) {
@@ -23,10 +29,11 @@ void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
 
 void LinearProgramHandleSoplex::set_objective(
     const Objective<double>& objective) {
-  DSVector dummy(0);
-  for (const auto& coefficient : objective.values) {
-    soplex_->addColReal(LPCol(coefficient, dummy, infinity, 0.0));
+  if (num_vars() != objective.values.size()) {
+    throw MismatchedDimensionsException();
   }
+  VectorReal obj(static_cast<int>(objective.values.size()), const_cast<Objective<double>&>(objective).values.data());
+  soplex_->changeObjReal(obj);
 }
 
 void LinearProgramHandleSoplex::set_objective_sense(

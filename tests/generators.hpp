@@ -145,6 +145,7 @@ inline Solver genLinearProgramSolver(
 
   Solver h;
   h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
+  h.linear_program().add_variables(objective.values.size());
   h.linear_program().set_objective(std::move(objective));
   h.linear_program().add_constraints(std::move(constraints));
   return h;
@@ -214,6 +215,7 @@ inline Solver gen_simple_valid_lp(std::size_t nrows, std::size_t ncols,
                                     rc::gen::positive<double>());
 
   Solver lp;
+  lp.linear_program().add_variables(obj.values.size());
   lp.linear_program().set_objective(std::move(obj));
   lp.linear_program().add_constraints(std::move(constrs));
   return lp;
