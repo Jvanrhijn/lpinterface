@@ -226,4 +226,14 @@ void test_unsupported_vartype(std::size_t ncols, rc::Gen<VarType> unsup) {
   });
 }
 
+template <class Solver>
+void test_add_vars() {
+  templated_prop<Solver>("Adding variables properly sets num_vars() return value", [=]() {
+    auto nvars = *rc::gen::arbitrary<std::size_t>();
+    Solver solver;
+    solver.linear_program().add_variables(nvars);
+    RC_ASSERT(nvars == solver.linear_program().num_vars());
+  })
+}
+
 } // namespace lpint

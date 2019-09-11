@@ -70,6 +70,12 @@ class ILinearProgramHandle {
    */
   virtual std::size_t num_constraints() const = 0;
 
+  /**
+   * @brief Set the objective sense of this ILinearProgramHandle.
+   * The Optimization type can be either OptimizationType::Minimize or
+   * OptimizationType::Maximize, which correspond to the LP formulations
+   * min c^T * x and max c^T * x, respectively.
+   */
   virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
@@ -88,8 +94,8 @@ class ILinearProgramHandle {
 
   /**
    * @brief Retrieve the objective sense of this ILinearProgramHandle.
-   * The Optimization type can be either Type::Minimize or
-   * Type::Maximize, which correspond to the LP formulations
+   * The Optimization type can be either OptimizationType::Minimize or
+   * OptimizationType::Maximize, which correspond to the LP formulations
    * min c^T * x and max c^T * x, respectively.
    */
   virtual OptimizationType optimization_type() const = 0;

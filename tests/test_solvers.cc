@@ -51,6 +51,13 @@ struct FullProblemTests {
   }
 };
 
+struct Variables {
+  template <class Solver>
+  static void exec() {
+    test_add_vars<Solver>();
+  }
+};
+
 TEST(Solvers, Constraints) {
   for_each_type<ConstraintProperties, LPINT_SUPPORTED_SOLVERS>();
 }
@@ -65,4 +72,8 @@ TEST(Solvers, LinearProgram) {
 
 TEST(Solvers, FullProblem) {
   for_each_type<FullProblemTests, LPINT_SUPPORTED_SOLVERS>();
+}
+
+TEST(Solvers, AddVars) {
+  for_each_type<Variables, LPINT_SUPPORTED_SOLVERS>();
 }
