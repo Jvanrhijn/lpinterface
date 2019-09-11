@@ -20,6 +20,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
                             std::shared_ptr<soplex::SoPlex> soplex)
       : soplex_(soplex) {}
 
+  void add_variables(std::size_t num_vars) override;
+
   void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
 

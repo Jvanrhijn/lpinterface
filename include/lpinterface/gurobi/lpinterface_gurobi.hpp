@@ -45,11 +45,7 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
                 std::vector<int>&& col_indices, std::vector<double>&& lb,
                 std::vector<double>&& ub) override;
-  void add_variables(std::vector<double>&& objective_values,
-                     std::vector<VarType>&& var_types) override;
-
-  static std::vector<char> convert_variable_type(
-      const std::vector<VarType>& var_types);
+  void add_variables(std::vector<double>&& objective_values) override;
 
 #if __cplusplus >= 201402L
   constexpr

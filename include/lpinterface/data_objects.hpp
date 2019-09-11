@@ -13,20 +13,6 @@
 
 namespace lpint {
 
-/// Enum representing possible variable types for an LP.
-enum class VarType {
-  //! Supported by: Gurobi.
-  Binary,
-  //! Supported by: Gurobi.
-  Integer,
-  //! Supported by: Gurobi, SoPlex.
-  Real,
-  //! Supported by: Gurobi.
-  SemiReal,
-  //! Supported by: Gurobi.
-  SemiInteger,
-};
-
 // matrix entry is templated over T, with T restricted to
 // arithmetic types i.e. numbers
 /**
@@ -241,24 +227,14 @@ struct Objective {
   // This might be different in other solvers, so
   // we'll have to carefully check when adding support.
   explicit Objective(std::vector<T>&& vals)
-      : values(std::move(vals)), variable_types(values.size(), VarType::Real) {}
-  Objective(std::vector<T>&& vals, std::vector<VarType>&& var_types)
-      : values(std::move(vals)), variable_types(std::move(var_types)) {
-    if (values.size() != variable_types.size()) {
-      throw MismatchedDimensionsException();
-    }
-  }
+      : values(std::move(vals)) {}
   //! Values of elements in the objective vector.
   std::vector<T> values;
-  //! Variable type the objective assigns to each
-  //! variable the linear program optimizes.
-  std::vector<VarType> variable_types;
 };
 
 template <class T>
 bool operator==(const Objective<T>& left, const Objective<T>& right) {
-  return left.variable_types == right.variable_types &&
-         left.values == right.values;
+  return left.values == right.values;
 }
 
 /**
@@ -285,29 +261,6 @@ inline std::ostream& operator<<(std::ostream& os,
   return os;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const VarType& vtype) {
-  switch (vtype) {
-    case VarType::Binary:
-      os << "Binary";
-      break;
-    case VarType::Integer:
-      os << "Integer";
-      break;
-    case VarType::Real:
-      os << "Real";
-      break;
-    case VarType::SemiInteger:
-      os << "Semi-integer";
-      break;
-    case VarType::SemiReal:
-      os << "Semi-real";
-      break;
-    default:
-      throw UnsupportedVariableTypeException();
-  }
-  return os;
-}
-
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
   if (obj.values.size() == 0) {
@@ -317,7 +270,7 @@ inline std::ostream& operator<<(std::ostream& os, const Objective<T>& obj) {
   os << "Objective {";
   std::size_t n = obj.values.size();
   for (std::size_t i = 0; i < n; i++) {
-    os << obj.variable_types[i] << " " << obj.values[i] << ", ";
+    os << obj.values[i] << ", ";
   }
   os << "\b\b}";
   return os;
