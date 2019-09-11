@@ -214,4 +214,14 @@ void test_model_not_solved_acces_throw() {
   RC_ASSERT_THROWS_AS(solver.get_solution(), ModelNotSolvedException);
 }
 
+template <class Solver>
+void test_num_vars() {
+  templated_prop<Solver>("Adding variables causes correct num_vars() return values", [=]() {
+    auto nvars = *rc::gen::inRange<std::size_t>(0, 10000);
+    Solver solver;
+    solver.linear_program().add_variables(nvars);
+    RC_ASSERT(solver.linear_program().num_vars() == nvars);
+  });
+}
+
 } // namespace lpint

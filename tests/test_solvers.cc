@@ -54,7 +54,7 @@ struct FullProblemTests {
 struct Variables {
   template <class Solver>
   static void exec() {
-    test_add_vars<Solver>();
+    test_num_vars<Solver>();
   }
 };
 
