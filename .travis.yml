@@ -17,7 +17,6 @@ addons:
     packages:
       - llvm
       - lcov
-      - kcov
       - cmake-data
       - binutils-dev
       - libiberty-dev
@@ -237,7 +236,11 @@ script:
 
 after_success:
   - cd ${TRAVIS_BUILD_DIR}/build
-  - kcov --exclude-pattern=gtest,gmock,rapidcheck,/usr,tests out tests/unit_tests --gtest_shuffle
+  - lcov --capture --directory . --initial --output-file coverage.info
+  - ./tests/unit_tests
+  - lcov --capture --directory . --output-file coverage.info
+  - lcov --remove coverage.info '/usr/*' '*rapidcheck*' '*gtest*' -o coverage.info
+  - lcov --list coverage.info
   - bash <(curl -s https://codecov.io/bash) && echo "Uploaded code coverage"
   - cd ${TRAVIS_BUILD_DIR}
   - doxygen docs/config 

@@ -66,6 +66,6 @@ add_custom_command(TARGET ${UNIT_TESTS} POST_BUILD
     COMMENT "Running tests")
 
 if (COVERAGE) 
-  target_compile_options(${UNIT_TESTS} PRIVATE --coverage -g)
+  target_compile_options(${UNIT_TESTS} PRIVATE --coverage -g -O0 -fprofile-arcs -ftest-coverage)
   target_link_libraries(${UNIT_TESTS} PRIVATE --coverage -g)
 endif()
