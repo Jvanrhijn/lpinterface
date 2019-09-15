@@ -99,7 +99,7 @@ void test_add_remove_constraints(std::size_t ncols) {
     std::transform(constraints.begin(), constraints.end(), constraints_backup.begin(),
       [](const Constraint<double>& c) { return copy_constraint<double>(c); } );
 
-    const auto nconstr_to_remove = 1;//*rc::gen::inRange(1ul, nconstr+1).as("Num constraints to remove");
+    const auto nconstr_to_remove = *rc::gen::inRange(1ul, nconstr+1).as("Num constraints to remove");
   
     Solver solver(OptimizationType::Maximize);
     // generate variables to avoid error
@@ -111,22 +111,16 @@ void test_add_remove_constraints(std::size_t ncols) {
     for (std::size_t i = 0; i < nconstr_to_remove; i++) {
       // generate index of constraint to remove
       auto nconstr_left = solver.linear_program().num_constraints();
-      const auto remove_idx = *rc::gen::inRange(0ul, nconstr_left).as("Removal index");
+      // TODO: generalize to any removal order
+      const auto remove_idx = nconstr_left - 1;//*rc::gen::inRange(0ul, nconstr_left).as("Removal index");
 
       // remove constraint from backup
-      constraints_backup.erase(constraints_backup.begin() 
-        + static_cast<decltype(constraints_backup)::difference_type>(remove_idx));
+      constraints_backup.pop_back();
 
       solver.linear_program().remove_constraint(remove_idx);
-
-      auto constr_left = solver.linear_program().constraints();
-
-      for (const auto& constr : constr_left) {
-        RC_ASSERT(std::find(constraints_backup.begin(), constraints_backup.end(), constr) != constraints_backup.end());
-      }
-
-      RC_ASSERT(constr_left.size() == constraints_backup.size());
     }
+
+    RC_ASSERT(solver.linear_program().constraints() == constraints_backup);
   
   });
 }
