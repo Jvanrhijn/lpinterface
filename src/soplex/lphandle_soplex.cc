@@ -1,9 +1,26 @@
 #include "lpinterface/soplex/lphandle_soplex.hpp"
-#include "util/container.hpp"
+#include "lpinterface/detail/util.hpp"
 
 namespace lpint {
 
 using namespace soplex;
+
+std::vector<Variable> LinearProgramHandleSoplex::variables() const {
+  auto nvars = num_vars();
+  std::vector<Variable> vars;
+  for (std::size_t i = 0; i < nvars; i++) {
+    vars.emplace_back(soplex_->lowerReal(i), soplex_->upperReal(i));
+  }
+  return vars;
+}
+
+void LinearProgramHandleSoplex::add_variables(
+    const std::vector<Variable>& vars) {
+  DSVector dummy(0);
+  for (const auto& var : vars) {
+    soplex_->addColReal(LPCol(0, dummy, var.upper(), var.lower()));
+  }
+}
 
 void LinearProgramHandleSoplex::add_variables(const std::size_t nvars) {
   for (std::size_t i = 0; i < nvars; i++) {
@@ -20,11 +37,27 @@ void LinearProgramHandleSoplex::add_constraints(
                constraint.row.values().data());
     soplex_->addRowReal(
         LPRow(constraint.lower_bound, ds_row, constraint.upper_bound));
+    // add new indices to permutation and inverse permutation.
+    // newly added constraints are not permuted, so just add
+    // their actual index.
+    permutation_.push_back(permutation_.size());
+    inverse_permutation_.push_back(inverse_permutation_.size());
   }
 }
 
 void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
-  soplex_->removeRowReal(i);
+  soplex_->removeRowReal(inverse_permutation_[i]);
+  // calculate the new permutation and inverse permutation. Soplex removed
+  // constraints by swapping them with then end of the constraint list
+  // and shrinking the list.
+  // first, swap the permutation index with the back of its array
+  std::swap(permutation_[inverse_permutation_[i]], permutation_.back());
+  // shrink the permutation list
+  permutation_.pop_back();
+  // make sure all permutation indices are in the range [0, num_constraints]
+  permutation_ = detail::rankify(permutation_);
+  // compute the inverse of the updated permutation
+  inverse_permutation_ = detail::inverse_permutation(permutation_);
 }
 
 void LinearProgramHandleSoplex::set_objective(
@@ -61,21 +94,21 @@ std::size_t LinearProgramHandleSoplex::num_constraints() const {
 }
 
 std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
-  const auto nrows = static_cast<std::size_t>(soplex_->numRowsReal());
-  std::vector<Constraint<double>> constraints(num_constraints());
-  for (std::size_t i = 0; i < nrows; i++) {
-    auto idx = i;
-    auto lb = soplex_->lhsReal(idx);
-    auto ub = soplex_->rhsReal(idx);
+  std::vector<Constraint<double>> constraints;
+  // to retrieve constraints in the proper order,
+  // iterate over the inverse permutation indices.
+  for (auto i : inverse_permutation_) {
+    auto lb = soplex_->lhsReal(i);
+    auto ub = soplex_->rhsReal(i);
 
     Row<double> row;
-    const auto sv = soplex_->rowVectorRealInternal(idx);
+    const auto sv = soplex_->rowVectorRealInternal(i);
     for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
       const auto element = sv.element(j);
       row.nonzero_indices().push_back(element.idx);
       row.values().push_back(element.val);
     }
-    constraints[i] = Constraint<double>(std::move(row), lb, ub);
+    constraints.emplace_back(std::move(row), lb, ub);
   }
   return constraints;
 }

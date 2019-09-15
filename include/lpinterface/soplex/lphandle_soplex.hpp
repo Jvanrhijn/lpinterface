@@ -2,12 +2,14 @@
 #define LPINTERFACE_LPHANDLE_SOPLEX_H
 
 #include <memory>
+#include <numeric>
 #include <unordered_map>
 #include <vector>
 
 #include "soplex.h"
 
 #include "lpinterface/badge.hpp"
+#include "lpinterface/detail/util.hpp"
 #include "lpinterface/lp.hpp"
 
 namespace lpint {
@@ -18,7 +20,14 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
  public:
   LinearProgramHandleSoplex(detail::Badge<SoplexSolver>,
                             std::shared_ptr<soplex::SoPlex> soplex)
-      : soplex_(soplex) {}
+      : soplex_(soplex) {
+    std::iota(permutation_.begin(), permutation_.end(), 0);
+    inverse_permutation_ = detail::inverse_permutation(permutation_);
+  }
+
+  std::vector<Variable> variables() const override;
+
+  void add_variables(const std::vector<Variable>& vars) override;
 
   void add_variables(std::size_t num_vars) override;
 
@@ -46,20 +55,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   }
 
  private:
-  // static std::size_t transform_index(std::size_t removed, std::size_t i,
-  // std::size_t length) {
-  //  if (i < removed) {
-  //    return i;
-  //  } else if (i == length - 2) {
-  //    return removed;
-  //  } else {
-  //    return i + 1;
-  //  }
-  //}
-
-  using InternalIndex = std::size_t;
-
-  // std::vector<InternalIndex> internal_indices_;
+  std::vector<std::size_t> permutation_;
+  std::vector<std::size_t> inverse_permutation_;
 
   std::shared_ptr<soplex::SoPlex> soplex_;
 

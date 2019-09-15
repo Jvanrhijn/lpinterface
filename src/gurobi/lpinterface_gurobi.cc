@@ -102,8 +102,11 @@ const ILinearProgramHandle& GurobiSolver::linear_program() const {
 ILinearProgramHandle& GurobiSolver::linear_program() { return lp_handle_; }
 
 const Solution<double>& GurobiSolver::get_solution() const {
-  return solution_status() == Status::Optimal ? solution_
-                                              : throw ModelNotSolvedException();
+  if (solution_status() == Status::Optimal) {
+    return solution_;
+  } else {
+    throw ModelNotSolvedException();
+  }
 }
 
 void GurobiSolver::add_columns(

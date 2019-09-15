@@ -16,11 +16,36 @@ void LinearProgramHandleGurobi::set_objective_sense(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
+std::vector<Variable> LinearProgramHandleGurobi::variables() const {
+  std::vector<Variable> vars;
+  for (std::size_t i = 0; i < num_vars_; i++) {
+    double lb, ub;
+    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                    GRB_DBL_ATTR_LB, i, &lb);
+    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                    GRB_DBL_ATTR_UB, i, &ub);
+    vars.emplace_back(lb, ub);
+  }
+  return vars;
+}
+
+void LinearProgramHandleGurobi::add_variables(
+    const std::vector<Variable>& vars) {
+  num_vars_ += vars.size();
+  for (const auto& var : vars) {
+    detail::gurobi_function_checked(GRBaddvar, grb_model_.get(), 0, nullptr,
+                                    nullptr, 0.0, var.lower(), var.upper(),
+                                    GRB_CONTINUOUS, nullptr);
+  }
+  detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
+}
+
 void LinearProgramHandleGurobi::add_variables(const std::size_t num_vars) {
   num_vars_ += num_vars;
   detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0,
                                   nullptr, nullptr, nullptr, nullptr, nullptr,
                                   nullptr, nullptr, nullptr);
+  detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
 void LinearProgramHandleGurobi::add_constraints(
@@ -46,6 +71,7 @@ void LinearProgramHandleGurobi::remove_constraint(std::size_t i) {
   int to_del = static_cast<int>(i);
   detail::gurobi_function_checked(GRBdelconstrs, grb_model_.get(), 1, &to_del);
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
+  num_constraints_--;
 }
 
 void LinearProgramHandleGurobi::set_objective(

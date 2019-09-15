@@ -124,6 +124,17 @@ struct Arbitrary<lpint::OptimizationType> {
   }
 };
 
+template <>
+struct Arbitrary<lpint::Variable> {
+  static Gen<lpint::Variable> arbitrary() {
+    using namespace lpint;
+    return gen::construct<Variable>(
+      gen::negative<double>(),
+      gen::nonNegative<double>()
+    );
+  }
+};
+
 template <class Solver>
 inline Solver genLinearProgramSolver(
     const std::size_t max_nrows, const std::size_t max_ncols) {
@@ -145,7 +156,7 @@ inline Solver genLinearProgramSolver(
 
   Solver h;
   h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
-  h.linear_program().add_variables(objective.values.size());
+  h.linear_program().add_variables(*gen::container<std::vector<Variable>>(objective.values.size(), gen::arbitrary<Variable>()));
   h.linear_program().set_objective(std::move(objective));
   h.linear_program().add_constraints(std::move(constraints));
   return h;
