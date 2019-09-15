@@ -3,6 +3,7 @@ set(UNIT_TESTS unit_tests)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+  set(CMAKE_CXX_FLAGS_TESTS ${CMAKE_CXX_FLAGS_TESTS} -Wno-unused-command-line-argument)
 endif()
 
 if (CI)
@@ -27,7 +28,6 @@ set(test_files
   test_data_objects.cc)
 
 list(APPEND LIBS lpinterface)
-
 
 find_package(GUROBI)
 if (GUROBI_FOUND)
@@ -66,6 +66,7 @@ add_custom_command(TARGET ${UNIT_TESTS} POST_BUILD
     COMMENT "Running tests")
 
 if (COVERAGE) 
-  target_compile_options(${UNIT_TESTS} PRIVATE --coverage -g -O0 -fprofile-arcs -ftest-coverage)
+  target_compile_options(${UNIT_TESTS} PRIVATE --coverage -g -O0
+                                               -fprofile-arcs -ftest-coverage)
   target_link_libraries(${UNIT_TESTS} PRIVATE --coverage -g)
 endif()
