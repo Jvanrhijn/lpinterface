@@ -6,6 +6,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <cassert>
 
 namespace lpint {
 
@@ -16,11 +17,17 @@ inline GRBenv* create_gurobi_env() {
   int saved_stdout = dup(1);
   close(1);
   int new_stdout = open("/dev/null", O_WRONLY);
-  
+  if (new_stdout != 1) {
+    throw std::runtime_error("Failed to redirect stdout");
+  }
+
   int err = GRBloadenv(&env, "");
 
   close(new_stdout);
   new_stdout = dup(saved_stdout);
+  if (new_stdout != 1) {
+    throw std::runtime_error("Failed to redirect stdout");
+  }
   close(saved_stdout);
 
   if (err) {

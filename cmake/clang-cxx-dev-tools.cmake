@@ -42,7 +42,7 @@ if(CLANG_TIDY)
     clang-tidy
     COMMAND clang-tidy
     ${ALL_CXX_SOURCE_FILES}
-    -checks='cppcoreguidelines-*,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-bounds-pointer-arithmetic'
+    -checks='cppcoreguidelines-*,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg'
     -warnings-as-errors=*
     --
     -I../include/
