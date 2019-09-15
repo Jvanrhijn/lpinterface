@@ -37,6 +37,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - lcov
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=gcc-6 && CXX=g++-6" PAGES=YES COVERAGE=YES
 
     - os: linux
