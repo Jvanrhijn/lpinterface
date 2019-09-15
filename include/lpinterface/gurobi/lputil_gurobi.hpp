@@ -4,13 +4,26 @@
 #include "gurobi_c.h"
 #include "lpinterface/errors.hpp"
 
+#include <fcntl.h>
+#include <unistd.h>
+
 namespace lpint {
 
 namespace detail {
 
 inline GRBenv* create_gurobi_env() {
   GRBenv* env;
-  if (int err = GRBloadenv(&env, "")) {
+  int saved_stdout = dup(1);
+  close(1);
+  int new_stdout = open("/dev/null", O_WRONLY);
+  
+  int err = GRBloadenv(&env, "");
+
+  close(new_stdout);
+  new_stdout = dup(saved_stdout);
+  close(saved_stdout);
+
+  if (err) {
     throw GurobiException(err, GRBgeterrormsg(env));
   }
   return env;

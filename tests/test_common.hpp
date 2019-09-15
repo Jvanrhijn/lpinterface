@@ -1,3 +1,4 @@
+#include <gtest/gtest.h>
 #include <rapidcheck.h>
 
 #include "generators.hpp"
