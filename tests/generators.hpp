@@ -124,6 +124,17 @@ struct Arbitrary<lpint::OptimizationType> {
   }
 };
 
+template <>
+struct Arbitrary<lpint::Variable> {
+  static Gen<lpint::Variable> arbitrary() {
+    using namespace lpint;
+    return gen::construct<Variable>(
+      gen::negative<double>(),
+      gen::nonNegative<double>()
+    );
+  }
+};
+
 template <class Solver>
 inline Solver genLinearProgramSolver(
     const std::size_t max_nrows, const std::size_t max_ncols) {

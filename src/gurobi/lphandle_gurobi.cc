@@ -16,6 +16,13 @@ void LinearProgramHandleGurobi::set_objective_sense(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
+void LinearProgramHandleGurobi::add_variables(const std::vector<Variable>& vars) {
+  num_vars_ += vars.size();
+  for (const auto& var : vars) {
+    detail::gurobi_function_checked(GRBaddvar, grb_model_.get(), 0, nullptr, nullptr, 0.0, var.lower(), var.upper(), GRB_CONTINUOUS, nullptr);
+  }  
+}
+
 void LinearProgramHandleGurobi::add_variables(const std::size_t num_vars) {
   num_vars_ += num_vars;
   detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0,

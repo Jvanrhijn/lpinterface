@@ -4,6 +4,13 @@ namespace lpint {
 
 using namespace soplex;
 
+void LinearProgramHandleSoplex::add_variables(const std::vector<Variable>& vars) {
+  DSVector dummy(0);
+  for (const auto& var : vars) {
+    soplex_->addColReal(LPCol(0, dummy, var.upper(), var.lower()));
+  }
+}
+
 void LinearProgramHandleSoplex::add_variables(const std::size_t nvars) {
   for (std::size_t i = 0; i < nvars; i++) {
     soplex_->addColReal(LPCol());

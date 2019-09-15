@@ -79,7 +79,14 @@ class ILinearProgramHandle {
   virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
-   * @brief Add num_vars variables to the LP.
+   * @brief Add variables to the LP.
+   * 
+   * @param vars Vector of variables to add.
+   */
+  virtual void add_variables(const std::vector<Variable>& vars) = 0;
+
+  /**
+   * @brief Add num_vars unbounded variables to the LP.
    * To be called before settings the objective function.
    */
   virtual void add_variables(const std::size_t num_vars) = 0;

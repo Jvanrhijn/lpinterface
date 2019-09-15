@@ -221,7 +221,11 @@ void test_num_vars() {
     Solver solver;
     solver.linear_program().add_variables(nvars);
     RC_ASSERT(solver.linear_program().num_vars() == nvars);
+    const auto vars = *rc::gen::container<std::vector<Variable>>(rc::gen::arbitrary<Variable>());
+    solver.linear_program().add_variables(vars);
+    RC_ASSERT(solver.linear_program().num_vars() == nvars + vars.size());
   });
 }
+
 
 } // namespace lpint

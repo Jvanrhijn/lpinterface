@@ -29,6 +29,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
+  void add_variables(const std::vector<Variable>& vars) override;
+
   void add_variables(const std::size_t num_vars) override;
 
   void add_constraints(
