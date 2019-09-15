@@ -55,6 +55,7 @@ struct Variables {
   template <class Solver>
   static void exec() {
     test_num_vars<Solver>();
+    test_add_retrieve_vars<Solver>();
   }
 };
 

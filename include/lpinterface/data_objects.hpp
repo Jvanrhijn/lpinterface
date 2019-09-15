@@ -250,6 +250,15 @@ class Variable {
   double upper_bound_ = LPINT_INFINITY;
 };
 
+inline bool operator==(const Variable& left, const Variable& right) {
+  return left.lower() == right.lower() && left.upper() == right.upper();
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Variable& var) {
+  os << "Variable { lower = " << var.lower() << ", upper = " << var.upper() << " }";
+  return os;
+}
+
 /**
  * @brief Struct representing the solution of a linear program.
  *

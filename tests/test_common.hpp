@@ -227,5 +227,15 @@ void test_num_vars() {
   });
 }
 
+template <class Solver>
+void test_add_retrieve_vars() {
+  templated_prop<Solver>("Retrieved variables from LP are equal to inserted variables", [=]() {
+    auto vars = *rc::gen::container<std::vector<Variable>>(rc::gen::arbitrary<Variable>());
+    Solver solver;
+    solver.linear_program().add_variables(vars);
+    RC_ASSERT(vars == solver.linear_program().variables());
+  });
+}
+
 
 } // namespace lpint

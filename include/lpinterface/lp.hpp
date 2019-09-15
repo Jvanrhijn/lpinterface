@@ -79,6 +79,13 @@ class ILinearProgramHandle {
   virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
+   * @brief Retrieve the variables from the internal LP solver.
+   * 
+   * @return std::vector<Variable> Vector containing internal LP variables.
+   */
+  virtual std::vector<Variable> variables() const = 0;
+
+  /**
    * @brief Add variables to the LP.
    * 
    * @param vars Vector of variables to add.

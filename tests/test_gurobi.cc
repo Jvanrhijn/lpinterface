@@ -27,14 +27,11 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
   dup(saved_stdout);
   close(saved_stdout);
 
-  if (error) {
-    return error;
-  }
+  if (error) { return error; }
+  
   error = GRBnewmodel(*env, model, nullptr, 0, nullptr, nullptr, nullptr,
                       nullptr, nullptr);
-  if (error) {
-    return error;
-  }
+  if (error) { return error; }
 
   GRBsetintparam(GRBgetenv(*model), "outputflag", 0);
 
@@ -43,19 +40,14 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
                         lp.optimization_type() == OptimizationType::Maximize
                             ? GRB_MAXIMIZE
                             : GRB_MINIMIZE);
-  if (error) {
-    return error;
-  }
+  if (error) { return error; }
   // add variables
   auto obj = lp.objective();
-  error = GRBaddvars(
-      *model, obj.values.size(), 0, nullptr, nullptr, nullptr,
-      obj.values.data(), nullptr, nullptr,
-      nullptr,
-      nullptr);
-
-  if (error) {
-    return error;
+  auto vars = lp.variables();
+  for (std::size_t i = 0; i < lp.num_vars(); i++) {
+    error = GRBaddvar(*model, 0, nullptr, nullptr, obj.values[i], 
+                      vars[i].lower(), vars[i].upper(), GRB_CONTINUOUS, nullptr);
+    if (error) { return error; }
   }
 
   auto constraints = lp.constraints();
@@ -69,9 +61,7 @@ inline int configure_gurobi(const ILinearProgramHandle& lp, GRBenv** env, GRBmod
                          constraint.lower_bound,
                          constraint.upper_bound,
                          nullptr);
-    if (error) {
-      return error;
-    }
+    if (error) { return error; }
     idx++;
   }
   return 0;

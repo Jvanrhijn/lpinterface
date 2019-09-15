@@ -29,10 +29,14 @@ inline soplex::SoPlex configure_soplex(const ILinearProgramHandle& lp) {
   soplex.setIntParam(SoPlex::VERBOSITY, 0);
 
   // soplex: add vars
+  auto objective = lp.objective();
+  const auto vars = lp.variables();
   DSVector dummycol(0);
-  for (const auto& coefficient : lp.objective().values) {
-    soplex.addColReal(LPCol(coefficient, dummycol, infinity, 0.0));
+  for (std::size_t i = 0; i < lp.num_vars(); i++ ) {
+    soplex.addColReal(LPCol(objective.values[i], dummycol, vars[i].upper(), vars[i].lower()));
   }
+  VectorReal obj(static_cast<int>(objective.values.size()), objective.values.data());
+  soplex.changeObjReal(obj);
 
   for (const auto& constraint : lp.constraints()) {  // soplex
     DSVector ds_row(constraint.row.values().size());

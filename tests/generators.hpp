@@ -156,7 +156,7 @@ inline Solver genLinearProgramSolver(
 
   Solver h;
   h.linear_program().set_objective_sense(*rc::gen::arbitrary<OptimizationType>());
-  h.linear_program().add_variables(objective.values.size());
+  h.linear_program().add_variables(*gen::container<std::vector<Variable>>(objective.values.size(), gen::arbitrary<Variable>()));
   h.linear_program().set_objective(std::move(objective));
   h.linear_program().add_constraints(std::move(constraints));
   return h;

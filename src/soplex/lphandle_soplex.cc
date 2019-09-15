@@ -4,6 +4,15 @@ namespace lpint {
 
 using namespace soplex;
 
+std::vector<Variable> LinearProgramHandleSoplex::variables() const {
+  auto nvars = num_vars();
+  std::vector<Variable> vars;
+  for (std::size_t i = 0; i < nvars; i++) {
+    vars.emplace_back(soplex_->lowerReal(i), soplex_->upperReal(i));
+  }
+  return vars;
+}
+
 void LinearProgramHandleSoplex::add_variables(const std::vector<Variable>& vars) {
   DSVector dummy(0);
   for (const auto& var : vars) {
