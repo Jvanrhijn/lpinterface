@@ -112,10 +112,11 @@ void test_add_remove_constraints(std::size_t ncols) {
       // generate index of constraint to remove
       auto nconstr_left = solver.linear_program().num_constraints();
       // TODO: generalize to any removal order
-      const auto remove_idx = nconstr_left - 1;//*rc::gen::inRange(0ul, nconstr_left).as("Removal index");
+      const auto remove_idx = *rc::gen::inRange(0ul, nconstr_left).as("Removal index");
 
       // remove constraint from backup
-      constraints_backup.pop_back();
+      constraints_backup.erase(constraints_backup.begin() 
+        + static_cast<std::vector<Constraint<double>>::difference_type>(remove_idx));
 
       solver.linear_program().remove_constraint(remove_idx);
     }
