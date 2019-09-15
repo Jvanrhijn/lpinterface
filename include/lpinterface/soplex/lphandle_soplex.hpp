@@ -2,15 +2,15 @@
 #define LPINTERFACE_LPHANDLE_SOPLEX_H
 
 #include <memory>
+#include <numeric>
 #include <unordered_map>
 #include <vector>
-#include <numeric>
 
 #include "soplex.h"
 
 #include "lpinterface/badge.hpp"
-#include "lpinterface/lp.hpp"
 #include "lpinterface/detail/util.hpp"
+#include "lpinterface/lp.hpp"
 
 namespace lpint {
 
@@ -20,11 +20,10 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
  public:
   LinearProgramHandleSoplex(detail::Badge<SoplexSolver>,
                             std::shared_ptr<soplex::SoPlex> soplex)
-      : soplex_(soplex) 
-   {
-     std::iota(permutation_.begin(), permutation_.end(), 0);
-     inverse_permutation_ = detail::inverse_permutation(permutation_);
-   }
+      : soplex_(soplex) {
+    std::iota(permutation_.begin(), permutation_.end(), 0);
+    inverse_permutation_ = detail::inverse_permutation(permutation_);
+  }
 
   std::vector<Variable> variables() const override;
 

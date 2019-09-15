@@ -20,18 +20,23 @@ std::vector<Variable> LinearProgramHandleGurobi::variables() const {
   std::vector<Variable> vars;
   for (std::size_t i = 0; i < num_vars_; i++) {
     double lb, ub;
-    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(), GRB_DBL_ATTR_LB, i, &lb);
-    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(), GRB_DBL_ATTR_UB, i, &ub);
+    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                    GRB_DBL_ATTR_LB, i, &lb);
+    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                    GRB_DBL_ATTR_UB, i, &ub);
     vars.emplace_back(lb, ub);
   }
   return vars;
 }
 
-void LinearProgramHandleGurobi::add_variables(const std::vector<Variable>& vars) {
+void LinearProgramHandleGurobi::add_variables(
+    const std::vector<Variable>& vars) {
   num_vars_ += vars.size();
   for (const auto& var : vars) {
-    detail::gurobi_function_checked(GRBaddvar, grb_model_.get(), 0, nullptr, nullptr, 0.0, var.lower(), var.upper(), GRB_CONTINUOUS, nullptr);
-  }  
+    detail::gurobi_function_checked(GRBaddvar, grb_model_.get(), 0, nullptr,
+                                    nullptr, 0.0, var.lower(), var.upper(),
+                                    GRB_CONTINUOUS, nullptr);
+  }
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 

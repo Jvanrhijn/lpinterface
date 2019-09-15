@@ -239,8 +239,7 @@ bool operator==(const Objective<T>& left, const Objective<T>& right) {
 class Variable {
  public:
   Variable() = default;
-  Variable(double lb, double ub)
-    : lower_bound_(lb), upper_bound_(ub) {}
+  Variable(double lb, double ub) : lower_bound_(lb), upper_bound_(ub) {}
 
   double upper() const { return upper_bound_; }
   double lower() const { return lower_bound_; }
@@ -255,7 +254,8 @@ inline bool operator==(const Variable& left, const Variable& right) {
 }
 
 inline std::ostream& operator<<(std::ostream& os, const Variable& var) {
-  os << "Variable { lower = " << var.lower() << ", upper = " << var.upper() << " }";
+  os << "Variable { lower = " << var.lower() << ", upper = " << var.upper()
+     << " }";
   return os;
 }
 

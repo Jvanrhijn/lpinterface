@@ -80,14 +80,14 @@ class ILinearProgramHandle {
 
   /**
    * @brief Retrieve the variables from the internal LP solver.
-   * 
+   *
    * @return std::vector<Variable> Vector containing internal LP variables.
    */
   virtual std::vector<Variable> variables() const = 0;
 
   /**
    * @brief Add variables to the LP.
-   * 
+   *
    * @param vars Vector of variables to add.
    */
   virtual void add_variables(const std::vector<Variable>& vars) = 0;

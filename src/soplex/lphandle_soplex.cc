@@ -14,7 +14,8 @@ std::vector<Variable> LinearProgramHandleSoplex::variables() const {
   return vars;
 }
 
-void LinearProgramHandleSoplex::add_variables(const std::vector<Variable>& vars) {
+void LinearProgramHandleSoplex::add_variables(
+    const std::vector<Variable>& vars) {
   DSVector dummy(0);
   for (const auto& var : vars) {
     soplex_->addColReal(LPCol(0, dummy, var.upper(), var.lower()));
