@@ -1,5 +1,4 @@
 #include "lpinterface/soplex/lphandle_soplex.hpp"
-#include "util/container.hpp"
 
 namespace lpint {
 
