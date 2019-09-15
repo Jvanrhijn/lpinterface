@@ -166,6 +166,7 @@ void test_add_retrieve_objective(std::size_t ncols) {
 template <class Solver>
 void test_raw_data_full_problem() {
   Solver solver(OptimizationType::Maximize);
+  solver.set_parameter(Param::Verbosity, 0);
 
   {
     std::vector<double> values = {1, 2, 3, 1, 1};

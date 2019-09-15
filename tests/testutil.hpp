@@ -26,7 +26,8 @@ inline void for_each_type() {
 
 template <class T, class Testable>
 void templated_prop(const std::string& description, Testable testable) {
-  rc::check(description + " (" + typeid(T).name() + ")", testable);
+  std::cerr << description + " (" + typeid(T).name() + ")" << std::endl;
+  rc::detail::checkGTest(testable);
 }
 
 } // namespace lpint
