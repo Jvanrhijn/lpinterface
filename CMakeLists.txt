@@ -40,9 +40,6 @@ include_directories(include/lpinterface/detail)
 # clang-format and clang-tidy
 include(cmake/clang-cxx-dev-tools.cmake)
 
-# source files
-#list(APPEND lpinterface_files src/lp_impl.cc)
-
 # Optional dependencies
 find_package(GUROBI)
 
