@@ -41,7 +41,7 @@ matrix:
       env: BUILD_TYPE=Release MATRIX_EVAL="CC=gcc-6 && CXX=g++-6" PAGES=YES COVERAGE=YES
 
     - os: linux
-    S  compiler: gcc
+      compiler: gcc
       addons:
         apt:
           sources:
