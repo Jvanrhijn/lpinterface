@@ -234,5 +234,28 @@ void test_add_retrieve_vars() {
   });
 }
 
+template <class Solver>
+void test_add_remove_vars() {
+  templated_prop<Solver>("Removing variables from LP preserves ordering", [=]() {
+    auto vars = *rc::gen::container<std::vector<Variable>>(rc::gen::arbitrary<Variable>())
+      .as("Variables");
+    Solver solver;
+    solver.linear_program().add_variables(vars);
+
+    auto nvars_to_remove = *rc::gen::inRange<std::size_t>(1, vars.size()+1).as("Num of vars to remove");
+
+    for (std::size_t i = 0; i < nvars_to_remove; i++) {
+      auto nvars_left = vars.size();
+      auto to_remove = *rc::gen::inRange<std::size_t>(0, nvars_left).as("Removal index");
+
+      solver.linear_program().remove_variable(to_remove);
+      
+      vars.erase(vars.begin() + static_cast<decltype(vars)::difference_type>(to_remove));
+    }
+
+    RC_ASSERT(vars == solver.linear_program().variables());
+  });
+}
+
 
 } // namespace lpint

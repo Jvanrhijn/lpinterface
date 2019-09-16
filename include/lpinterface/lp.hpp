@@ -113,6 +113,13 @@ class ILinearProgramHandle {
   virtual void remove_constraint(const std::size_t i) = 0;
 
   /**
+   * @brief Remove a variable from the LP.
+   *
+   * @param i Index of variable to remove.
+   */
+  virtual void remove_variable(const std::size_t i) = 0;
+
+  /**
    * @brief Retrieve the objective sense of this ILinearProgramHandle.
    * The Optimization type can be either OptimizationType::Minimize or
    * OptimizationType::Maximize, which correspond to the LP formulations
