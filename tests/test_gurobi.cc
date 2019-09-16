@@ -79,8 +79,12 @@ TEST(Gurobi, UnsolvedModelThrowsOnAccess) {
 TEST(Gurobi, SupportedParams) {
   test_supported_params<GurobiSolver>(
     {
-      Param::Threads, Param::TimeLimit, Param::Verbosity, Param::IterationLimit
-    }, {}
+      Param::Threads, Param::TimeLimit, Param::Verbosity, Param::IterationLimit,
+      Param::PrimalOrDual, Param::Cutoff
+    }, 
+    {
+      Param::Infinity, Param::ObjectiveLowerLimit, Param::ObjectiveUpperLimit,
+    }
   );
 }
 

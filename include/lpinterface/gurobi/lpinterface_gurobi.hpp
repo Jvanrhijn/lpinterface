@@ -47,13 +47,10 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
                 std::vector<double>&& ub) override;
   void add_variables(std::vector<double>&& objective_values) override;
 
-#if __cplusplus >= 201402L
-  constexpr
-#endif
-      static Status
-      convert_gurobi_status(int status);
+  static Status convert_gurobi_status(int status);
 
   static const std::unordered_map<Param, const char*> param_dict_;
+  static const std::unordered_map<int, Status> status_dict_;
 
   //! The gurobi environment object
   std::shared_ptr<GRBenv> gurobi_env_;
@@ -68,45 +65,9 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   Solution<double> solution_;
 };
 
-#if __cplusplus >= 201402L
-constexpr
-#endif
-    inline Status
-    GurobiSolver::convert_gurobi_status(int status) {
-  switch (status) {
-    case GRB_LOADED:
-      return Status::NoInformation;
-    case GRB_OPTIMAL:
-      return Status::Optimal;
-    case GRB_INFEASIBLE:
-      return Status::Infeasible;
-    case GRB_INF_OR_UNBD:
-      return Status::InfeasibleOrUnbounded;
-    case GRB_UNBOUNDED:
-      return Status::Unbounded;
-    case GRB_CUTOFF:
-      return Status::Cutoff;
-    case GRB_ITERATION_LIMIT:
-      return Status::IterationLimit;
-    case GRB_NODE_LIMIT:
-      return Status::NodeLimit;
-    case GRB_TIME_LIMIT:
-      return Status::TimeOut;
-    case GRB_SOLUTION_LIMIT:
-      return Status::SolutionLimit;
-    case GRB_INTERRUPTED:
-      return Status::Interrupted;
-    case GRB_NUMERIC:
-      return Status::NumericFailure;
-    case GRB_SUBOPTIMAL:
-      return Status::SuboptimalSolution;
-    case GRB_INPROGRESS:
-      return Status::InProgress;
-    case GRB_USER_OBJ_LIMIT:
-      return Status::UserObjectiveLimit;
-    default:
-      throw UnknownStatusException(status);
-  }
+inline Status GurobiSolver::convert_gurobi_status(int status) {
+  return status_dict_.count(status) ? status_dict_.at(status)
+                                    : throw UnknownStatusException(status);
 }
 
 }  // namespace lpint

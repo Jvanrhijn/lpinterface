@@ -133,6 +133,25 @@ const std::unordered_map<Param, const char*> GurobiSolver::param_dict_ = {
     {Param::Cutoff, GRB_DBL_PAR_CUTOFF},
     {Param::TimeLimit, GRB_DBL_PAR_TIMELIMIT},
     {Param::IterationLimit, GRB_DBL_PAR_ITERATIONLIMIT},
+    {Param::PrimalOrDual, GRB_INT_PAR_METHOD}
+};
+
+const std::unordered_map<int, Status> GurobiSolver::status_dict_ = {
+    {GRB_LOADED, Status::NoInformation},
+    {GRB_OPTIMAL, Status::Optimal},
+    {GRB_INFEASIBLE, Status::Infeasible},
+    {GRB_INF_OR_UNBD, Status::InfeasibleOrUnbounded},
+    {GRB_UNBOUNDED, Status::Unbounded},
+    {GRB_CUTOFF, Status::Cutoff},
+    {GRB_ITERATION_LIMIT, Status::IterationLimit},
+    {GRB_NODE_LIMIT, Status::NodeLimit},
+    {GRB_TIME_LIMIT, Status::TimeOut},
+    {GRB_SOLUTION_LIMIT, Status::SolutionLimit},
+    {GRB_INTERRUPTED, Status::Interrupted},
+    {GRB_NUMERIC, Status::NumericFailure},
+    {GRB_SUBOPTIMAL, Status::SuboptimalSolution},
+    {GRB_INPROGRESS, Status::InProgress},
+    {GRB_USER_OBJ_LIMIT, Status::UserObjectiveLimit},
 };
 
 }  // namespace lpint
