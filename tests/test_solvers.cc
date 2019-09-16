@@ -56,6 +56,7 @@ struct Variables {
   static void exec() {
     test_num_vars<Solver>();
     test_add_retrieve_vars<Solver>();
+    test_add_remove_vars<Solver>();
   }
 };
 
@@ -75,6 +76,6 @@ TEST(Solvers, FullProblem) {
   for_each_type<FullProblemTests, LPINT_SUPPORTED_SOLVERS>();
 }
 
-TEST(Solvers, AddVars) {
+TEST(Solvers, Vars) {
   for_each_type<Variables, LPINT_SUPPORTED_SOLVERS>();
 }

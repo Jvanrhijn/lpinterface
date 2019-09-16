@@ -23,6 +23,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
       : soplex_(soplex) {
     std::iota(permutation_.begin(), permutation_.end(), 0);
     inverse_permutation_ = detail::inverse_permutation(permutation_);
+    std::iota(permutation_vars_.begin(), permutation_vars_.end(), 0);
+    inverse_permutation_vars_ = detail::inverse_permutation(permutation_vars_);
   }
 
   std::vector<Variable> variables() const override;
@@ -33,6 +35,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
 
   void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
+
+  void remove_variable(const std::size_t i) override;
 
   void remove_constraint(std::size_t i) override;
 
@@ -57,6 +61,9 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
  private:
   std::vector<std::size_t> permutation_;
   std::vector<std::size_t> inverse_permutation_;
+
+  std::vector<std::size_t> permutation_vars_;
+  std::vector<std::size_t> inverse_permutation_vars_;
 
   std::shared_ptr<soplex::SoPlex> soplex_;
 

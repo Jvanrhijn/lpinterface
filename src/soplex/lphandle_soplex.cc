@@ -6,9 +6,8 @@ namespace lpint {
 using namespace soplex;
 
 std::vector<Variable> LinearProgramHandleSoplex::variables() const {
-  auto nvars = num_vars();
   std::vector<Variable> vars;
-  for (std::size_t i = 0; i < nvars; i++) {
+  for (const auto i : inverse_permutation_vars_) {
     vars.emplace_back(soplex_->lowerReal(i), soplex_->upperReal(i));
   }
   return vars;
@@ -19,12 +18,16 @@ void LinearProgramHandleSoplex::add_variables(
   DSVector dummy(0);
   for (const auto& var : vars) {
     soplex_->addColReal(LPCol(0, dummy, var.upper(), var.lower()));
+    permutation_vars_.push_back(permutation_vars_.size());
+    inverse_permutation_vars_.push_back(inverse_permutation_vars_.size());
   }
 }
 
 void LinearProgramHandleSoplex::add_variables(const std::size_t nvars) {
   for (std::size_t i = 0; i < nvars; i++) {
     soplex_->addColReal(LPCol());
+    permutation_vars_.push_back(permutation_vars_.size());
+    inverse_permutation_vars_.push_back(inverse_permutation_vars_.size());
   }
 }
 
@@ -43,6 +46,15 @@ void LinearProgramHandleSoplex::add_constraints(
     permutation_.push_back(permutation_.size());
     inverse_permutation_.push_back(inverse_permutation_.size());
   }
+}
+
+void LinearProgramHandleSoplex::remove_variable(const std::size_t i) {
+  soplex_->removeColReal(inverse_permutation_vars_[i]);
+  std::swap(permutation_vars_[inverse_permutation_vars_[i]],
+            permutation_vars_.back());
+  permutation_vars_.pop_back();
+  permutation_vars_ = detail::rankify(permutation_vars_);
+  inverse_permutation_vars_ = detail::inverse_permutation(permutation_vars_);
 }
 
 void LinearProgramHandleSoplex::remove_constraint(const std::size_t i) {
