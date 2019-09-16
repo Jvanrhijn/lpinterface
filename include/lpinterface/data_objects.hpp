@@ -236,16 +236,41 @@ bool operator==(const Objective<T>& left, const Objective<T>& right) {
   return left.values == right.values;
 }
 
+/**
+ * @brief Class representing a variable in the LP.
+ * 
+ * This class represents a variable in the linear program,
+ * referred to as a column by some solvers. In essense, it
+ * encodes an element of the vector x in
+ * \f[
+ *  max c^T x
+ *  l \leq x \leq u
+ * \f]
+ * 
+ * Concretely, it simply keeps track of the lower and upper bounds
+ * of the variable.
+ */
 class Variable {
  public:
+  /**
+   * @brief Construct a non-negative variable.
+   */
   Variable() = default;
+  /**
+   * @brief Construct a new Variable object.
+   * 
+   * @param lb Lower bound of this variable.
+   * @param ub Upper bound of this variable.
+   */
   Variable(double lb, double ub) : lower_bound_(lb), upper_bound_(ub) {}
 
+  //! Retrieve the upper bound of this variable.
   double upper() const { return upper_bound_; }
+  //! Retrieve the lower bound of this variable.
   double lower() const { return lower_bound_; }
 
  private:
-  double lower_bound_ = -LPINT_INFINITY;
+  double lower_bound_ = 0.0;
   double upper_bound_ = LPINT_INFINITY;
 };
 

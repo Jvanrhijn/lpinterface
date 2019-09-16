@@ -24,11 +24,7 @@ void LinearProgramHandleSoplex::add_variables(
 }
 
 void LinearProgramHandleSoplex::add_variables(const std::size_t nvars) {
-  for (std::size_t i = 0; i < nvars; i++) {
-    soplex_->addColReal(LPCol());
-    permutation_vars_.push_back(permutation_vars_.size());
-    inverse_permutation_vars_.push_back(inverse_permutation_vars_.size());
-  }
+  add_variables(std::vector<Variable>(nvars));
 }
 
 void LinearProgramHandleSoplex::add_constraints(

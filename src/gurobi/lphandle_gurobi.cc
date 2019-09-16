@@ -41,11 +41,7 @@ void LinearProgramHandleGurobi::add_variables(
 }
 
 void LinearProgramHandleGurobi::add_variables(const std::size_t num_vars) {
-  num_vars_ += num_vars;
-  detail::gurobi_function_checked(GRBaddvars, grb_model_.get(), num_vars, 0,
-                                  nullptr, nullptr, nullptr, nullptr, nullptr,
-                                  nullptr, nullptr, nullptr);
-  detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
+  add_variables(std::vector<Variable>(num_vars));
 }
 
 void LinearProgramHandleGurobi::add_constraints(
