@@ -12,14 +12,6 @@ Common interface for different linear programming and (mixed-)integer programmin
 This library uses a polymorphic interface in order to allow seamless interchange of
 linear programming solvers in application code.
 
-The library can be built using either C++11 or C++14. Newer versions provide some level
-of static optimization; simply change the relevant line in `CMakeLists.txt`:
-
-~~~cmake
-set(CMAKE_CXX_STANDARD 11) # change to 14, 17, ... if desired
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-~~~
-
 ## Supported solver backends
 
 * Gurobi
@@ -77,11 +69,7 @@ int main() {
   // NOTE: the objective function should be set before
   // adding constraints, so the solver knows how many variables
   // there are in the program.
-  lp.set_objective(
-    Objective<double>{
-      {1, 2, 3, 4}, {VarType::Real, VarType::Integer, VarType::Binary, VarType::Real}
-    }
-  );
+  lp.set_objective(Objective<double>{{1, 2, 3, 4}});
 
   // Add constraints; these represent the constraint equations.
   // These constraints are equivalent to the equations
@@ -95,11 +83,12 @@ int main() {
 
   // set solver parameters, see Param documentation for all
   // possible parameter settings.
-  wrapper.solver->set_parameter(Param::TimeLimit, 10.0);
-  wrapper.solver->set_parameter(Param::Verbosity, 0);
+  wrapper.solver->set_parameter(Param::TimeLimit, 10.0); // max 10 seconds duration
+  wrapper.solver->set_parameter(Param::Verbosity, 0); // don't output anything
+  wrapper.solver->set_parameter(Param::PrimalOrDual, 0); // use primal simplex
   
   // solve the LP.
-  const Status status = wrapper.solver->solve_primal();
+  const Status status = wrapper.solver->solve();
 
   // check the solution status
   switch (status) {
@@ -107,6 +96,9 @@ int main() {
       std::cout << "Optimal objective: " 
                 <<  wrapper.solver->get_solution().objective_value 
                 << std::endl;
+      const std::vector<double> primal = wrapper.solver->get_solution().primal;
+      const std::vector<double> dual = wrapper.solver->get_solution().dual;
+      // do something with the primal/dual solution
       break;
     case (Status::Unbounded):
       std::cerr << "LP was proven unbounded\n";
