@@ -38,6 +38,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   void add_constraints(
       const std::vector<Constraint<double>>& constraints) override;
 
+  void remove_variable(const std::size_t i) override;
+
   void remove_constraint(std::size_t i) override;
 
   OptimizationType optimization_type() const override;
