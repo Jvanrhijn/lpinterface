@@ -45,7 +45,7 @@ find_package(GUROBI)
 
 if (GUROBI_FOUND)
   message(STATUS "Found Gurobi: TRUE")
-  include_directories(${GUROBI_INCLUDE_DIRS})
+  include_directories(SYSTEM ${GUROBI_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gurobi)
   list(APPEND LIBS ${GUROBI_LIBRARY})
   list(APPEND lpinterface_files 
@@ -57,12 +57,23 @@ find_package(SOPLEX)
 
 if (SOPLEX_FOUND)
   message(STATUS "Found SoPlex: TRUE")
-  include_directories(${SOPLEX_INCLUDE_DIRS})
+  include_directories(SYSTEM ${SOPLEX_INCLUDE_DIRS})
   list(APPEND LIBS ${SOPLEX_LIBRARIES})
   list(APPEND lpinterface_files 
         src/soplex/lpinterface_soplex.cc
         src/soplex/lphandle_soplex.cc)
 endif(SOPLEX_FOUND)
+
+find_package(Cplex)
+
+if (CPLEX_FOUND)
+  message(STATUS "Found CPlex: TRUE")
+  include_directories(SYSTEM ${CPLEX_INCLUDE_DIRS})
+  list(APPEND LIBS ${CPLEX_LIBRARIES})
+  list(APPEND lpinterface_files
+        src/cplex/lpinterface_cplex.cc
+        src/cplex/lphandle_cplex.cc)
+endif(CPLEX_FOUND)
 
 # Gtest configuration
 if (LPINT_ENABLE_TESTING)
