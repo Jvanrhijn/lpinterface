@@ -7,14 +7,7 @@
 #include <memory>
 #include <unordered_map>
 
-// Magic tricks to have CPLEX behave well:
-#ifndef IL_STD
-#define IL_STD
-#endif
-#include <cstring>
-#include <ilcplex/ilocplex.h>
-ILOSTLBEGIN
-// End magic tricks
+#include <ilcplex/cplex.h>
 
 namespace lpint {
 
@@ -22,8 +15,12 @@ class CplexSolver;
 
 class LinearProgramHandleCplex : public ILinearProgramHandle {
 
+  using CplexEnv = std::remove_pointer<CPXENVptr>::type;
+  using CplexLp = std::remove_pointer<CPXLPptr>::type;
+
  public:
-  LinearProgramHandleCplex(detail::Badge<CplexSolver>, IloEnv env, std::shared_ptr<IloCplex> cplex);
+  LinearProgramHandleCplex(detail::Badge<CplexSolver>,
+                           std::shared_ptr<CplexEnv> env);
 
   std::size_t num_vars() const override;
 
@@ -57,10 +54,9 @@ class LinearProgramHandleCplex : public ILinearProgramHandle {
   Objective<double> objective() const override;
 
  private:
-  IloModel model_;
-  std::shared_ptr<IloCplex> cplex_;
 
-  IloNumVarArray vars_;
+  std::shared_ptr<CplexEnv> env_;
+  std::shared_ptr<CplexLp> lp_;
 
 };
 

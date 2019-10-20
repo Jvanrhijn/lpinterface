@@ -84,6 +84,24 @@ class GurobiException : public LpException {
   int code_;
 };
 
+//! Internal error occured in Gurobi.
+class CplexException : public LpException {
+ public:
+  explicit CplexException(int code)
+      : LpException("Error occured in Cplex, code " + std::to_string(code)),
+        code_(code) {}
+
+  CplexException(int code, const char *msg)
+      : LpException("Error occured in Cplex, code " + std::to_string(code) +
+                    " - " + std::string(msg)),
+        code_(code) {}
+
+  int code() const { return code_; }
+
+ private:
+  int code_;
+};
+
 //! Attempt to use a status code that is not supported.
 class UnknownStatusException : public LpException {
  public:

@@ -5,20 +5,15 @@
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/cplex/lphandle_cplex.hpp"
 
-// Magic tricks to have CPLEX behave well:
-#ifndef IL_STD
-#define IL_STD
-#endif
-#include <cstring>
-#include <ilcplex/ilocplex.h>
-ILOSTLBEGIN
-// End magic tricks
+#include <ilcplex/cplex.h>
 
 #include <memory> 
 
 namespace lpint {
 
 class CplexSolver : public LinearProgramSolver {
+  using CplexEnv = std::remove_pointer<CPXENVptr>::type;
+
  public:
 
   explicit CplexSolver(OptimizationType optim_type);
@@ -42,11 +37,13 @@ class CplexSolver : public LinearProgramSolver {
   const Solution<double>& get_solution() const override;
  
  private:
-  IloEnv env_;
-  std::shared_ptr<IloCplex> cplex_;
+  std::shared_ptr<CplexEnv> env_;
+
   LinearProgramHandleCplex lp_handle_;
 
-  static const std::unordered_map<Param, IloCplex::IntParam> int_param_dict_;
+  int status_ = 0;
+
+  static const std::unordered_map<Param, int> int_param_dict_;
 
 };
 
