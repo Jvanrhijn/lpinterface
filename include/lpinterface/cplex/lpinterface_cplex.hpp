@@ -46,6 +46,8 @@ class CplexSolver : public LinearProgramSolver {
   std::shared_ptr<IloCplex> cplex_;
   LinearProgramHandleCplex lp_handle_;
 
+  static const std::unordered_map<Param, IloCplex::IntParam> int_param_dict_;
+
 };
 
 

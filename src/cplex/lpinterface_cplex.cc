@@ -24,11 +24,14 @@ CplexSolver::CplexSolver()
 }
 
 bool CplexSolver::parameter_supported(const Param param) const {
-  throw NotImplementedError();
+  return int_param_dict_.count(param);
 }
 
 void CplexSolver::set_parameter(const Param param, const int value) {
-  throw NotImplementedError();
+  if (!parameter_supported(param)) throw UnsupportedParameterException();
+  const auto convert_param = 
+    static_cast<IloCplex::IntParam>(int_param_dict_.at(param));
+  cplex_->setParam(convert_param, value);
 }
 
 void CplexSolver::set_parameter(const Param param, const double value) {
@@ -54,5 +57,10 @@ ILinearProgramHandle& CplexSolver::linear_program() {
 const Solution<double>& CplexSolver::get_solution() const {
   throw NotImplementedError();
 }
+
+const std::unordered_map<Param, IloCplex::IntParam> CplexSolver::int_param_dict_ = 
+  {
+    {Param::Verbosity, IloCplex::IntParam::SimDisplay}
+};
 
 }

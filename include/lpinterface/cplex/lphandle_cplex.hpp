@@ -5,6 +5,7 @@
 #include "lpinterface/lp.hpp"
 
 #include <memory>
+#include <unordered_map>
 
 // Magic tricks to have CPLEX behave well:
 #ifndef IL_STD
