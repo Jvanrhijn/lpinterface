@@ -7,6 +7,7 @@ file(GLOB_RECURSE
      )
 
 find_package(GUROBI)
+find_package(CPLEX)
 
 # TODO: find a prettier way to do this
 # probably just make a function
@@ -21,6 +22,17 @@ if (NOT GUROBI_FOUND)
   list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_hpp}")
   list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_handle_hpp}")
   list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${gurobi_util_hpp}")
+endif()
+
+if (NOT )
+  get_filename_component(cplex_cc src/cplex/lpinterface_cplex.cc ABSOLUTE)
+  get_filename_component(cplex_handle_cc src/cplex/lphandle_cplex.cc ABSOLUTE)
+  get_filename_component(cplex_hpp include/lpinterface/cplex/lpinterface_cplex.hpp ABSOLUTE)
+  get_filename_component(cplex_handle_hpp include/lpinterface/cplex/lphandle_cplex.hpp ABSOLUTE)
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${cplex_cc}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${cplex_handle_cc}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${cplex_hpp}")
+  list(REMOVE_ITEM ALL_CXX_SOURCE_FILES "${cplex_handle_hpp}")
 endif()
 
 # Adding clang-format target if executable is found
@@ -44,8 +56,10 @@ if(CLANG_TIDY)
     ${ALL_CXX_SOURCE_FILES}
     -checks='cppcoreguidelines-*,-cppcoreguidelines-pro-type-const-cast,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg'
     -warnings-as-errors=*
-    --
-    -I../include/
-    -std=c++14
+    -p .
+    -extra-arg
+    '-I../include/'
+    -extra-arg
+    '-std=c++14'
     )
 endif()

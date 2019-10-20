@@ -224,7 +224,7 @@ script:
   - which ${CXX}
   - which ${CC}
   # generate build files
-  - cmake -H. -Bbuild -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1
+  - cmake -H. -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLPINT_ENABLE_TESTING=1 -DCOVERAGE=1 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCI=1
   # run clang-tidy
   - cd build 
   - make clang-tidy
