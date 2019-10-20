@@ -1,2 +1,70 @@
 #include "lpinterface/cplex/lphandle_cplex.hpp"
 
+namespace lpint {
+
+LinearProgramHandleCplex::LinearProgramHandleCplex(detail::Badge<LinearProgramHandleCplex>) {
+
+}
+
+std::size_t LinearProgramHandleCplex::num_vars() const {
+  throw NotImplementedError();
+}
+
+std::size_t LinearProgramHandleCplex::num_constraints() const {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::set_objective_sense(const OptimizationType objsense) {
+  throw NotImplementedError();
+}
+
+Variable LinearProgramHandleCplex::variable(std::size_t i) const {
+  throw NotImplementedError();
+}
+
+std::vector<Variable> LinearProgramHandleCplex::variables() const {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::add_variables(const std::vector<Variable>& vars) {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::add_variables(const std::size_t num_vars) {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::add_constraints(
+    const std::vector<Constraint<double>>& constraints) {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::remove_variable(const std::size_t i) {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::remove_constraint(std::size_t i) {
+  throw NotImplementedError();
+}
+
+OptimizationType LinearProgramHandleCplex::optimization_type() const {
+  throw NotImplementedError();
+}
+
+void LinearProgramHandleCplex::set_objective(const Objective<double>& objective) {
+  throw NotImplementedError();
+}
+
+Constraint<double> LinearProgramHandleCplex::constraint(std::size_t i) const {
+  throw NotImplementedError();
+}
+
+std::vector<Constraint<double>> LinearProgramHandleCplex::constraints() const {
+  throw NotImplementedError();
+}
+
+Objective<double> LinearProgramHandleCplex::objective() const {
+  throw NotImplementedError();
+}
+
+}

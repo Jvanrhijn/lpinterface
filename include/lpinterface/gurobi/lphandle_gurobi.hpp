@@ -48,7 +48,7 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   void set_objective(const Objective<double>& objective) override;
 
-  virtual Constraint<double> constraint(std::size_t i) const override;
+  Constraint<double> constraint(std::size_t i) const override;
 
   std::vector<Constraint<double>> constraints() const override;
 

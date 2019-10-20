@@ -4,6 +4,15 @@
 #include "lpinterface/badge.hpp"
 #include "lpinterface/lp.hpp"
 
+// Magic tricks to have CPLEX behave well:
+#ifndef IL_STD
+#define IL_STD
+#endif
+#include <cstring>
+#include <ilcplex/ilocplex.h>
+ILOSTLBEGIN
+// End magic tricks
+
 namespace lpint {
 
 class LinearProgramHandleCplex : public ILinearProgramHandle {
@@ -36,7 +45,7 @@ class LinearProgramHandleCplex : public ILinearProgramHandle {
 
   void set_objective(const Objective<double>& objective) override;
 
-  virtual Constraint<double> constraint(std::size_t i) const override;
+  Constraint<double> constraint(std::size_t i) const override;
 
   std::vector<Constraint<double>> constraints() const override;
 
