@@ -66,6 +66,13 @@ class UnsupportedVariableTypeException : public LpException {
       : LpException("Unsupported variable type for this backend") {}
 };
 
+//! Attempt to construct a variable with invalid bounds.
+class InvalidVariableBoundsException : public LpException {
+  public:
+   InvalidVariableBoundsException()
+      : LpException("Variable lower bound should be smaller than upper bound") {}
+};
+
 //! Internal error occured in Gurobi.
 class GurobiException : public LpException {
  public:

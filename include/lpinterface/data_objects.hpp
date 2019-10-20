@@ -262,7 +262,12 @@ class Variable {
    * @param lb Lower bound of this variable.
    * @param ub Upper bound of this variable.
    */
-  Variable(double lb, double ub) : lower_bound_(lb), upper_bound_(ub) {}
+  Variable(double lb, double ub) : lower_bound_(lb), upper_bound_(ub) 
+  {
+    if (lb > ub) {
+      throw InvalidVariableBoundsException();
+    }
+  }
 
   //! Retrieve the upper bound of this variable.
   double upper() const { return upper_bound_; }

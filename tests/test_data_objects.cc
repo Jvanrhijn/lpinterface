@@ -34,3 +34,12 @@ RC_GTEST_PROP(DataObjects, MatrixEntryThrowsIfDimensionsMismatched,
                         MismatchedDimensionsException);
   }
 }
+
+RC_GTEST_PROP(DataObjects, VariableThrowsIfLowerBoundGreaterThanUpperBound, 
+              (double x1, double x2)) {
+  double lb = std::max(x1, x2);
+  double ub = std::min(x1, x2);
+  if (lb != ub) {
+    RC_ASSERT_THROWS_AS(Variable(lb, ub), InvalidVariableBoundsException);
+  }
+}
