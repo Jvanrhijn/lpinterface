@@ -18,6 +18,7 @@ and usage will be the same for each solver.
 #include "lpinterface.hpp"
 #include "lpinterface/gurobi/lpinterface_gurobi.hpp"
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
+#include "lpinterface/cplex/lpinterface_cplex.hpp"
 
 #include "common.hpp"
 
@@ -58,6 +59,8 @@ int main(int argc, char* argv[]) {
       wrapper.insert_solver(std::make_shared<GurobiSolver>());
     } else if (argv[1] == std::string("soplex")) {
       wrapper.insert_solver(std::make_shared<SoplexSolver>());
+    } else if (argv[1] == std::string("cplex")) {
+      wrapper.insert_solver(std::make_shared<CplexSolver>());
     } else {
       std::cerr << "Unsupported solver backend." << std::endl;
     }

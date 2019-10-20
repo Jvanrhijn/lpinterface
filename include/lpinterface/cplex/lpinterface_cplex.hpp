@@ -21,7 +21,9 @@ namespace lpint {
 class CplexSolver : public LinearProgramSolver {
  public:
 
-  CplexSolver(OptimizationType optim_type);
+  explicit CplexSolver(OptimizationType optim_type);
+
+  CplexSolver();
 
   bool parameter_supported(const Param param) const override;
 

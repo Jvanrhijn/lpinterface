@@ -17,4 +17,40 @@ CplexSolver::CplexSolver(OptimizationType opt_type)
   
 }
 
+CplexSolver::CplexSolver() 
+    : env_(std::make_shared<IloEnv>()), model_(std::make_shared<IloModel>(*env_))
+{}
+
+bool CplexSolver::parameter_supported(const Param param) const {
+  throw NotImplementedError();
+}
+
+void CplexSolver::set_parameter(const Param param, const int value) {
+  throw NotImplementedError();
+}
+
+void CplexSolver::set_parameter(const Param param, const double value) {
+  throw NotImplementedError();
+}
+
+Status CplexSolver::solve() {
+  throw NotImplementedError();
+}
+
+Status CplexSolver::solution_status() const {
+  throw NotImplementedError();
+}
+
+const ILinearProgramHandle& CplexSolver::linear_program() const {
+  throw NotImplementedError();
+}
+
+ILinearProgramHandle& CplexSolver::linear_program() {
+  throw NotImplementedError();
+}
+
+const Solution<double>& CplexSolver::get_solution() const {
+  throw NotImplementedError();
+}
+
 }
