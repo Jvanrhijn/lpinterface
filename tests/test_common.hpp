@@ -164,34 +164,6 @@ void test_add_retrieve_objective(std::size_t ncols) {
 }
 
 template <class Solver>
-void test_raw_data_full_problem() {
-  Solver solver(OptimizationType::Maximize);
-  solver.set_parameter(Param::Verbosity, 0);
-
-  {
-    std::vector<double> values = {1, 2, 3, 1, 1};
-    std::vector<int> start_indices = {0, 3};
-    std::vector<int> col_indices = {0, 1, 2, 0, 1};
-    std::vector<double> lb = {-LPINT_INFINITY, 1.0};
-    std::vector<double> ub = {4.0, LPINT_INFINITY};
-    std::vector<double> objective = {1.0, 1.0, 2.0};
-
-    solver.add_variables(std::move(objective));
-    solver.add_rows(std::move(values), std::move(start_indices),
-                 std::move(col_indices), std::move(lb), std::move(ub));
-  }
-  // Solve the primal LP problem
-  auto status = solver.solve();
-  ASSERT_EQ(status, Status::Optimal);
-
-  //// check solution value
-  auto solution = solver.get_solution();
-
-  ASSERT_EQ(solution.primal, (std::vector<double>{4.0, 0.0, 0.0}));
-  ASSERT_EQ(solution.objective_value, 4.0);
-}
-
-template <class Solver>
 void test_supported_params(std::initializer_list<Param> supported, 
                            std::initializer_list<Param> not_supported) {
   Solver solver;

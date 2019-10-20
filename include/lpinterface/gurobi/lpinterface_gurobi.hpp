@@ -12,12 +12,11 @@
 #include "lpinterface/gurobi/lphandle_gurobi.hpp"
 #include "lpinterface/gurobi/lputil_gurobi.hpp"
 #include "lpinterface/lp.hpp"
-#include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
 
 namespace lpint {
 
-class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
+class GurobiSolver : public LinearProgramSolver {
  public:
   GurobiSolver();
   explicit GurobiSolver(OptimizationType optim_type);
@@ -37,15 +36,6 @@ class GurobiSolver : public LinearProgramSolver, public FlushRawData<double> {
   ILinearProgramHandle& linear_program() override;
 
   const Solution<double>& get_solution() const override;
-
-  void add_columns(std::vector<double>&& values,
-                   std::vector<int>&& start_indices,
-                   std::vector<int>&& row_indices, std::vector<double>&& lb,
-                   std::vector<double>&& ub) override;
-  void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
-                std::vector<int>&& col_indices, std::vector<double>&& lb,
-                std::vector<double>&& ub) override;
-  void add_variables(std::vector<double>&& objective_values) override;
 
   static Status convert_gurobi_status(int status);
 

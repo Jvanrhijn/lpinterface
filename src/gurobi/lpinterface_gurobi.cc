@@ -100,33 +100,6 @@ const Solution<double>& GurobiSolver::get_solution() const {
   }
 }
 
-void GurobiSolver::add_columns(
-    __attribute__((unused)) std::vector<double>&& values,
-    __attribute__((unused)) std::vector<int>&& start_indices,
-    __attribute__((unused)) std::vector<int>&& row_indices,
-    __attribute__((unused)) std::vector<double>&& lb,
-    __attribute__((unused)) std::vector<double>&& ub) {
-  throw UnsupportedFeatureException();
-}
-
-void GurobiSolver::add_rows(std::vector<double>&& values,
-                            std::vector<int>&& start_indices,
-                            std::vector<int>&& col_indices,
-                            std::vector<double>&& lb,
-                            std::vector<double>&& ub) {
-  detail::gurobi_function_checked(GRBaddrangeconstrs, gurobi_model_.get(),
-                                  start_indices.size(), values.size(),
-                                  start_indices.data(), col_indices.data(),
-                                  values.data(), lb.data(), ub.data(), nullptr);
-}
-void GurobiSolver::add_variables(std::vector<double>&& objective_values) {
-  detail::gurobi_function_checked(GRBaddvars, gurobi_model_.get(),
-                                  objective_values.size(), 0, nullptr, nullptr,
-                                  nullptr, objective_values.data(), nullptr,
-                                  nullptr, nullptr, nullptr);
-  lp_handle_.set_num_vars({}, objective_values.size());
-}
-
 const std::unordered_map<Param, const char*> GurobiSolver::param_dict_ = {
     {Param::Verbosity, GRB_INT_PAR_OUTPUTFLAG},
     {Param::Threads, GRB_INT_PAR_THREADS},

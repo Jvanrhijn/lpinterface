@@ -75,55 +75,6 @@ const Solution<double>& SoplexSolver::get_solution() const {
   return solution_;
 }
 
-void SoplexSolver::add_columns(
-    __attribute__((unused)) std::vector<double>&& values,
-    __attribute__((unused)) std::vector<int>&& start_indices,
-    __attribute__((unused)) std::vector<int>&& row_indices,
-    __attribute__((unused)) std::vector<double>&& lb,
-    __attribute__((unused)) std::vector<double>&& ub) {
-  throw UnsupportedFeatureException();
-}
-
-void SoplexSolver::add_rows(std::vector<double>&& values,
-                            std::vector<int>&& start_indices,
-                            std::vector<int>&& col_indices,
-                            std::vector<double>&& lb,
-                            std::vector<double>&& ub) {
-  std::size_t nrows = start_indices.size();
-  for (std::size_t i = 0; i < nrows - 1; i++) {
-    const int nnz = start_indices[i + 1] - start_indices[i];
-
-    std::vector<double> row(values.begin() + start_indices[i],
-                            values.begin() + start_indices[i + 1]);
-    std::vector<int> nonzero_indices(
-        col_indices.begin() + start_indices[i],
-        col_indices.begin() + start_indices[i + 1]);
-
-    DSVector ds_row(nnz);
-    ds_row.add(nnz, nonzero_indices.data(), row.data());
-    soplex_->addRowReal(LPRow(lb[i], ds_row, ub[i]));
-  }
-  // have to do the last one manually since the logic differs slightly
-  const int last_start_idx = start_indices[start_indices.size() - 1];
-  std::vector<double> row(values.begin() + last_start_idx, values.end());
-  std::vector<int> nonzero_indices(col_indices.begin() + last_start_idx,
-                                   col_indices.end());
-  int nnz = row.size();
-  DSVector ds_row(nnz);
-  ds_row.add(nnz, nonzero_indices.data(), row.data());
-  soplex_->addRowReal(LPRow(lb[start_indices.size() - 1], ds_row,
-                            ub[start_indices.size() - 1]));
-}
-
-void SoplexSolver::add_variables(std::vector<double>&& objective_values) {
-  // TODO: add columns all in one go with SoPlex::addColsReal()
-  DSVector dummycol(0);
-  const std::size_t nvars = objective_values.size();
-  for (std::size_t i = 0; i < nvars; i++) {
-    soplex_->addColReal(LPCol(objective_values[i], dummycol, infinity, 0.0));
-  }
-}
-
 const std::unordered_map<Param, int> SoplexSolver::param_dict_ = {
     {Param::ObjectiveSense, soplex::SoPlex::OBJSENSE},
     {Param::Verbosity, soplex::SoPlex::VERBOSITY},

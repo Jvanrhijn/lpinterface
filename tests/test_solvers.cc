@@ -47,7 +47,6 @@ struct FullProblemTests {
   template <class Solver>
   static void exec() {
     test_full_problem<Solver>();
-    test_raw_data_full_problem<Solver>();
   }
 };
 

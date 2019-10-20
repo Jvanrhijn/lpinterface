@@ -12,13 +12,12 @@
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"
 #include "lpinterface/lp.hpp"
-#include "lpinterface/lp_flush_raw_data.hpp"
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/soplex/lphandle_soplex.hpp"
 
 namespace lpint {
 
-class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
+class SoplexSolver : public LinearProgramSolver {
  public:
   SoplexSolver();
 
@@ -39,15 +38,6 @@ class SoplexSolver : public LinearProgramSolver, public FlushRawData<double> {
   ILinearProgramHandle& linear_program() override;
 
   const Solution<double>& get_solution() const override;
-
-  void add_columns(std::vector<double>&& values,
-                   std::vector<int>&& start_indices,
-                   std::vector<int>&& row_indices, std::vector<double>&& lb,
-                   std::vector<double>&& ub) override;
-  void add_rows(std::vector<double>&& values, std::vector<int>&& start_indices,
-                std::vector<int>&& col_indices, std::vector<double>&& lb,
-                std::vector<double>&& ub) override;
-  void add_variables(std::vector<double>&& objective_values) override;
 
   static Status translate_status(const soplex::SPxSolver::Status status);
 
