@@ -27,6 +27,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
     inverse_permutation_vars_ = detail::inverse_permutation(permutation_vars_);
   }
 
+  Variable variable(std::size_t i) const override;
+
   std::vector<Variable> variables() const override;
 
   void add_variables(const std::vector<Variable>& vars) override;
@@ -49,6 +51,8 @@ class LinearProgramHandleSoplex : public ILinearProgramHandle {
   void set_objective(const Objective<double>& objective) override;
 
   OptimizationType optimization_type() const override;
+
+  Constraint<double> constraint(std::size_t i) const override;
 
   std::vector<Constraint<double>> constraints() const override;
 

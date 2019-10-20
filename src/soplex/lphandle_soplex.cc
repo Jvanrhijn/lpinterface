@@ -5,11 +5,19 @@ namespace lpint {
 
 using namespace soplex;
 
+Variable LinearProgramHandleSoplex::variable(std::size_t i) const {
+  return Variable(soplex_->lowerReal(inverse_permutation_vars_[i]), 
+                  soplex_->upperReal(inverse_permutation_vars_[i]));
+}
+
 std::vector<Variable> LinearProgramHandleSoplex::variables() const {
   std::vector<Variable> vars;
-  for (const auto i : inverse_permutation_vars_) {
-    vars.emplace_back(soplex_->lowerReal(i), soplex_->upperReal(i));
+  for (std::size_t i = 0; i < num_vars(); i++) {
+    vars.emplace_back(variable(i));
   }
+  //for (const auto i : inverse_permutation_vars_) {
+  //  vars.emplace_back(soplex_->lowerReal(i), soplex_->upperReal(i));
+  //}
   return vars;
 }
 
@@ -101,23 +109,41 @@ std::size_t LinearProgramHandleSoplex::num_constraints() const {
   return static_cast<std::size_t>(soplex_->numRowsReal());
 }
 
+Constraint<double> LinearProgramHandleSoplex::constraint(std::size_t ii) const {
+  auto i = inverse_permutation_[ii];
+  auto lb = soplex_->lhsReal(i);
+  auto ub = soplex_->rhsReal(i);
+
+  Row<double> row;
+  const auto sv = soplex_->rowVectorRealInternal(i);
+  for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
+    const auto element = sv.element(j);
+    row.nonzero_indices().push_back(element.idx);
+    row.values().push_back(element.val);
+  }
+  return Constraint<double>(std::move(row), lb, ub);
+}
+
 std::vector<Constraint<double>> LinearProgramHandleSoplex::constraints() const {
   std::vector<Constraint<double>> constraints;
+  for (std::size_t i = 0; i < num_constraints(); i++) {
+    constraints.emplace_back(constraint(i));
+  }
   // to retrieve constraints in the proper order,
   // iterate over the inverse permutation indices.
-  for (auto i : inverse_permutation_) {
-    auto lb = soplex_->lhsReal(i);
-    auto ub = soplex_->rhsReal(i);
+  //for (auto i : inverse_permutation_) {
+  //  auto lb = soplex_->lhsReal(i);
+  //  auto ub = soplex_->rhsReal(i);
 
-    Row<double> row;
-    const auto sv = soplex_->rowVectorRealInternal(i);
-    for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
-      const auto element = sv.element(j);
-      row.nonzero_indices().push_back(element.idx);
-      row.values().push_back(element.val);
-    }
-    constraints.emplace_back(std::move(row), lb, ub);
-  }
+  //  Row<double> row;
+  //  const auto sv = soplex_->rowVectorRealInternal(i);
+  //  for (std::size_t j = 0; j < static_cast<std::size_t>(sv.size()); j++) {
+  //    const auto element = sv.element(j);
+  //    row.nonzero_indices().push_back(element.idx);
+  //    row.values().push_back(element.val);
+  //  }
+  //  constraints.emplace_back(std::move(row), lb, ub);
+  //}
   return constraints;
 }
 

@@ -16,15 +16,19 @@ void LinearProgramHandleGurobi::set_objective_sense(
   detail::gurobi_function_checked(GRBupdatemodel, grb_model_.get());
 }
 
+Variable LinearProgramHandleGurobi::variable(std::size_t i) const {
+  double lb, ub;
+  detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                  GRB_DBL_ATTR_LB, i, &lb);
+  detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
+                                  GRB_DBL_ATTR_UB, i, &ub);
+  return Variable(lb, ub);
+}
+
 std::vector<Variable> LinearProgramHandleGurobi::variables() const {
   std::vector<Variable> vars;
   for (std::size_t i = 0; i < num_vars_; i++) {
-    double lb, ub;
-    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
-                                    GRB_DBL_ATTR_LB, i, &lb);
-    detail::gurobi_function_checked(GRBgetdblattrelement, grb_model_.get(),
-                                    GRB_DBL_ATTR_UB, i, &ub);
-    vars.emplace_back(lb, ub);
+    vars.emplace_back(variable(i));
   }
   return vars;
 }
@@ -96,34 +100,28 @@ OptimizationType LinearProgramHandleGurobi::optimization_type() const {
                                : OptimizationType::Minimize;
 }
 
+Constraint<double> LinearProgramHandleGurobi::constraint(std::size_t i) const {
+  int nnz;
+  detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz,
+                                  nullptr, nullptr, nullptr, i, 1);
+  // allocate data
+  std::vector<double> values(static_cast<std::size_t>(nnz));
+  std::vector<int> indices(static_cast<std::size_t>(nnz));
+  int cbeg;
+  detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz,
+                                  &cbeg, indices.data(), values.data(), i, 1);
+
+  Row<double> row(std::vector<double>(values.begin(), values.end() - 1),
+                  std::vector<int>(indices.begin(), indices.end() - 1));
+  return Constraint<double>(std::move(row), lower_bounds[i], upper_bounds[i]);
+}
+
 std::vector<Constraint<double>> LinearProgramHandleGurobi::constraints() const {
   // retrieve number of constraints
-  int nconstr;
-  detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(),
-                                  GRB_INT_ATTR_NUMCONSTRS, &nconstr);
-  // retrieve number of variables in gurobi
-  int nvars;
-  detail::gurobi_function_checked(GRBgetintattr, grb_model_.get(),
-                                  GRB_INT_ATTR_NUMVARS, &nvars);
-
   std::vector<Constraint<double>> constraints;
-  for (std::size_t i = 0; i < nconstr; i++) {
-    // retrieve size of data
-    int nnz;
-    detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz,
-                                    nullptr, nullptr, nullptr, i, 1);
-    // allocate data
-    std::vector<double> values(static_cast<std::size_t>(nnz));
-    std::vector<int> indices(static_cast<std::size_t>(nnz));
-    int cbeg;
-    detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz,
-                                    &cbeg, indices.data(), values.data(), i, 1);
-
-    Row<double> row(std::vector<double>(values.begin(), values.end() - 1),
-                    std::vector<int>(indices.begin(), indices.end() - 1));
-    constraints.emplace_back(std::move(row), lower_bounds[i], upper_bounds[i]);
+  for (std::size_t i = 0; i < num_constraints_; i++) {
+    constraints.emplace_back(constraint(i));
   }
-
   return constraints;
 }
 

@@ -29,6 +29,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
 
   void set_objective_sense(const OptimizationType objsense) override;
 
+  Variable variable(std::size_t i) const override;
+
   std::vector<Variable> variables() const override;
 
   void add_variables(const std::vector<Variable>& vars) override;
@@ -45,6 +47,8 @@ class LinearProgramHandleGurobi : public ILinearProgramHandle {
   OptimizationType optimization_type() const override;
 
   void set_objective(const Objective<double>& objective) override;
+
+  virtual Constraint<double> constraint(std::size_t i) const override;
 
   std::vector<Constraint<double>> constraints() const override;
 

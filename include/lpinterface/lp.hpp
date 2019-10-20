@@ -79,6 +79,14 @@ class ILinearProgramHandle {
   virtual void set_objective_sense(const OptimizationType objsense) = 0;
 
   /**
+   * @brief Retrieve variable i from the internal LP solver.
+   *
+   * @param i Index of variable to retrieve.
+   * @return std::vector<Variable> Vector containing internal LP variables.
+   */
+  virtual Variable variable(std::size_t i) const = 0;
+
+  /**
    * @brief Retrieve the variables from the internal LP solver.
    *
    * @return std::vector<Variable> Vector containing internal LP variables.
@@ -132,6 +140,19 @@ class ILinearProgramHandle {
    * must be called before calling add_constraints().
    */
   virtual void set_objective(const Objective<double>& objective) = 0;
+
+  /**
+   * @brief Retrieve constraint i of the internal LP.
+   * This method requests a constraint from the internal LP
+   * solver backend, copies it, and returns it.
+   * Since constraints have to be copied from the backend,
+   * this can be an expensive operation, and so should be
+   * used sparingly.
+   *
+   * @param i Index of constraint.
+   * @return Constraint<double>
+   */
+  virtual Constraint<double> constraint(std::size_t i) const = 0;
 
   /**
    * @brief Retrieve the constraints of the internal LP.
