@@ -7,7 +7,7 @@ file(GLOB_RECURSE
      )
 
 find_package(GUROBI)
-find_package(CPLEX)
+find_package(Cplex)
 
 # TODO: find a prettier way to do this
 # probably just make a function

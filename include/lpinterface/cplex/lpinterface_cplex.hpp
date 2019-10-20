@@ -42,11 +42,10 @@ class CplexSolver : public LinearProgramSolver {
   const Solution<double>& get_solution() const override;
  
  private:
-  std::shared_ptr<IloEnv> env_;
-  std::shared_ptr<IloModel> model_;
+  IloEnv env_;
+  std::shared_ptr<IloCplex> cplex_;
+  LinearProgramHandleCplex lp_handle_;
 
-  
- 
 };
 
 

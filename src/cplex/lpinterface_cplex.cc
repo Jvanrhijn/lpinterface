@@ -11,15 +11,17 @@ ILOSTLBEGIN
 
 namespace lpint {
 
-CplexSolver::CplexSolver(OptimizationType opt_type)
-    : env_(std::make_shared<IloEnv>()), model_(std::make_shared<IloModel>(*env_))
+CplexSolver::CplexSolver(OptimizationType opt_type) 
+    : cplex_(std::make_shared<IloCplex>(env_)), lp_handle_({}, env_, cplex_)
 {
-  
+  lp_handle_.set_objective_sense(opt_type);
 }
 
 CplexSolver::CplexSolver() 
-    : env_(std::make_shared<IloEnv>()), model_(std::make_shared<IloModel>(*env_))
-{}
+    : cplex_(std::make_shared<IloCplex>(env_)), lp_handle_({}, env_, cplex_)
+{
+  lp_handle_.set_objective_sense(OptimizationType::Maximize);
+}
 
 bool CplexSolver::parameter_supported(const Param param) const {
   throw NotImplementedError();

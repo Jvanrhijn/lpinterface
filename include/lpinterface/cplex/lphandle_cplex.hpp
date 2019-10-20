@@ -4,6 +4,8 @@
 #include "lpinterface/badge.hpp"
 #include "lpinterface/lp.hpp"
 
+#include <memory>
+
 // Magic tricks to have CPLEX behave well:
 #ifndef IL_STD
 #define IL_STD
@@ -15,10 +17,12 @@ ILOSTLBEGIN
 
 namespace lpint {
 
+class CplexSolver;
+
 class LinearProgramHandleCplex : public ILinearProgramHandle {
 
  public:
-  LinearProgramHandleCplex(detail::Badge<LinearProgramHandleCplex>);
+  LinearProgramHandleCplex(detail::Badge<CplexSolver>, IloEnv env, std::shared_ptr<IloCplex> cplex);
 
   std::size_t num_vars() const override;
 
@@ -50,6 +54,12 @@ class LinearProgramHandleCplex : public ILinearProgramHandle {
   std::vector<Constraint<double>> constraints() const override;
 
   Objective<double> objective() const override;
+
+ private:
+  IloModel model_;
+  std::shared_ptr<IloCplex> cplex_;
+
+  IloNumVarArray vars_;
 
 };
 

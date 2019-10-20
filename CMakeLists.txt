@@ -88,7 +88,7 @@ endif()
 add_library(${TARGET} ${lpinterface_files})
 
 # link optional dependencies
-target_link_libraries(${TARGET} ${LIBS})
+target_link_libraries(${TARGET} ${LIBS} dl)
 
 # set library compiler options
 target_compile_options(${TARGET} PRIVATE ${CMAKE_CXX_FLAGS_LIB})
