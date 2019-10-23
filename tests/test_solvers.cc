@@ -8,6 +8,10 @@
 #include "lpinterface/soplex/lpinterface_soplex.hpp"
 #endif
 
+#ifdef LPINT_CPLEX_SUPPORTED
+#include "lpinterface/cplex/lpinterface_cplex.hpp"
+#endif
+
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 #include <rapidcheck.h>

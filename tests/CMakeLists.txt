@@ -47,8 +47,19 @@ if (SOPLEX_FOUND)
 
   list(APPEND SUPPORTED_SOLVERS SoplexSolver)
   add_definitions(-DLPINT_SOPLEX_SUPPORTED)
-  string(REPLACE ";" "," SUPPORTED_SOLVERS "${SUPPORTED_SOLVERS}")
 endif (SOPLEX_FOUND)
+
+find_package(Cplex)
+if (CPLEX_FOUND)
+  #list(APPEND test_files test_soplex.cc)
+  include_directories(${CPLEX_INCLUDE_DIRS})
+  list(APPEND LIBS ${CPLEX_LIBRARIES})
+
+  list(APPEND SUPPORTED_SOLVERS CplexSolver)
+  add_definitions(-DLPINT_CPLEX_SUPPORTED)
+endif (CPLEX_FOUND)
+
+string(REPLACE ";" "," SUPPORTED_SOLVERS "${SUPPORTED_SOLVERS}")
 
 add_definitions(-DLPINT_SUPPORTED_SOLVERS=${SUPPORTED_SOLVERS})
 
