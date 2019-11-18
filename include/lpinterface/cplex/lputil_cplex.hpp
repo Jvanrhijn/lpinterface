@@ -3,6 +3,12 @@
 
 #include <ilcplex/cplex.h>
 
+#include <memory>
+#include <type_traits>
+#include <utility>
+
+#include "lpinterface/errors.hpp"
+
 namespace lpint {
 
 using CplexEnv = std::remove_pointer<CPXENVptr>::type;
@@ -14,9 +20,9 @@ template <class F, class... Args>
 inline void cplex_function_checked(F f, CPXENVptr env, Args&&... args) {
   int status = f(env, std::forward<Args>(args)...);
   if (status) {
-    char msg[CPXMESSAGEBUFSIZE];
-    CPXgeterrorstring(env, status, msg);
-    throw CplexException(status, msg);
+    std::array<char, CPXMESSAGEBUFSIZE> msg = {0};
+    CPXgeterrorstring(env, status, msg.data());
+    throw CplexException(status, msg.data());
   }
 }
 

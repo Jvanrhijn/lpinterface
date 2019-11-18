@@ -13,9 +13,9 @@ LinearProgramHandleCplex::LinearProgramHandleCplex(
         CPXfreeprob(env_.get(), &lp);
       }) {}
 
-LinearProgramHandleCplex::~LinearProgramHandleCplex() {
-  // TODO: destruct pointers to problem data via free_and_null
-}
+// LinearProgramHandleCplex::~LinearProgramHandleCplex() {
+//  // TODO: destruct pointers to problem data via free_and_null
+//}
 
 std::size_t LinearProgramHandleCplex::num_vars() const {
   return static_cast<std::size_t>(CPXgetnumcols(env_.get(), lp_.get()));
