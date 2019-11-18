@@ -84,7 +84,9 @@ OptimizationType LinearProgramHandleCplex::optimization_type() const {
 }
 
 void LinearProgramHandleCplex::set_objective(const Objective<double>& objective) {
-  throw NotImplementedError();
+  for (std::size_t i = 0; i < objective.values.size(); i++) {
+    detail::cplex_function_checked(CPXchgcoef, env_.get(), lp_.get(), -1, i, objective.values[i]);
+  }
 }
 
 Constraint<double> LinearProgramHandleCplex::constraint(std::size_t i) const {
