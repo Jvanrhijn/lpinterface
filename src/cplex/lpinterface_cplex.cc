@@ -49,11 +49,11 @@ Status CplexSolver::solution_status() const {
 }
 
 const ILinearProgramHandle& CplexSolver::linear_program() const {
-  throw NotImplementedError();
+  return lp_handle_;
 }
 
 ILinearProgramHandle& CplexSolver::linear_program() {
-  throw NotImplementedError();
+  return lp_handle_;
 }
 
 const Solution<double>& CplexSolver::get_solution() const {

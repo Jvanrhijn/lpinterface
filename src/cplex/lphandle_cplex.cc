@@ -16,7 +16,7 @@ LinearProgramHandleCplex::~LinearProgramHandleCplex() {
 }
 
 std::size_t LinearProgramHandleCplex::num_vars() const {
-  throw NotImplementedError();
+  return static_cast<std::size_t>(CPXgetnumcols(env_.get(), lp_.get()));
 }
 
 std::size_t LinearProgramHandleCplex::num_constraints() const {
@@ -39,7 +39,16 @@ std::vector<Variable> LinearProgramHandleCplex::variables() const {
 }
 
 void LinearProgramHandleCplex::add_variables(const std::vector<Variable>& vars) {
-  throw NotImplementedError();
+  std::vector<double> lbs(vars.size());
+  std::vector<double> ubs(vars.size());
+
+  std::transform(vars.begin(), vars.end(), lbs.begin(), 
+    [](const Variable& var) { return var.lower(); });
+  std::transform(vars.begin(), vars.end(), ubs.begin(), 
+    [](const Variable& var) { return var.upper(); });
+
+  detail::cplex_function_checked(CPXaddcols, env_.get(), lp_.get(), vars.size(), 0, nullptr, nullptr, nullptr, nullptr,
+    lbs.data(), ubs.data(), nullptr);
 }
 
 void LinearProgramHandleCplex::add_variables(const std::size_t num_vars) {
