@@ -21,6 +21,8 @@ class LinearProgramHandleCplex : public ILinearProgramHandle {
  public:
   LinearProgramHandleCplex(detail::Badge<CplexSolver>,
                            std::shared_ptr<CplexEnv> env);
+  
+  ~LinearProgramHandleCplex();
 
   std::size_t num_vars() const override;
 
