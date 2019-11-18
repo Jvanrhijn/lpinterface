@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "gurobi_c.h"
-
 #include "lpinterface/badge.hpp"
 #include "lpinterface/gurobi/lputil_gurobi.hpp"
 #include "lpinterface/lp.hpp"

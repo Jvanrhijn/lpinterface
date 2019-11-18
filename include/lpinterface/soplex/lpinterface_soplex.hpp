@@ -5,8 +5,6 @@
 #include <memory>
 #include <unordered_map>
 
-#include "soplex.h"
-
 #include "lpinterface/badge.hpp"
 #include "lpinterface/common.hpp"
 #include "lpinterface/data_objects.hpp"
@@ -14,6 +12,7 @@
 #include "lpinterface/lp.hpp"
 #include "lpinterface/lpinterface.hpp"
 #include "lpinterface/soplex/lphandle_soplex.hpp"
+#include "soplex.h"
 
 namespace lpint {
 

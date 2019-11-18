@@ -29,9 +29,8 @@ inline CplexLp* create_cplex_problem(std::shared_ptr<CplexEnv> env) {
   return lp;
 }
 
+}  // namespace detail
 
-}
+}  // namespace lpint
 
-}
-
-#endif // LPINTERFACE_LPUTIL_CPLEX_H
+#endif  // LPINTERFACE_LPUTIL_CPLEX_H

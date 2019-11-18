@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include <iostream>
 
 namespace lpint {
@@ -106,8 +107,7 @@ const std::unordered_map<Param, const char*> GurobiSolver::param_dict_ = {
     {Param::Cutoff, GRB_DBL_PAR_CUTOFF},
     {Param::TimeLimit, GRB_DBL_PAR_TIMELIMIT},
     {Param::IterationLimit, GRB_DBL_PAR_ITERATIONLIMIT},
-    {Param::PrimalOrDual, GRB_INT_PAR_METHOD}
-};
+    {Param::PrimalOrDual, GRB_INT_PAR_METHOD}};
 
 const std::unordered_map<int, Status> GurobiSolver::status_dict_ = {
     {GRB_LOADED, Status::NoInformation},

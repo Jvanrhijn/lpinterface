@@ -108,8 +108,8 @@ Constraint<double> LinearProgramHandleGurobi::constraint(std::size_t i) const {
   std::vector<double> values(static_cast<std::size_t>(nnz));
   std::vector<int> indices(static_cast<std::size_t>(nnz));
   int cbeg;
-  detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz,
-                                  &cbeg, indices.data(), values.data(), i, 1);
+  detail::gurobi_function_checked(GRBgetconstrs, grb_model_.get(), &nnz, &cbeg,
+                                  indices.data(), values.data(), i, 1);
 
   Row<double> row(std::vector<double>(values.begin(), values.end() - 1),
                   std::vector<int>(indices.begin(), indices.end() - 1));

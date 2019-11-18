@@ -5,7 +5,6 @@
 #include <unordered_map>
 
 #include "gurobi_c.h"
-
 #include "lpinterface/common.hpp"
 #include "lpinterface/data_objects.hpp"
 #include "lpinterface/errors.hpp"

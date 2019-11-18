@@ -1,27 +1,26 @@
 #ifndef LPINTERFACE_LPHANDLE_CPLEX_H
 #define LPINTERFACE_LPHANDLE_CPLEX_H
 
-#include "lpinterface/badge.hpp"
-#include "lpinterface/lp.hpp"
+#include <ilcplex/cplex.h>
 
 #include <memory>
 #include <unordered_map>
 
-#include <ilcplex/cplex.h>
+#include "lpinterface/badge.hpp"
+#include "lpinterface/lp.hpp"
 
 namespace lpint {
 
 class CplexSolver;
 
 class LinearProgramHandleCplex : public ILinearProgramHandle {
-
   using CplexEnv = std::remove_pointer<CPXENVptr>::type;
   using CplexLp = std::remove_pointer<CPXLPptr>::type;
 
  public:
   LinearProgramHandleCplex(detail::Badge<CplexSolver>,
                            std::shared_ptr<CplexEnv> env);
-  
+
   ~LinearProgramHandleCplex();
 
   std::size_t num_vars() const override;
@@ -56,12 +55,10 @@ class LinearProgramHandleCplex : public ILinearProgramHandle {
   Objective<double> objective() const override;
 
  private:
-
   std::shared_ptr<CplexEnv> env_;
   std::shared_ptr<CplexLp> lp_;
-
 };
 
-} // lpint
+}  // namespace lpint
 
-#endif // LPINTERFACE_LPHANDLE_CPLEX_H
+#endif  // LPINTERFACE_LPHANDLE_CPLEX_H

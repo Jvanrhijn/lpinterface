@@ -2,6 +2,7 @@
 #define LPINTERCACE_COMMON_H
 
 #include <limits>
+
 #include "errors.hpp"
 
 namespace lpint {

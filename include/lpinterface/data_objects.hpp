@@ -238,7 +238,7 @@ bool operator==(const Objective<T>& left, const Objective<T>& right) {
 
 /**
  * @brief Class representing a variable in the LP.
- * 
+ *
  * This class represents a variable in the linear program,
  * referred to as a column by some solvers. In essense, it
  * encodes an element of the vector x in
@@ -246,7 +246,7 @@ bool operator==(const Objective<T>& left, const Objective<T>& right) {
  *  max c^T x
  *  l \leq x \leq u
  * \f]
- * 
+ *
  * Concretely, it simply keeps track of the lower and upper bounds
  * of the variable.
  */
@@ -258,7 +258,7 @@ class Variable {
   Variable() = default;
   /**
    * @brief Construct a new Variable object.
-   * 
+   *
    * @param lb Lower bound of this variable.
    * @param ub Upper bound of this variable.
    */

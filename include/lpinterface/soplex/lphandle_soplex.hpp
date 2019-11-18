@@ -6,11 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "soplex.h"
-
 #include "lpinterface/badge.hpp"
 #include "lpinterface/detail/util.hpp"
 #include "lpinterface/lp.hpp"
+#include "soplex.h"
 
 namespace lpint {
 

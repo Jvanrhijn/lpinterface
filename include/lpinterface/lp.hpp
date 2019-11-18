@@ -5,10 +5,9 @@
 #include <iostream>
 #include <vector>
 
+#include "common.hpp"
 #include "data_objects.hpp"
 #include "errors.hpp"
-
-#include "common.hpp"
 
 /** \namespace lpint */
 namespace lpint {
