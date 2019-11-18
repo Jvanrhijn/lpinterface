@@ -1,5 +1,6 @@
 #include "lpinterface/cplex/lphandle_cplex.hpp"
 #include "lpinterface/cplex/lputil_cplex.hpp"
+#include <numeric>
 
 namespace lpint {
 
@@ -31,11 +32,21 @@ void LinearProgramHandleCplex::set_objective_sense(const OptimizationType objsen
 }
 
 Variable LinearProgramHandleCplex::variable(std::size_t i) const {
-  throw NotImplementedError();
+  double lb;
+  double ub;
+
+  detail::cplex_function_checked(CPXgetlb, env_.get(), lp_.get(), &lb, i, i);
+  detail::cplex_function_checked(CPXgetub, env_.get(), lp_.get(), &ub, i, i);
+
+  return Variable(lb, ub);
 }
 
 std::vector<Variable> LinearProgramHandleCplex::variables() const {
-  throw NotImplementedError();
+  std::vector<Variable> result;
+  for (std::size_t i = 0; i < num_vars(); i++) {
+    result.emplace_back(variable(i));
+  }
+  return result;
 }
 
 void LinearProgramHandleCplex::add_variables(const std::vector<Variable>& vars) {
@@ -61,7 +72,7 @@ void LinearProgramHandleCplex::add_constraints(
 }
 
 void LinearProgramHandleCplex::remove_variable(const std::size_t i) {
-  throw NotImplementedError();
+  detail::cplex_function_checked(CPXdelcols, env_.get(), lp_.get(), i, i);
 }
 
 void LinearProgramHandleCplex::remove_constraint(std::size_t i) {
